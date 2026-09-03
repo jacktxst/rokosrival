@@ -7,7 +7,7 @@ We are creatives and environmentalists, so we don't really think generative AI i
 If you need help setting anything up, using GitHub, understanding the guidelines, etc.,
 please let me know, I will be happy to help and clarify for everyone else.
 
-- Jack
+\- Jack
 
 # GitHub Usage Guidelines
 
