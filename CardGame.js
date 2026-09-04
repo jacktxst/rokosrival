@@ -7,14 +7,22 @@
 	[CardPlayer] <-> [CardGame] <-> [CardPlayer]
 
 */
-class CardGame {
+export class CardGame {
 
-	constructor() {
+	constructor(player1, player2) {
 
-		this.player1
-		this.player2
-		this.currentPlayer = this.player1
+		this.player1 = player1
+		this.player2 = player2
+		this.currentPlayer = player1
+		player1.game = this
+		player2.game = this
 
+
+
+	}
+
+	beginGame() {
+		this.currentPlayer.doTurn()
 	}
 
 	submitTurn() {
@@ -28,5 +36,7 @@ class CardGame {
 		this.currentPlayer.doTurn()
 
 	}
+
+	
 
 }

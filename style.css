@@ -1,0 +1,38 @@
+.rr-opp-battle-stat {
+	text-align: right;
+}
+
+
+
+.rr-hand-container {
+	height: 40vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.rr-opp-hand {
+
+}
+
+.rr-user-hand {
+
+}
+
+.rr-card-backside {
+	background-color: lightgray;
+	width: 100px;
+	border-radius: 15px;
+	height: 180px;
+	margin: 15px;
+	display: inline-block;
+}
+
+.rr-card-frontside {
+	background-color: lightgray;
+	width: 100px;
+	border-radius: 15px;
+	height: 180px;
+	margin: 15px;
+	display: inline-block;
+}
