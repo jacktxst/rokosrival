@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Home</title>
+    <title>JSDoc: Source: CardDeck.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,32 +17,45 @@
 
 <div id="main">
 
-    <h1 class="page-title">Home</h1>
+    <h1 class="page-title">Source: CardDeck.js</h1>
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+/**
+ 	represents a deck of cards.
+ */
+export class CardDeck {
 
+	constructor(cards){
+		this.original = Array.from(cards)
+		this.cards = Array.from(cards)
+	}
 
-    <h3> </h3>
+	/** unimplemented, return a list of n cards off the top of the deck, and remove them from this.cards
+		*/
+	drawCards(n) {
+		
+	}
 
+	/** unimplemented,  thoroughly shuffle this.cards */
+	shuffleCards() {
+		
+	}
 
+	/** return a deck to its original order. */
+	unshuffleCards() {
+		this.cards = Array.from(this.original)
+	}
 
-
-
-
-
-
-
-
-    
-
-
-
-
-
+}</code></pre>
+        </article>
+    </section>
 
 
 

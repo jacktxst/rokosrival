@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Home</title>
+    <title>JSDoc: Source: CardGame.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,32 +17,59 @@
 
 <div id="main">
 
-    <h1 class="page-title">Home</h1>
+    <h1 class="page-title">Source: CardGame.js</h1>
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+
+	Represents a single match between two CardPlayers
+	The opponents interact indirectly through this CardGame class, which they will share a reference to
+	The CardGame also stores references to each of its Players
+
+	[CardPlayer] &lt;-> [CardGame] &lt;-> [CardPlayer]
+
+*/
+export class CardGame {
+
+	constructor(player1, player2) {
+
+		this.player1 = player1
+		this.player2 = player2
+		this.currentPlayer = player1
+		player1.game = this
+		player2.game = this
 
 
-    <h3> </h3>
 
+	}
 
+	beginGame() {
+		this.currentPlayer.doTurn()
+	}
 
+	submitTurn() {
 
+		if(this.currentPlayer === this.player1) {
+			this.currentPlayer = this.player2
+		} else {
+			this.currentPlayer = this.player1
+		}
 
+		this.currentPlayer.doTurn()
 
+	}
 
+	
 
-
-
-    
-
-
-
-
-
+}</code></pre>
+        </article>
+    </section>
 
 
 
