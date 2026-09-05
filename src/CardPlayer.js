@@ -25,7 +25,7 @@ export class CardPlayer {
 		this.deck.unshuffleCards()
 		this.deck.shuffleCards()
 		this.hand = this.deck.drawCards(5)
-
+		this.opponent = (this === this.game.player1) ? this.game.player2 : this.game.player1
 	}
 
 	/**
@@ -33,8 +33,8 @@ export class CardPlayer {
 		renders the board from this player's perspective, and is responsible for setting up event listeners on the cards themselves
 
 	*/
-	renderBoard(){
-		const opponent = (this === this.game.player1) ? this.game.player2 : this.game.player1
+	renderBoard(){ 
+		const opponent = this.opponent
 		document.getElementById("board").innerHTML = `
 			<div class="rr-opp-battle-stat">
 				${opponent.name} ${opponent.health} health
@@ -62,8 +62,8 @@ export class CardPlayer {
 							string += `
 								<div class="rr-card-frontside">
 
-									${this.hand[i].name}
-
+									<h3>${this.hand[i].name}</h3>
+									${this.hand[i].note}
 								</div>
 							`
 						}
@@ -77,12 +77,14 @@ export class CardPlayer {
 			</div>	
 		`
 
-		const userCardDivs = document.getElementById("rr-user-hand").children
-
+		let userCardDivs = document.getElementById("rr-user-hand").children
+		if (!userCardDivs) return
 		// turn the card black on click, just for testing interaction
-		for(let i in userCardDivs) {
+		for(let i=0;i<userCardDivs.length;i++) {
 			userCardDivs[i].addEventListener("click",(e)=>{
-				userCardDivs[i].style.backgroundColor = "black"
+				this.played_card = i
+				this.hand[i].onPlay.bind(this)()
+				this.renderBoard()
 			})
 		}
 

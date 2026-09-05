@@ -8,31 +8,45 @@ export class CardLibrary {
 		this.cards = [
 
 			new CardBase({
-				name : "Card A"
+				name : "Card A",
+				note : "10 damage to your opponent",
+				onPlay() {
+					this.opponent.health -= 10
+				}
 			}),
 
 			new CardBase({
-				name : "Card B"
+				name : "Card B",
+				note : "absorb 10 hp of your opponents health",
+				onPlay() {
+					this.opponent.health -= 10
+					this.health += 10
+				}
 			}),
 
 			new CardBase({
-				name : "Card C"
+				name : "Card C",
+				note : "increase your defense in the next round"
 			}),
 
 			new CardBase({
-				name : "Card D"
+				name : "Card D",
+				note : "this card does nothing"
 			}),
 
 			new CardBase({
-				name : "Card E"
+				name : "Card E",
+				note : "this card does nothing"
 			}),
 
 			new CardBase({
-				name : "Card F"
+				name : "Card F",
+				note : "this card does nothing"
 			}),
 
 			new CardBase({
-				name : "Card G"
+				name : "Card G",
+				note : "this card does nothing"
 			})
 		]
 

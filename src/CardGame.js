@@ -10,15 +10,11 @@
 export class CardGame {
 
 	constructor(player1, player2) {
-
 		this.player1 = player1
 		this.player2 = player2
 		this.currentPlayer = player1
 		player1.game = this
 		player2.game = this
-
-
-
 	}
 
 	/** */
@@ -27,20 +23,5 @@ export class CardGame {
 		this.player2.beginGame()
 		this.currentPlayer.doTurn()
 	}
-
-	/** im pretty sure this architecture will lead to an eventual stack overflow */
-	submitTurn() {
-
-		if(this.currentPlayer === this.player1) {
-			this.currentPlayer = this.player2
-		} else {
-			this.currentPlayer = this.player1
-		}
-
-		this.currentPlayer.doTurn()
-
-	}
-
-	
 
 }

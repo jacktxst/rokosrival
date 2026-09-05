@@ -10,8 +10,7 @@ export class CardDeck {
 		this.cards = Array.from(cards||[])
 	}
 
-	/** unimplemented, return a list of n cards off the top of the deck, and remove them from this.cards
-		*/
+	/** return a list of n cards and remove them from the deck */
 	drawCards(n) {
 		let list = []
 		for(let i=0;i<n;i++) {
@@ -20,12 +19,14 @@ export class CardDeck {
 		return list
 	}
 
+	/** place cards on top of a deck */
 	placeCards(cards) {
-
+		this.cards = [...this.cards, ...cards]
 	}
 
+	/** place cards underneath a deck */
 	burnCards(cards) {
-
+		this.cards = [...cards, ...this.cards]
 	}
 
 	/** shuffle the cards */
