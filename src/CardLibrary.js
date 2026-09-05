@@ -1,3 +1,4 @@
+import { CardBase } from './CardBase.js'
 
 
 export class CardLibrary {
