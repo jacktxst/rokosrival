@@ -21,10 +21,14 @@ export class CardGame {
 
 	}
 
+	/** */
 	beginGame() {
+		this.player1.beginGame()
+		this.player2.beginGame()
 		this.currentPlayer.doTurn()
 	}
 
+	/** im pretty sure this architecture will lead to an eventual stack overflow */
 	submitTurn() {
 
 		if(this.currentPlayer === this.player1) {

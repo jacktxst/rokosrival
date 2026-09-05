@@ -1,4 +1,5 @@
 
-class CardLibrary {
+
+export class CardLibrary {
 	
 }
