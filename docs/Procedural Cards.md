@@ -12,21 +12,21 @@ let cardLibrary = new CardLibrary(seed)
 and the `constructor` of `CardLibrary` should create an array of `CardBase` objects.  
 
 here's how it works. we will hand write `onPlay` functions for each general kind of card behavior.
-These `onPlay` functions will be called whenever 
+These `onPlay` functions will be called whenever the player clicks on a card or an AI decides to play a card.
 
 
 However, there are some caveats here.
 
 
 The `onPlay` functions are probably defined inside `CardLibrary` or some other context which
-is separate from the player playing the card, as well as any procedurally generated data that is attached to the card.
+is separate from the player playing the card.
 
 In order to ensure that the `onPlay` function can access the current player, current game, and any procedurally generated data, the caller of `onPlay`, the actual `CardPlayer`, attaches itself to the `onPlay` function as such: 
 ```js
 this.played_card = i
 this.hand[i].onPlay.bind(this)()
 ```
-i is the hand index of the played card.
+`i` is the hand index of the played card.
 
 calling `.bind(this)` makes it so you can refer to the `CardPlayer` as `this` inside of `onPlay`
 
