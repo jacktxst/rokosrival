@@ -1,31 +1,62 @@
-.rr-opp-battle-stat {
-	text-align: right;
+body, html {
+	background-image: url("./textures/Brick_02.png");
+	padding: 0px;
+	margin: 0px;
 }
 
 
+
+.rr-opp-battle-stat {
+	text-align: right;
+	background-color: #ffffffaa;
+	font-size: 48px;
+}
+
+.rr-user-battle-stat {
+	text-align: left;
+	background-color: #ffffffaa;
+	font-size: 48px;
+}
+
+#board {
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
 
 .rr-hand-container {
 	height: 40vh;
 	display: flex;
 	justify-content: center;
+	flex-direction: row;
 	align-items: center;
 }
 
-
-.rr-card-backside {
-	background-color: lightgray;
+.rr-card {
+	background-image: url("./textures/paper.jpg");
+	background-repeat: repeat;
+	background-size: 300px;
+	padding: 15px;
 	width: 100px;
 	border-radius: 15px;
 	height: 180px;
 	margin: 15px;
-	display: inline-block;
+	font-family: fantasy;
+}
+
+.rr-card-backside {
+	
 }
 
 .rr-card-frontside {
-	background-color: lightgray;
-	width: 100px;
-	border-radius: 15px;
-	height: 180px;
-	margin: 15px;
-	display: inline-block;
+
+	transition: transform 0.3s ease;
+
+
+}
+
+.rr-card-frontside:hover {
+	
+  transform: translateY(-3px); /* Lifts the button slightly */
 }

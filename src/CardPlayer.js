@@ -37,16 +37,16 @@ export class CardPlayer {
 		const opponent = this.opponent
 		document.getElementById("board").innerHTML = `
 			<div class="rr-opp-battle-stat">
-				${opponent.name} ${opponent.health} health
+				${opponent.name}: ${opponent.health} HP
 			</div>
 
 			<div class="rr-hand-container">
-				<div class="rr-opp-hand">
+				<div class="rr-hand-container" id="rr-opp-hand">
 					${(()=>{
 						let string = ""
 						for (let i=0;i<5;i++) {
 							string += `
-								<div class="rr-card-backside"></div>
+								<div class="rr-card rr-card-backside"></div>
 							`
 						}
 						return string
@@ -55,12 +55,13 @@ export class CardPlayer {
 			</div>
 			
 			<div class="rr-hand-container">
-				<div id="rr-user-hand">
+				<div class="rr-hand-container" id="rr-user-hand">
 					${(()=>{
 						let string = ""
-						for (let i=0;i<5;i++) {
+						console.log(this.hand.length)
+						for (let i=0;i<this.hand.length;i++) {
 							string += `
-								<div class="rr-card-frontside">
+								<div class="rr-card rr-card-frontside">
 
 									<h3>${this.hand[i].name}</h3>
 									${this.hand[i].note}
@@ -73,7 +74,7 @@ export class CardPlayer {
 			</div>
 						
 			<div class="rr-user-battle-stat">
-				${this.name} ${this.health} health
+				${this.name}: ${this.health} HP
 			</div>	
 		`
 
@@ -83,7 +84,15 @@ export class CardPlayer {
 		for(let i=0;i<userCardDivs.length;i++) {
 			userCardDivs[i].addEventListener("click",(e)=>{
 				this.played_card = i
-				this.hand[i].onPlay.bind(this)()
+				this.hand[i].onPlay?.bind(this)()
+				
+				// discard and draw
+
+				this.hand.splice(i, 1)
+				this.hand = [...this.hand, ...this.deck.drawCards(1)]
+
+				// update display
+
 				this.renderBoard()
 			})
 		}

@@ -20,8 +20,8 @@ function p2Turn(){
 
 }
 
-let p1 = new CardPlayer({turnCallback:p1Turn, deck:new CardDeck(cardLibrary.cards)})
-let p2 = new CardPlayer({turnCallback:p2Turn, deck:new CardDeck(cardLibrary.cards)})
+let p1 = new CardPlayer({turnCallback:p1Turn, deck:new CardDeck(cardLibrary.cards), name: "You"})
+let p2 = new CardPlayer({turnCallback:p2Turn, deck:new CardDeck(cardLibrary.cards), name: "CPU"})
 
 window.p1 = p1
 window.p2 = p2

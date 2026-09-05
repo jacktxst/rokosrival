@@ -14,6 +14,7 @@ export class CardDeck {
 	drawCards(n) {
 		let list = []
 		for(let i=0;i<n;i++) {
+			if (this.cards.length === 0) break
 			list.push(this.cards.pop())
 		}
 		return list
