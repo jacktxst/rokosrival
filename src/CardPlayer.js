@@ -44,7 +44,7 @@ export class CardPlayer {
 				<div class="rr-hand-container" id="rr-opp-hand">
 					${(()=>{
 						let string = ""
-						for (let i=0;i<5;i++) {
+						for (let i=0;i<this.opponent.hand.length;i++) {
 							string += `
 								<div class="rr-card rr-card-backside"></div>
 							`
@@ -55,10 +55,13 @@ export class CardPlayer {
 			</div>
 			
 			<div class="rr-hand-container">
+				<div id="rr-played-card"></div>
+			</div>
+						
+			<div class="rr-hand-container">
 				<div class="rr-hand-container" id="rr-user-hand">
 					${(()=>{
 						let string = ""
-						console.log(this.hand.length)
 						for (let i=0;i<this.hand.length;i++) {
 							string += `
 								<div class="rr-card rr-card-frontside">
@@ -78,26 +81,22 @@ export class CardPlayer {
 			</div>	
 		`
 
-		let userCardDivs = document.getElementById("rr-user-hand").children
-		if (!userCardDivs) return
-		// turn the card black on click, just for testing interaction
-		for(let i=0;i<userCardDivs.length;i++) {
-			userCardDivs[i].addEventListener("click",(e)=>{
-				this.played_card = i
-				this.hand[i].onPlay?.bind(this)()
-				
-				// discard and draw
-
-				this.hand.splice(i, 1)
-				this.hand = [...this.hand, ...this.deck.drawCards(1)]
-
-				// update display
-
-				this.renderBoard()
-			})
-		}
+		
 
 		// 
+	}
+
+	playCardFromHand(i) {
+		this.played_card = i
+		this.playedCard = this.hand[i]
+		this.hand[i].onPlay?.bind(this)()
+		
+		// discard and draw
+
+		this.hand.splice(i, 1)
+		this.hand = [...this.hand, ...this.deck.drawCards(1)]
+
+		this.game.yieldTurn()
 	}
 
 }
