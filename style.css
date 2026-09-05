@@ -45,6 +45,16 @@ body, html {
 	font-family: fantasy;
 }
 
+#rr-played-card {
+	display: grid;
+   	place-items: center;
+	position: absolute;
+	top: 0px;
+	pointer-events: none;
+	width: 100vw;
+	height: 100vh;
+}
+
 .rr-card-backside {
 	
 }
@@ -57,6 +67,6 @@ body, html {
 }
 
 .rr-card-frontside:hover {
-	
+
   transform: translateY(-3px); /* Lifts the button slightly */
 }

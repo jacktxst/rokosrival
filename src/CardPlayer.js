@@ -53,11 +53,7 @@ export class CardPlayer {
 					})()}
 				</div>
 			</div>
-			
-			<div class="rr-hand-container">
-				<div id="rr-played-card"></div>
-			</div>
-						
+
 			<div class="rr-hand-container">
 				<div class="rr-hand-container" id="rr-user-hand">
 					${(()=>{

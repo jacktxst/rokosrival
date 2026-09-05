@@ -36,7 +36,7 @@ let p2 = new CardPlayer({turnCallback:p2Turn, deck:new CardDeck(cardLibrary.card
 
 let game = new CardGame(p1,p2)
 
-document.body.innerHTML = "<div id='board'></div>"
+document.body.innerHTML = "<div id='board'></div> <div id='rr-played-card'></div>"
 
 game.beginGame()
 

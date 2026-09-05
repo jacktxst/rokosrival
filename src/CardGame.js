@@ -31,7 +31,7 @@ export class CardGame {
 
 		this.player1.renderBoard()
 
-		document.getElementById("rr-played-card").style.display = "block"
+		document.getElementById("rr-played-card").style.display = "grid"
 		document.getElementById("rr-played-card").innerHTML = `
 			<div class="rr-card rr-card-frontside">
 				<h3>${this.currentPlayer.playedCard.name}</h3>
