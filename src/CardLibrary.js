@@ -26,12 +26,15 @@ export class CardLibrary {
 
 			new CardBase({
 				name : "Card C",
-				note : "increase your defense in the next round"
+				note : "increase your defense in the next round. not implemented."
 			}),
 
 			new CardBase({
 				name : "health potion",
-				note : "heal 10 hp"
+				note : "heal 10 hp",
+				onPlay() {
+					this.health += 10
+				}
 			}),
 
 			new CardBase({

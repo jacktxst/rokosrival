@@ -8,14 +8,14 @@ export function mainMenu() {
 	document.body.innerHTML = `
 
 		<div id="rr-menu-main">
-			<div id="rr-main-title">
-				Roko's Rival
+			<div id="rr-play-button">
+				Play
 			</div>
 		</div>
 
 	`
 
-	document.getElementById("rr-main-title").addEventListener("click",(e)=>{
+	document.getElementById("rr-play-button").addEventListener("click",(e)=>{
 
 		startCardGame()
 

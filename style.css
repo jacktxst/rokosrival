@@ -4,7 +4,20 @@ body, html {
 	margin: 0px;
 }
 
+#rr-menu-main {
+	display: flex;
+	height: 100vh;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 
+}
+
+#rr-play-button {
+	font-size: 72px;
+	border: inset 15px;
+	background-color: #ffffff99;
+}
 
 .rr-opp-battle-stat {
 	text-align: right;
