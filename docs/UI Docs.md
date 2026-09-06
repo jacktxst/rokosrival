@@ -55,7 +55,4 @@ CSS animations, requestAnimationFrame, and setTimeout
 
 # Rendering Code
 
-Weirdly enough, the rendering code for the board currently lives in CardPlayer.js. The reason for this is just that the player is what determines the perspective of how the board renders, which bank of cards is on top and bottom, etc. I'm thinking that it would make more sense for the board rendering to be done by a separate class, which contains a reference to the player from which the perspective should be.
-
-
-There's also some HTML-containing code in CardGame.js, for showing the card that was just played, and in CardGameControl.js, for setting up the board initially.  
+ALl the rendering code for the card game lives in ViewCardGame.js
