@@ -28,15 +28,18 @@ export class CardGame {
 	yieldTurn() {
 
 		/* show the card that was just played */
+		// note that renderBoard also removes event listeners, thus disabling the player from making a move. correct.
 
 		this.player1.renderBoard()
 
-		document.getElementById("rr-played-card").style.display = "grid"
-		document.getElementById("rr-played-card").innerHTML = `
+		let playedCardDiv = document.getElementById(this.currentPlayer === this.player1 ? "rr-played-card-p1" : "rr-played-card-p2")
+
+		playedCardDiv.innerHTML = `
 			<div class="rr-card rr-card-frontside">
 				<h3>${this.currentPlayer.playedCard.name}</h3>
 				${this.currentPlayer.playedCard.note}
 			</div>`
+		playedCardDiv.style.opacity = "100%"
 
 		/* switch this.currentPlayer */
 
@@ -49,15 +52,11 @@ export class CardGame {
 		/* give control to the current player after animation plays */
 
 		setTimeout( (()=>{
-			document.getElementById("rr-played-card").style.display = "none"
+			playedCardDiv.style.opacity = "0%"
+
 			this.currentPlayer.doTurn()
 		}).bind(this), 1000)
-
-		
-
-		
-
-		
+	
 	}
 
 }

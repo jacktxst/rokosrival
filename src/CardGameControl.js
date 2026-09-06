@@ -37,7 +37,7 @@ export function startCardGame() {
 	p1 = new CardPlayer({turnCallback:p1Turn, deck:new CardDeck(cardLibrary.cards), name: "You"})
 	p2 = new CardPlayer({turnCallback:p2Turn, deck:new CardDeck(cardLibrary.cards), name: "CPU"})
 	game = new CardGame(p1,p2)
-	document.body.innerHTML = "<div id='board'></div> <div id='rr-played-card'></div>"
+	document.body.innerHTML = "<div id='board'></div> <div class='rr-played-card' id='rr-played-card-p1'></div> <div class='rr-played-card' id='rr-played-card-p2'></div>"
 	game.beginGame()
 }
 

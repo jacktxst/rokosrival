@@ -1,3 +1,10 @@
+/*
+
+	[PlayerController] -> [CardPlayer] <-> [CardGame] <-> [CardPlayer] <- [BotController]
+
+*/
+
+
 import { CardDeck } from './CardDeck.js'
 
 /**

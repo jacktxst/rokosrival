@@ -35,7 +35,7 @@ export class CardLibrary {
 			}),
 
 			new CardBase({
-				name : "Card E",
+				name : "poison",
 				note : "this card does nothing"
 			}),
 

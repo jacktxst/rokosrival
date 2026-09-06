@@ -45,15 +45,20 @@ body, html {
 	font-family: fantasy;
 }
 
-#rr-played-card {
+.rr-played-card {
 	display: grid;
    	place-items: center;
 	position: absolute;
 	top: 0px;
+	opacity: 0;
 	pointer-events: none;
 	width: 100vw;
 	height: 100vh;
+
+	transition: opacity 0.25s, display 0.25s allow-discrete;
+
 }
+
 
 .rr-card-backside {
 	
