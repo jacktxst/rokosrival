@@ -30,8 +30,8 @@ export class CardLibrary {
 			}),
 
 			new CardBase({
-				name : "Card D",
-				note : "this card does nothing"
+				name : "health potion",
+				note : "heal 10 hp"
 			}),
 
 			new CardBase({
