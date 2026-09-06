@@ -33,16 +33,13 @@ export class CardGame {
 
 		this.view.renderBoard()
 
-		let playedCardDiv = document.getElementById(this.currentPlayer === this.player1 ? "rr-played-card-p1" : "rr-played-card-p2")
+		/* give control to the current player after animation plays */
 
-		playedCardDiv.innerHTML = `
-			<div class="rr-card rr-card-frontside">
-				<h3>${this.currentPlayer.playedCard.name}</h3>
-				${this.currentPlayer.playedCard.note}
-			</div>`
-		playedCardDiv.style.opacity = "100%"
+		this.view.showPlayedCard( ()=>{
+			this.currentPlayer.doTurn()
+		} )
 
-		/* switch this.currentPlayer */
+		/* switch this.currentPlayer (before animation finishes) */
 
 		if (this.currentPlayer === this.player1) {
 			this.currentPlayer = this.player2
@@ -50,14 +47,6 @@ export class CardGame {
 			this.currentPlayer = this.player1
 		}
 
-		/* give control to the current player after animation plays */
-
-		setTimeout( (()=>{
-			playedCardDiv.style.opacity = "0%"
-
-			this.currentPlayer.doTurn()
-		}).bind(this), 1000)
-	
 	}
 
 }

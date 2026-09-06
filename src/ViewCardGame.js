@@ -9,10 +9,10 @@ import { p2Turn } from './GameBotController.js'
 
 
 /**
-	
-		renders the board from this player's perspective, and is responsible for setting up event listeners on the cards themselves
 
-	*/
+	ALL RENDERING CODE FOR THE CARD GAME	
+
+*/
 
 export class ViewCardGame {
 
@@ -25,6 +25,37 @@ export class ViewCardGame {
 		document.body.innerHTML = "<div id='board'></div> <div class='rr-played-card' id='rr-played-card-p1'></div> <div class='rr-played-card' id='rr-played-card-p2'></div>"
 		this.game.beginGame()
 	}
+
+	/*
+
+		After a card is played (by you or the opponent), 
+		briefly show the card in the middle of the screen. 
+		Otherwise you will not be able to know what your 
+		opponent just played. 
+
+	*/
+	showPlayedCard(afterFunc) {
+
+		let playedCardDiv = document.getElementById(this.game.currentPlayer === this.game.player1 ? "rr-played-card-p1" : "rr-played-card-p2")
+
+		playedCardDiv.innerHTML = `
+			<div class="rr-card rr-card-frontside">
+				<h3>${this.game.currentPlayer.playedCard.name}</h3>
+				${this.game.currentPlayer.playedCard.note}
+			</div>`
+		playedCardDiv.style.opacity = "100%"
+
+		setTimeout( (()=>{
+
+			playedCardDiv.style.opacity = "0%"
+
+			afterFunc()
+			
+		}).bind(this), 1000)
+
+	}
+
+
 
 	renderBoard(){ 
 		const opponent = this.p2
