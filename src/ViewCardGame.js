@@ -4,8 +4,8 @@ import { CardDeck } from './CardDeck.js'
 import { CardBase } from './CardBase.js'
 import { CardLibrary } from './CardLibrary.js'
 
-import { GamePlayerController } from './GamePlayerController.js'
-import { GameBotController } from './GameBotController.js'
+import { p1Turn } from './GamePlayerController.js'
+import { p2Turn } from './GameBotController.js'
 
 
 /**
@@ -14,20 +14,21 @@ import { GameBotController } from './GameBotController.js'
 
 	*/
 
-class ViewCardGame {
+export class ViewCardGame {
 
 
 	constructor() {
 		this.cardLibrary = new CardLibrary()
-		this.p1 = new CardPlayer({turnCallback:p1Turn, deck:new CardDeck(cardLibrary.cards), name: "You"})
-		this.p2 = new CardPlayer({turnCallback:p2Turn, deck:new CardDeck(cardLibrary.cards), name: "CPU"})
-		this.game = new CardGame(p1,p2)
+		this.p1 = new CardPlayer({turnCallback:p1Turn, deck:new CardDeck(this.cardLibrary.cards), name: "You"})
+		this.p2 = new CardPlayer({turnCallback:p2Turn, deck:new CardDeck(this.cardLibrary.cards), name: "CPU"})
+		this.game = new CardGame(this.p1,this.p2,this)
 		document.body.innerHTML = "<div id='board'></div> <div class='rr-played-card' id='rr-played-card-p1'></div> <div class='rr-played-card' id='rr-played-card-p2'></div>"
 		this.game.beginGame()
 	}
 
 	renderBoard(){ 
-		const opponent = this.opponent
+		const opponent = this.p2
+		const p1 = this.p1
 		document.getElementById("board").innerHTML = `
 			<div class="rr-opp-battle-stat">
 				${opponent.name}: ${opponent.health} HP
@@ -37,7 +38,7 @@ class ViewCardGame {
 				<div class="rr-hand-container" id="rr-opp-hand">
 					${(()=>{
 						let string = ""
-						for (let i=0;i<this.opponent.hand.length;i++) {
+						for (let i=0;i<opponent.hand.length;i++) {
 							string += `
 								<div class="rr-card rr-card-backside"></div>
 							`
@@ -51,12 +52,12 @@ class ViewCardGame {
 				<div class="rr-hand-container" id="rr-user-hand">
 					${(()=>{
 						let string = ""
-						for (let i=0;i<this.hand.length;i++) {
+						for (let i=0;i<p1.hand.length;i++) {
 							string += `
 								<div class="rr-card rr-card-frontside">
 
-									<h3>${this.hand[i].name}</h3>
-									${this.hand[i].note}
+									<h3>${p1.hand[i].name}</h3>
+									${p1.hand[i].note}
 								</div>
 							`
 						}
@@ -66,7 +67,7 @@ class ViewCardGame {
 			</div>
 						
 			<div class="rr-user-battle-stat">
-				${this.name}: ${this.health} HP
+				${p1.name}: ${p1.health} HP
 			</div>	
 		`
 

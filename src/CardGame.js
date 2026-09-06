@@ -9,7 +9,8 @@
 */
 export class CardGame {
 
-	constructor(player1, player2) {
+	constructor(player1, player2, gameView) {
+		this.view = gameView
 		this.player1 = player1
 		this.player2 = player2
 		this.currentPlayer = player1
@@ -21,7 +22,7 @@ export class CardGame {
 	beginGame() {
 		this.player1.beginGame()
 		this.player2.beginGame()
-		this.player1.renderBoard()
+		this.view.renderBoard()
 		this.currentPlayer.doTurn()
 	}
 
@@ -30,7 +31,7 @@ export class CardGame {
 		/* show the card that was just played */
 		// note that renderBoard also removes event listeners, thus disabling the player from making a move. correct.
 
-		this.player1.renderBoard()
+		this.view.renderBoard()
 
 		let playedCardDiv = document.getElementById(this.currentPlayer === this.player1 ? "rr-played-card-p1" : "rr-played-card-p2")
 

@@ -1,5 +1,5 @@
 
-import { startCardGame } from './CardGameControl.js'
+import { ViewCardGame } from './ViewCardGame.js'
 
 export function mainMenu() {
 
@@ -17,7 +17,7 @@ export function mainMenu() {
 
 	document.getElementById("rr-play-button").addEventListener("click",(e)=>{
 
-		startCardGame()
+		new ViewCardGame()
 
 	})
 

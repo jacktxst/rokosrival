@@ -6,7 +6,7 @@ export function p1Turn(){
 	for(let i=0;i<userCardDivs.length;i++) {
 		userCardDivs[i].addEventListener("click",(e)=>{
 
-			p1.playCardFromHand(i)
+			this.playCardFromHand(i)
 			
 		})
 	}
