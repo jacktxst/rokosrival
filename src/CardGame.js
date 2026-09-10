@@ -31,6 +31,10 @@ export class CardGame {
 	yieldTurn() {
 		// note that renderBoard also removes event listeners, thus disabling the player from making a move. correct.
 
+		this.player1.mana += 3
+		this.player2.mana += 3
+
+
 		this.view.renderBoard()
 
 		if (this.currentPlayer === this.player1) {
