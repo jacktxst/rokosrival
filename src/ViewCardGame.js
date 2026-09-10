@@ -88,6 +88,7 @@ export class ViewCardGame {
 								<div class="rr-card rr-card-frontside">
 
 									<h3>${p1.hand[i].name}</h3>
+									${p1.hand[i].cost} mp <br>
 									${p1.hand[i].note}
 								</div>
 							`
@@ -98,8 +99,11 @@ export class ViewCardGame {
 			</div>
 						
 			<div class="rr-user-battle-stat">
-				${p1.name}: ${p1.health} HP
+				${p1.name}: ${p1.health} HP ${p1.mana} MP
+
 			</div>	
+
+			<button id="rr-btn-end-turn">end turn</button>
 		`
 
 	}

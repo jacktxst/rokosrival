@@ -6,9 +6,14 @@ export function p1Turn(){
 	for(let i=0;i<userCardDivs.length;i++) {
 		userCardDivs[i].addEventListener("click",(e)=>{
 
-			this.playCardFromHand(i)
+			this.playCardFromHand(i, this.doTurn )
+			
 			
 		})
 	}
+
+	document.getElementById("rr-btn-end-turn").addEventListener("click",(e)=>{
+		this.game.yieldTurn()
+	})
 
 }

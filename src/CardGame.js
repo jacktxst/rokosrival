@@ -20,6 +20,8 @@ export class CardGame {
 
 	/** */
 	beginGame() {
+		this.player1.view = this.view
+		this.player2.view = this.view
 		this.player1.beginGame()
 		this.player2.beginGame()
 		this.view.renderBoard()
@@ -27,25 +29,21 @@ export class CardGame {
 	}
 
 	yieldTurn() {
-
-		/* show the card that was just played */
 		// note that renderBoard also removes event listeners, thus disabling the player from making a move. correct.
 
+		this.player1.mana += 3
+		this.player2.mana += 3
+
+
 		this.view.renderBoard()
-
-		/* give control to the current player after animation plays */
-
-		this.view.showPlayedCard( ()=>{
-			this.currentPlayer.doTurn()
-		} )
-
-		/* switch this.currentPlayer (before animation finishes) */
 
 		if (this.currentPlayer === this.player1) {
 			this.currentPlayer = this.player2
 		} else {
 			this.currentPlayer = this.player1
 		}
+
+		this.currentPlayer.doTurn()
 
 	}
 
