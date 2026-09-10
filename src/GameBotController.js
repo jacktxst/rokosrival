@@ -4,4 +4,6 @@ export function p2Turn(){
 
 	this.playCardFromHand(0)
 
+	this.game.yieldTurn()
+
 }

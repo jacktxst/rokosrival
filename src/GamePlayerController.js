@@ -11,4 +11,8 @@ export function p1Turn(){
 		})
 	}
 
+	document.getElementById("rr-btn-end-turn").addEventListener("click",(e)=>{
+		this.game.yieldTurn()
+	})
+
 }
