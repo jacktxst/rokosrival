@@ -29,7 +29,8 @@ export class CardPlayer {
 	beginGame() {
 
 		this.health = 100
-		this.mana = 100
+		this.baseMana = 100
+		this.mana = this.baseMana
 		this.deck.unshuffleCards()
 		this.deck.shuffleCards()
 		this.hand = this.deck.drawCards(5)
