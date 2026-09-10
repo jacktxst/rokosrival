@@ -36,7 +36,7 @@ export class CardPlayer {
 		this.opponent = (this === this.game.player1) ? this.game.player2 : this.game.player1
 	}
 
-	playCardFromHand(i) {
+	playCardFromHand(i, func) {
 		
 		if (this.mana < this.hand[i].cost) {
 			return
@@ -62,7 +62,8 @@ export class CardPlayer {
 		/* give control to the current player after animation plays */
 
 		this.view.showPlayedCard( ()=>{
-			this.doTurn()
+			if (func) func.bind(this)()
+			return
 		} )
 
 		
