@@ -31,8 +31,9 @@ export class CardGame {
 	yieldTurn() {
 		// note that renderBoard also removes event listeners, thus disabling the player from making a move. correct.
 
-		this.player1.mana += 3
-		this.player2.mana += 3
+		// reset mana for both players at the end of each turn
+		this.player1.mana = this.player1.baseMana
+		this.player2.mana = this.player2.baseMana
 
 
 		this.view.renderBoard()
