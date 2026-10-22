@@ -1,3 +1,9 @@
+import { CardTypeSpec, CostSpec, TriggerSpec } from "./CardDefinitions.js";
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
 export class Card {
   constructor({ id, type, costs = [], arcane = false, triggers = [], owner = { kind: "inherited" } }) {
 	assert(typeof id === "string" && id.length > 0, "id must exist and not be empty lol");
