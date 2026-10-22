@@ -1,6 +1,6 @@
 // CardGeneratorProcedural.js
 import { Card } from "./Card.js";
-import * as CardDefinitions from "./CardDefinitions.js";
+import * as Defs from "./CardDefinitions.js";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -41,13 +41,13 @@ export class CardGenerator {
 
   generate(options = {}) {
     const depth = options.depth ?? 0;
-    const forcedType = options.forcedType ?? pick(this.rng, Object.values(CardDefinitions.CARD_TYPE));
+    const forcedType = options.forcedType ?? pick(this.rng, Object.values(Defs.CARD_TYPE));
     return this.generateCard({ depth, forcedType });
   }
 
   generateCard({ depth = 0, forcedType = null, subcard = false } = {}) {
-    const kind = forcedType ?? pick(this.rng, Object.values(CardDefinitions.CARD_TYPE));
-    const type = new CardDefinitions.CardTypeSpec({
+    const kind = forcedType ?? pick(this.rng, Object.values(Defs.CARD_TYPE));
+    const type = new Defs.CardTypeSpec({
       kind,
       initialValue: randomInt(this.rng, this.typeValueRange[0], this.typeValueRange[1]),
     });
@@ -55,7 +55,7 @@ export class CardGenerator {
     const costs = subcard ? [] : this.generateCosts(kind, type.initialValue);
     const arcane = subcard ? false : this.rng() < 0.25;
     const explicitTriggerCount = randomInt(this.rng, 1, 3);
-    const triggers = [...CardDefinitions.CARD_TYPE_RULES[kind].defaultTriggers()];
+    const triggers = [...Defs.CARD_TYPE_RULES[kind].defaultTriggers()];
 
     for (let i = 0; i < explicitTriggerCount; i += 1) {
       triggers.push(this.generateTrigger(depth));
@@ -74,20 +74,20 @@ export class CardGenerator {
     const costs = [];
     // non-subcards must require at least one cost
     if (this.rng() < 0.8) {
-      costs.push(CardDefinitions.CostSpec.payMana(Math.max(1, Math.ceil(initialValue / 2))));
+      costs.push(Defs.CostSpec.payMana(Math.max(1, Math.ceil(initialValue / 2))));
     } else {
-      costs.push(CardDefinitions.CostSpec.payLife(randomInt(this.rng, 1, 3)));
+      costs.push(Defs.CostSpec.payLife(randomInt(this.rng, 1, 3)));
     }
 
     if (this.rng() < 0.18) {
-      costs.push(CardDefinitions.CostSpec.fizzleFriendlyNonPlayers(randomInt(this.rng, 1, 2)));
+      costs.push(Defs.CostSpec.fizzleFriendlyNonPlayers(randomInt(this.rng, 1, 2)));
     }
     return costs;
   }
 
   generateTrigger(depth) {
-    const kind = pick(this.rng, Object.values(CardDefinitions.TRIGGER_KIND));
-    const target = kind === CardDefinitions.TRIGGER_KIND.GREET ? this.generateTargetSpec() : null;
+    const kind = pick(this.rng, Object.values(Defs.TRIGGER_KIND));
+    const target = kind === Defs.TRIGGER_KIND.GREET ? this.generateTargetSpec() : null;
     const effectCount = randomInt(this.rng, 1, 2);
     const effects = [];
 
@@ -95,51 +95,51 @@ export class CardGenerator {
       effects.push(this.generateEffect(depth));
     }
 
-    return new CardDefinitions.TriggerSpec({ kind, target, effects });
+    return new Defs.TriggerSpec({ kind, target, effects });
   }
 
   generateEffect(depth) {
     const canCreateSubcard = depth < this.maxNestedDepth;
 
     const choices = [
-      CardDefinitions.EFFECT_KIND.ATTACK,
-      CardDefinitions.EFFECT_KIND.HEAL,
-      CardDefinitions.EFFECT_KIND.DEFEND,
-      CardDefinitions.EFFECT_KIND.SURGE,
-      CardDefinitions.EFFECT_KIND.DECAY,
-      CardDefinitions.EFFECT_KIND.DESTROY,
-      CardDefinitions.EFFECT_KIND.DRAW,
-      CardDefinitions.EFFECT_KIND.DISCARD,
-      CardDefinitions.EFFECT_KIND.PREDICT,
+      Defs.EFFECT_KIND.ATTACK,
+      Defs.EFFECT_KIND.HEAL,
+      Defs.EFFECT_KIND.DEFEND,
+      Defs.EFFECT_KIND.SURGE,
+      Defs.EFFECT_KIND.DECAY,
+      Defs.EFFECT_KIND.DESTROY,
+      Defs.EFFECT_KIND.DRAW,
+      Defs.EFFECT_KIND.DISCARD,
+      Defs.EFFECT_KIND.PREDICT,
     ];
 
-    if (canCreateSubcard) choices.push(CardDefinitions.EFFECT_KIND.DEPLOY_SUBCARD);
+    if (canCreateSubcard) choices.push(Defs.EFFECT_KIND.DEPLOY_SUBCARD);
 
     const kind = pick(this.rng, choices);
 
-    if (kind === CardDefinitions.EFFECT_KIND.DEPLOY_SUBCARD) {
-      return CardDefinitions.EffectSpec.deploySubcard(
+    if (kind === Defs.EFFECT_KIND.DEPLOY_SUBCARD) {
+      return Defs.EffectSpec.deploySubcard(
         this.generateCard({
           depth: depth + 1,
-          forcedType: pick(this.rng, Object.values(CardDefinitions.CARD_TYPE)),
+          forcedType: pick(this.rng, Object.values(Defs.CARD_TYPE)),
           subcard: true,
         }),
       );
     }
 
-    if ([CardDefinitions.EFFECT_KIND.DRAW, CardDefinitions.EFFECT_KIND.DISCARD, CardDefinitions.EFFECT_KIND.PREDICT].includes(kind)) {
-      return CardDefinitions.EffectSpec.player(
+    if ([Defs.EFFECT_KIND.DRAW, Defs.EFFECT_KIND.DISCARD, Defs.EFFECT_KIND.PREDICT].includes(kind)) {
+      return Defs.EffectSpec.player(
         kind,
         randomInt(this.rng, this.effectAmountRange[0], this.effectAmountRange[1]),
-        pick(this.rng, Object.values(CardDefinitions.PLAYER_REF)),
+        pick(this.rng, Object.values(Defs.PLAYER_REF)),
       );
     }
 
-    if (kind === CardDefinitions.EFFECT_KIND.DESTROY) {
-      return CardDefinitions.EffectSpec.destroy(this.generateSelectionForEffect(kind));
+    if (kind === Defs.EFFECT_KIND.DESTROY) {
+      return Defs.EffectSpec.destroy(this.generateSelectionForEffect(kind));
     }
 
-    return CardDefinitions.EffectSpec.targeted(
+    return Defs.EffectSpec.targeted(
       kind,
       randomInt(this.rng, this.effectAmountRange[0], this.effectAmountRange[1]),
       this.generateSelectionForEffect(kind),
@@ -150,59 +150,59 @@ export class CardGenerator {
     // self is always valid because the resolver function should own the special
     // fallback behavior for effects that target themselves
     if (this.rng() < 0.15) {
-      return new CardDefinitions.SelectionSpec({ mode: CardDefinitions.SELECTION_MODE.SELF });
+      return new Defs.SelectionSpec({ mode: Defs.SELECTION_MODE.SELF });
     }
 
-    const allowedTargetKinds = [...(CardDefinitions.EFFECT_TARGET_RULES[effectKind] ?? new Set())];
+    const allowedTargetKinds = [...(Defs.EFFECT_TARGET_RULES[effectKind] ?? new Set())];
     assert(allowedTargetKinds.length > 0, `No target rules for ${effectKind}.`);
 
     const kind = pick(this.rng, allowedTargetKinds);
     const alignment = this.generateAlignmentForTarget(kind);
     const mode = pick(this.rng, [
-      CardDefinitions.SELECTION_MODE.DIRECT,
-      CardDefinitions.SELECTION_MODE.RANDOM,
-      CardDefinitions.SELECTION_MODE.TWINNED,
-      CardDefinitions.SELECTION_MODE.SPLIT,
+      Defs.SELECTION_MODE.DIRECT,
+      Defs.SELECTION_MODE.RANDOM,
+      Defs.SELECTION_MODE.TWINNED,
+      Defs.SELECTION_MODE.SPLIT,
     ]);
 
-    return new CardDefinitions.SelectionSpec({
+    return new Defs.SelectionSpec({
       mode,
-      target: new CardDefinitions.TargetSpec({ kind, alignment }),
+      target: new Defs.TargetSpec({ kind, alignment }),
     });
   }
 
   generateTargetSpec() {
-    const kind = pick(this.rng, Object.values(CardDefinitions.TARGET_KIND));
-    return new CardDefinitions.TargetSpec({ kind, alignment: this.generateAlignmentForTarget(kind) });
+    const kind = pick(this.rng, Object.values(Defs.TARGET_KIND));
+    return new Defs.TargetSpec({ kind, alignment: this.generateAlignmentForTarget(kind) });
   }
 
   generateAlignmentForTarget(kind) {
-    if (kind === CardDefinitions.TARGET_KIND.PLAYER) {
-      return pick(this.rng, [CardDefinitions.ALIGNMENT.FRIENDLY, CardDefinitions.ALIGNMENT.OPPOSING]);
+    if (kind === Defs.TARGET_KIND.PLAYER) {
+      return pick(this.rng, [Defs.ALIGNMENT.FRIENDLY, Defs.ALIGNMENT.OPPOSING]);
     }
-    return pick(this.rng, Object.values(CardDefinitions.ALIGNMENT));
+    return pick(this.rng, Object.values(Defs.ALIGNMENT));
   }
 
 // regression testing simple
   buildMockupSimpleAttackSpell() {
     return new Card({
       id: this.nextId(),
-      type: new CardDefinitions.CardTypeSpec({ kind: CardDefinitions.CARD_TYPE.SPELL, initialValue: 1 }),
-      costs: [CardDefinitions.CostSpec.payMana(1)],
+      type: new Defs.CardTypeSpec({ kind: Defs.CARD_TYPE.SPELL, initialValue: 1 }),
+      costs: [Defs.CostSpec.payMana(1)],
       arcane: false,
       triggers: [
-        ...CardDefinitions.CARD_TYPE_RULES[CardDefinitions.CARD_TYPE.SPELL].defaultTriggers(),
-        new CardDefinitions.TriggerSpec({
-          kind: CardDefinitions.TRIGGER_KIND.ENTRY,
+        ...Defs.CARD_TYPE_RULES[Defs.CARD_TYPE.SPELL].defaultTriggers(),
+        new Defs.TriggerSpec({
+          kind: Defs.TRIGGER_KIND.ENTRY,
           effects: [
-            CardDefinitions.EffectSpec.targeted(
-              CardDefinitions.EFFECT_KIND.ATTACK,
+            Defs.EffectSpec.targeted(
+              Defs.EFFECT_KIND.ATTACK,
               5,
-              new CardDefinitions.SelectionSpec({
-                mode: CardDefinitions.SELECTION_MODE.DIRECT,
-                target: new CardDefinitions.TargetSpec({
-                  kind: CardDefinitions.TARGET_KIND.PLAYER,
-                  alignment: CardDefinitions.ALIGNMENT.OPPOSING,
+              new Defs.SelectionSpec({
+                mode: Defs.SELECTION_MODE.DIRECT,
+                target: new Defs.TargetSpec({
+                  kind: Defs.TARGET_KIND.PLAYER,
+                  alignment: Defs.ALIGNMENT.OPPOSING,
                 }),
               }),
             ),
@@ -216,31 +216,31 @@ export class CardGenerator {
   buildMockupComplexSpell() {
     const summonedCard = new Card({
       id: this.nextId("-sub"),
-      type: new CardDefinitions.CardTypeSpec({ kind: CardDefinitions.CARD_TYPE.SUMMON, initialValue: 5 }),
+      type: new Defs.CardTypeSpec({ kind: Defs.CARD_TYPE.SUMMON, initialValue: 5 }),
       costs: [],
       arcane: false,
       triggers: [
-        new CardDefinitions.TriggerSpec({
-          kind: CardDefinitions.TRIGGER_KIND.REST,
+        new Defs.TriggerSpec({
+          kind: Defs.TRIGGER_KIND.REST,
           effects: [
-            CardDefinitions.EffectSpec.targeted(
-              CardDefinitions.EFFECT_KIND.HEAL,
+            Defs.EffectSpec.targeted(
+              Defs.EFFECT_KIND.HEAL,
               2,
-              new CardDefinitions.SelectionSpec({ mode: CardDefinitions.SELECTION_MODE.SELF }),
+              new Defs.SelectionSpec({ mode: Defs.SELECTION_MODE.SELF }),
             ),
           ],
         }),
-        new CardDefinitions.TriggerSpec({
-          kind: CardDefinitions.TRIGGER_KIND.REST,
+        new Defs.TriggerSpec({
+          kind: Defs.TRIGGER_KIND.REST,
           effects: [
-            CardDefinitions.EffectSpec.targeted(
-              CardDefinitions.EFFECT_KIND.ATTACK,
+            Defs.EffectSpec.targeted(
+              Defs.EFFECT_KIND.ATTACK,
               1,
-              new CardDefinitions.SelectionSpec({
-                mode: CardDefinitions.SELECTION_MODE.DIRECT,
-                target: new CardDefinitions.TargetSpec({
-                  kind: CardDefinitions.TARGET_KIND.PLAYER,
-                  alignment: CardDefinitions.ALIGNMENT.OPPOSING,
+              new Defs.SelectionSpec({
+                mode: Defs.SELECTION_MODE.DIRECT,
+                target: new Defs.TargetSpec({
+                  kind: Defs.TARGET_KIND.PLAYER,
+                  alignment: Defs.ALIGNMENT.OPPOSING,
                 }),
               }),
             ),
@@ -251,14 +251,14 @@ export class CardGenerator {
 
     return new Card({
       id: this.nextId(),
-      type: new CardDefinitions.CardTypeSpec({ kind: CardDefinitions.CARD_TYPE.SPELL, initialValue: 2 }),
-      costs: [CardDefinitions.CostSpec.payMana(3)],
+      type: new Defs.CardTypeSpec({ kind: Defs.CARD_TYPE.SPELL, initialValue: 2 }),
+      costs: [Defs.CostSpec.payMana(3)],
       arcane: false,
       triggers: [
-        ...CardDefinitions.CARD_TYPE_RULES[CardDefinitions.CARD_TYPE.SPELL].defaultTriggers(),
-        new CardDefinitions.TriggerSpec({
-          kind: CardDefinitions.TRIGGER_KIND.AWAKEN,
-          effects: [CardDefinitions.EffectSpec.deploySubcard(summonedCard)],
+        ...Defs.CARD_TYPE_RULES[Defs.CARD_TYPE.SPELL].defaultTriggers(),
+        new Defs.TriggerSpec({
+          kind: Defs.TRIGGER_KIND.AWAKEN,
+          effects: [Defs.EffectSpec.deploySubcard(summonedCard)],
         }),
       ],
     });
@@ -316,17 +316,17 @@ function formatCost(cost) {
 
 function formatTriggerHeader(trigger) {
   switch (trigger.kind) {
-    case CardDefinitions.TRIGGER_KIND.AWAKEN:
+    case Defs.TRIGGER_KIND.AWAKEN:
       return "Awaken";
-    case CardDefinitions.TRIGGER_KIND.REST:
+    case Defs.TRIGGER_KIND.REST:
       return "Rest";
-    case CardDefinitions.TRIGGER_KIND.GREET:
+    case Defs.TRIGGER_KIND.GREET:
       return `Greet ${formatTarget(trigger.target)}`;
-    case CardDefinitions.TRIGGER_KIND.THORN:
+    case Defs.TRIGGER_KIND.THORN:
       return "Thorn";
-    case CardDefinitions.TRIGGER_KIND.EXIT:
+    case Defs.TRIGGER_KIND.EXIT:
       return "Exit";
-    case CardDefinitions.TRIGGER_KIND.ENTRY:
+    case Defs.TRIGGER_KIND.ENTRY:
       return "Entry";
     default:
       return trigger.kind;
@@ -335,15 +335,15 @@ function formatTriggerHeader(trigger) {
 
 function formatEffect(effect, indent) {
   switch (effect.kind) {
-    case CardDefinitions.EFFECT_KIND.DEPLOY_SUBCARD:
+    case Defs.EFFECT_KIND.DEPLOY_SUBCARD:
       return `${capitalize(effect.card.type.kind)} ${effect.card.type.initialValue} {\n${formatCard(effect.card, indent + 2)}\n${" ".repeat(indent)}}`;
-    case CardDefinitions.EFFECT_KIND.DESTROY:
+    case Defs.EFFECT_KIND.DESTROY:
       return `Destroy ${formatSelection(effect.selection)}`;
-    case CardDefinitions.EFFECT_KIND.DRAW:
+    case Defs.EFFECT_KIND.DRAW:
       return `${capitalize(effect.player)} Player Draw ${effect.amount}`;
-    case CardDefinitions.EFFECT_KIND.DISCARD:
+    case Defs.EFFECT_KIND.DISCARD:
       return `${capitalize(effect.player)} Player Discard ${effect.amount}`;
-    case CardDefinitions.EFFECT_KIND.PREDICT:
+    case Defs.EFFECT_KIND.PREDICT:
       return `${capitalize(effect.player)} Player Predict ${effect.amount}`;
     default:
       return `${capitalize(effect.kind)} ${effect.amount} ${formatSelection(effect.selection)}`;
@@ -351,7 +351,7 @@ function formatEffect(effect, indent) {
 }
 
 function formatSelection(selection) {
-  if (selection.mode === CardDefinitions.SELECTION_MODE.SELF) return "Self";
+  if (selection.mode === Defs.SELECTION_MODE.SELF) return "Self";
   return `${capitalize(selection.mode)} ${formatTarget(selection.target)}`;
 }
 
