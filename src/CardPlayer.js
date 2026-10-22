@@ -45,8 +45,8 @@ export class CardPlayer {
 			this.mana -= this.hand[i].cost
 		}
 
-		this.played_card = i
-		this.playedCard = this.hand[i]
+		this.played_card_i = i
+		this.played_card = this.hand[i]
 		this.hand[i].onPlay?.bind(this)()
 
 		// discard and draw
