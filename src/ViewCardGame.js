@@ -1,7 +1,7 @@
 import { CardPlayer } from './CardPlayer.js'
 import { CardGame } from './CardGame.js'
 import { CardDeck } from './CardDeck.js'
-import { CardBase } from './CardBase.js'
+import { Card } from './Card.js'
 import { CardLibrary } from './CardLibrary.js'
 
 import { p1Turn } from './GamePlayerController.js'
@@ -11,7 +11,7 @@ import { p2Turn } from './GameBotController.js'
 /**
 
 	ALL RENDERING CODE FOR THE CARD GAME	
-
+c
 */
 
 export class ViewCardGame {
