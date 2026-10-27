@@ -62,6 +62,29 @@ body, html {
 	height: 180px;
 	margin: 15px;
 	font-family: fantasy;
+	overflow-y: auto;
+	box-sizing: content-box;
+	font-size: 13px;
+	line-height: 1.25;
+}
+
+.rr-card-title {
+	margin: 0 0 6px;
+}
+
+.rr-card-cost {
+	font-weight: bold;
+	margin-bottom: 6px;
+}
+
+.rr-card-triggers {
+	margin: 0;
+	padding-left: 16px;
+}
+
+.rr-card-triggers ul {
+	margin: 2px 0 5px;
+	padding-left: 14px;
 }
 
 .rr-played-card {

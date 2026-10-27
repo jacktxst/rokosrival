@@ -1,11 +1,91 @@
 import { CardPlayer } from './CardPlayer.js'
 import { CardGame } from './CardGame.js'
 import { CardDeck } from './CardDeck.js'
-import { Card } from './Card.js'
 import { CardLibrary } from './CardLibrary.js'
 
 import { p1Turn } from './GamePlayerController.js'
 import { p2Turn } from './GameBotController.js'
+
+function escapeHtml(value) {
+	return String(value).replace(/[&<>"']/g, (character) => ({
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'"': '&quot;',
+		"'": '&#39;',
+	})[character])
+}
+
+function capitalize(value) {
+	return value.charAt(0).toUpperCase() + value.slice(1)
+}
+
+function formatTarget(target) {
+	return `${capitalize(target.alignment)} ${capitalize(target.kind)}`
+}
+
+function formatSelection(selection) {
+	if (selection.mode === 'self') return 'Self'
+	return `${capitalize(selection.mode)} ${formatTarget(selection.target)}`
+}
+
+function formatCost(cost) {
+	switch (cost.kind) {
+		case 'payMana':
+			return `${cost.amount} Mana`
+		case 'payLife':
+			return `${cost.amount} Life`
+		case 'fizzleFriendlyNonPlayers':
+			return `Fizzle ${cost.amount} Friendly non-player(s)`
+		default:
+			return capitalize(cost.kind)
+	}
+}
+
+function formatTrigger(trigger) {
+	if (trigger.kind === 'greet') {
+		return `Greet ${formatTarget(trigger.target)}`
+	}
+	return capitalize(trigger.kind)
+}
+
+function formatEffect(effect) {
+	switch (effect.kind) {
+		case 'destroy':
+			return `Destroy ${formatSelection(effect.selection)}`
+		case 'draw':
+		case 'discard':
+		case 'predict':
+			return `${capitalize(effect.player)} player: ${capitalize(effect.kind)} ${effect.amount}`
+		default:
+			return `${capitalize(effect.kind)} ${effect.amount} ${formatSelection(effect.selection)}`
+	}
+}
+
+function renderCardDetails(card) {
+	const title = `${capitalize(card.type.kind)} ${card.type.initialValue}`
+	const costs = card.costs.map(formatCost)
+	const triggers = card.triggers.map((trigger) => `
+		<li>
+			<strong>${escapeHtml(formatTrigger(trigger))}</strong>
+			${trigger.effects.length
+				? `<ul>${trigger.effects.map((effect) => `
+					<li>
+						${effect.kind === 'deploySubcard'
+							? `Deploy ${escapeHtml(capitalize(effect.card.type.kind))} ${effect.card.type.initialValue}${renderCardDetails(effect.card)}`
+							: escapeHtml(formatEffect(effect))}
+					</li>
+				`).join('')}</ul>`
+				: ''}
+		</li>
+	`).join('')
+
+	return `
+		<h3 class="rr-card-title">${escapeHtml(title)}</h3>
+		<div class="rr-card-cost">${costs.length ? costs.map(escapeHtml).join(', ') : 'Free'}${card.arcane ? ' · Arcane' : ''}</div>
+		${triggers ? `<ul class="rr-card-triggers">${triggers}</ul>` : '<div class="rr-card-triggers">No triggers</div>'}
+	`
+}
 
 
 /**
@@ -40,8 +120,7 @@ export class ViewCardGame {
 
 		playedCardDiv.innerHTML = `
 			<div class="rr-card rr-card-frontside">
-				<h3>${this.game.currentPlayer.playedCard.name}</h3>
-				${this.game.currentPlayer.playedCard.note}
+				${renderCardDetails(this.game.currentPlayer.played_card)}
 			</div>`
 		playedCardDiv.style.opacity = "100%"
 
@@ -86,10 +165,7 @@ export class ViewCardGame {
 						for (let i=0;i<p1.hand.length;i++) {
 							string += `
 								<div class="rr-card rr-card-frontside">
-
-									<h3>${p1.hand[i].name}</h3>
-									${p1.hand[i].cost} mp <br>
-									${p1.hand[i].note}
+									${renderCardDetails(p1.hand[i])}
 								</div>
 							`
 						}
