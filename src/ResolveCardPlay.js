@@ -40,8 +40,27 @@ function resolveEffect(effect) {
     }
 }
 
-function resolveSelection(card) {
-    selection = card.triggers.effect.selection;
-    player = card.owner;
-    
+function resolveSelection(effect) {
+    selection = effect.selection;
+    playerRef = effect.player;
+
+    switch (selection.mode) {
+        case "direct":
+            // Implement direct selection logic here
+            break;
+        case "random":
+            // Implement random selection logic here
+            break;
+        case "twinned":
+            // Implement twinned selection logic here
+            break;
+        case "split":
+            // Implement split selection logic here
+            break;
+        case "self":
+            // Implement self selection logic here
+            break;
+        default:
+            throw new Error(`Unknown selection mode: ${selection.mode}`);
+    }
 }
