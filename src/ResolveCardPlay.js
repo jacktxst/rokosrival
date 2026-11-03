@@ -44,6 +44,8 @@ function resolveSelection(card) {
     selection = card.triggers.effect.selection;
     playerRef = card.triggers.effect.player;
 
+    //need to handle player input for everything that isnt self and random iirc
+    //and need to be able to read cards currently in play to process summons and constructs instead of always targeting the other player
     switch (selection.mode) {
         case "direct":
             // Implement direct selection logic here
