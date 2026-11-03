@@ -3,8 +3,8 @@ import "./CardDefinitions.js";
 import { CardGame } from "./CardGame.js";
 
 
-function resolveEffect(effect) {
-    switch (effect.kind) {
+function resolveEffect(card) {
+    switch (card.triggers.effect.kind) {
         case "attack":
             // Implement attack logic here
             break;
@@ -40,9 +40,9 @@ function resolveEffect(effect) {
     }
 }
 
-function resolveSelection(effect) {
-    selection = effect.selection;
-    playerRef = effect.player;
+function resolveSelection(card) {
+    selection = card.triggers.effect.selection;
+    playerRef = card.triggers.effect.player;
 
     switch (selection.mode) {
         case "direct":
