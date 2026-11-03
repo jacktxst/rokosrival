@@ -1,4 +1,4 @@
-import Card from "./Card.js";
+import { Card } from "./Card.js";
 import "./CardDefinitions.js";
 import { CardGame } from "./CardGame.js";
 
@@ -11,9 +11,11 @@ export function resolveEffect(trigger) {
         switch (trigger.effect.kind) {
             case "attack":
                 // Implement attack logic here
+                target.health -= trigger.effect.amount;
                 break;
             case "heal":
                 // Implement heal logic here
+                target.health += trigger.effect.amount;
                 break;
             case "defend":
                 // Implement defend logic here
