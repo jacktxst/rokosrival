@@ -64,3 +64,26 @@ function resolveSelection(effect) {
             throw new Error(`Unknown selection mode: ${selection.mode}`);
     }
 }
+
+function resolveTarget(card, target) {
+    assert(card.triggers.effect.selection !== "self", "Self-targeting should be handled by the resolver, not the target-kind list.");
+
+
+    // Still need to figure out how to handle alignment without excess complexity
+    switch (target.kind) {
+        case "spell":
+            // Implement spell target logic here
+            break;
+        case "construct":
+            // Implement construct target logic here
+            break;
+        case "summon":
+            // Implement summon target logic here
+            break;
+        case "player":
+            // Implement player target logic here
+            break;
+        default:
+            throw new Error(`Unknown target kind: ${target.kind}`);
+    }
+}
