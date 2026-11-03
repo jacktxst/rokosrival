@@ -1,7 +1,7 @@
+import { goToLobby } from './MenuLobby.js'
+import { gameState, GameState } from './GameState.js'
 
-import { ViewCardGame } from './ViewCardGame.js'
-
-export function mainMenu() {
+export function goToMainMenu() {
 
 	document.body.replaceChildren()
 
@@ -9,7 +9,7 @@ export function mainMenu() {
 
 		<div id="rr-menu-main">
 			<div id="rr-play-button">
-				Play
+				New Game
 			</div>
 		</div>
 
@@ -17,7 +17,7 @@ export function mainMenu() {
 
 	document.getElementById("rr-play-button").addEventListener("click",(e)=>{
 
-		new ViewCardGame()
+		goToLobby()
 
 	})
 
