@@ -1,4 +1,5 @@
 import { CardGenerator } from "./CardGeneratorProcedural.js";
+import { resolveEffect } from "./ResolveCardPlay.js";
 
 export class CardLibrary {
   constructor() {
