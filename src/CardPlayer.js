@@ -38,11 +38,15 @@ export class CardPlayer {
 	}
 
 	playCardFromHand(i, func) {
-		
-		if (this.mana < this.hand[i].cost) {
-			return
-		} else {
-			this.mana -= this.hand[i].cost
+
+		for (cost in this.hand[i].costs) {	
+			if (cost.kind !== "payMana") {
+				if (this.mana < cost.amount) {
+					return
+				} else {
+					this.mana -= cost.amount
+				}
+			}
 		}
 
 		this.played_card_i = i
