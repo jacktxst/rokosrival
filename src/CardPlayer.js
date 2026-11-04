@@ -48,6 +48,22 @@ export class CardPlayer {
 					this.mana -= this.hand[i].costs[j].amount
 				}
 			}
+			if (this.hand[i].costs[j].kind === "payLife") {
+				if (this.health < this.hand[i].costs[j].amount) {
+					return
+				} else {
+					this.health -= this.hand[i].costs[j].amount
+				}
+			}
+			if (this.hand[i].costs[j].kind === "fizzleFriendlyNonPlayers") {
+				// for now this cost will empty the hand
+				if ((this.hand.length - 1 - i) < this.hand[i].costs[j].amount) {
+					return
+				} else {
+					this.hand.splice(i+1,this.hand[i].costs[j].amount)
+					this.hand = [...this.hand, ...this.deck.drawCards(this.hand[i].costs[j].amount)]
+				}
+			}
 		}
 
 		this.played_card_i = i
