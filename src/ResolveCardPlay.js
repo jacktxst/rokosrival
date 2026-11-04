@@ -2,21 +2,25 @@ import { Card } from "./Card.js";
 import "./CardDefinitions.js";
 import { CardGame } from "./CardGame.js";
 
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
 
 export function resolveEffect(trigger) {
 
     for (let j = 0; j < trigger.effects.length; j++) {
-        targets = resolveSelection.bind(this)(trigger.effects[j]);
+        let targets = []
+        targets = targets.concat(resolveSelection.bind(this)(trigger.effects[j]));
 
         for (let i = 0; i < targets.length; i++) {
-            switch (trigger.effect[j].kind) {
+            switch (trigger.effects[j].kind) {
                 case "attack":
                     // Implement attack logic here
-                    targets[i].health -= trigger.effect[j].amount;
+                    targets[i].health -= trigger.effects[j].amount;
                     break;
                 case "heal":
                     // Implement heal logic here
-                    targets[i].health += trigger.effect[j].amount;
+                    targets[i].health += trigger.effects[j].amount;
                     break;
                 case "defend":
                     // Implement defend logic here
@@ -43,22 +47,21 @@ export function resolveEffect(trigger) {
                     // Implement deploySubcard logic here
                     break;
                 default:
-                    throw new Error(`Unknown effect kind: ${effect.kind}`);
+                    throw new Error(`Unknown effect kind: ${trigger.effects[j].kind}`);
             }
         }
     }
 }
 
 function resolveSelection(effect) {
-    selection = effect.selection;
-    playerRef = effect.player;
+    let selection = effect.selection
 
     //need to handle player input for everything that isnt self and random iirc
     //and need to be able to read cards currently in play to process summons and constructs instead of always targeting the other player
     switch (selection.mode) {
         case "direct":
             // Implement direct selection logic here
-            break;
+            return resolveTarget.bind(this)(selection);
         case "random":
             // Implement random selection logic here
             break;
@@ -80,9 +83,9 @@ function resolveSelection(effect) {
     }
 }
 
-function resolveTarget(card, target) {
-    assert(card.triggers.effect.selection !== "self", "Self-targeting should be handled by the resolver, not the target-kind list.");
-
+function resolveTarget(selection) {
+    assert(selection.mode !== "self", "Self-targeting should be handled by the resolver, not the target-kind list.");
+    let target = selection.target
 
     // Still need to figure out how to handle alignment without excess complexity
     switch (target.kind) {
@@ -97,6 +100,7 @@ function resolveTarget(card, target) {
             break;
         case "player":
             // Implement player target logic here
+            return this.opponent;
             break;
         default:
             // Until selection is implemented, default to targeting opponent if not self
