@@ -42,10 +42,10 @@ export class CardGenerator {
   generate(options = {}) {
     const depth = options.depth ?? 0;
     const forcedType = options.forcedType ?? pick(this.rng, Object.values(Defs.CARD_TYPE));
-    return this.generateCard({ depth, forcedType });
+    return this.generateCard({ depth:depth, forcedType:forcedType });
   }
 
-  generateCard({ depth = 0, forcedType = null, subcard = false } = {}) {
+  generateCard({ depth = 0, forcedType = null, forcedTrigger = null, forcedEffects = [], subcard = false } = {}) {
     const kind = forcedType ?? pick(this.rng, Object.values(Defs.CARD_TYPE));
     const type = new Defs.CardTypeSpec({
       kind,
@@ -54,11 +54,11 @@ export class CardGenerator {
 
     const costs = subcard ? [] : this.generateCosts(kind, type.initialValue);
     const arcane = subcard ? false : this.rng() < 0.25;
-    const explicitTriggerCount = randomInt(this.rng, 1, 3);
-    const triggers = [...Defs.CARD_TYPE_RULES[kind].defaultTriggers()];
+    const explicitTriggerCount = 1 ? forcedTrigger: randomInt(this.rng, 1, 3);
+    const triggers = [this.generateTrigger({depth:depth, forcedTrigger:forcedTrigger, forcedEffects:forcedEffects})] ?? [...Defs.CARD_TYPE_RULES[kind].defaultTriggers()];
 
     for (let i = 0; i < explicitTriggerCount; i += 1) {
-      triggers.push(this.generateTrigger(depth));
+      triggers.push(this.generateTrigger({depth:depth}));
     }
 
     return new Card({
@@ -85,20 +85,26 @@ export class CardGenerator {
     return costs;
   }
 
-  generateTrigger(depth) {
-    const kind = pick(this.rng, Object.values(Defs.TRIGGER_KIND));
+  generateTrigger({ depth = 0, forcedTrigger = null, forcedEffects = [] } = {}) {
+    const kind = forcedTrigger ?? pick(this.rng, Object.values(Defs.TRIGGER_KIND));
     const target = kind === Defs.TRIGGER_KIND.GREET ? this.generateTargetSpec() : null;
-    const effectCount = randomInt(this.rng, 1, 2);
+    const effectCount = forcedEffects.length ?? randomInt(this.rng, 1, 2);
     const effects = [];
 
-    for (let i = 0; i < effectCount; i += 1) {
-      effects.push(this.generateEffect(depth));
+    if (forcedEffects) {
+      for (let i = 0; i < forcedEffects.length; i++) {
+        effects.push(this.generateEffect({depth:depth, forcedEffect:forcedEffects[i]}))
+      }
+    }
+
+    for (let i = forcedEffects.length ?? 0; i < effectCount; i += 1) {
+      effects.push(this.generateEffect({depth:depth}));
     }
 
     return new Defs.TriggerSpec({ kind, target, effects });
   }
 
-  generateEffect(depth) {
+  generateEffect({depth = 0, forcedEffect = null} = {}) {
     const canCreateSubcard = depth < this.maxNestedDepth;
 
     const choices = [
@@ -115,7 +121,7 @@ export class CardGenerator {
 
     if (canCreateSubcard) choices.push(Defs.EFFECT_KIND.DEPLOY_SUBCARD);
 
-    const kind = pick(this.rng, choices);
+    const kind = forcedEffect ?? pick(this.rng, choices);
 
     if (kind === Defs.EFFECT_KIND.DEPLOY_SUBCARD) {
       return Defs.EffectSpec.deploySubcard(
