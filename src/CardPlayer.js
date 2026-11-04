@@ -6,6 +6,7 @@
 
 
 import { CardDeck } from './CardDeck.js'
+import {resolveEffect} from './ResolveCardPlay.js'
 
 /**
 
@@ -51,7 +52,12 @@ export class CardPlayer {
 
 		this.played_card_i = i
 		this.played_card = this.hand[i]
-		this.hand[i].onPlay?.bind(this)()
+		
+		for (let j = 0; j < this.played_card.triggers.length; j++) {
+			if (this.played_card.triggers[j].kind === "entry") {
+			resolveEffect.bind(this)(this.played_card.triggers[j]);
+			}
+		}
 
 		// discard and draw
 
