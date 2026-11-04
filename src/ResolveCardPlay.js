@@ -5,51 +5,53 @@ import { CardGame } from "./CardGame.js";
 
 export function resolveEffect(trigger) {
 
-    targets = resolveSelection.bind(this)(this.played_card);
+    for (let j = 0; j < trigger.effects.length; j++) {
+        targets = resolveSelection.bind(this)(trigger.effects[j]);
 
-    for (target in targets) {
-        switch (trigger.effect.kind) {
-            case "attack":
-                // Implement attack logic here
-                target.health -= trigger.effect.amount;
-                break;
-            case "heal":
-                // Implement heal logic here
-                target.health += trigger.effect.amount;
-                break;
-            case "defend":
-                // Implement defend logic here
-                break;
-            case "surge":
-                // Implement surge logic here
-                break;
-            case "decay":
-                // Implement decay logic here
-                break;
-            case "destroy":
-                // Implement destroy logic here
-                break;
-            case "draw":
-                // Implement draw logic here
-                break;
-            case "discard":
-                // Implement discard logic here
-                break;
-            case "predict":
-                // Implement predict logic here
-                break;
-            case "deploySubcard":
-                // Implement deploySubcard logic here
-                break;
-            default:
-                throw new Error(`Unknown effect kind: ${effect.kind}`);
+        for (let i = 0; i < targets.length; i++) {
+            switch (trigger.effect[j].kind) {
+                case "attack":
+                    // Implement attack logic here
+                    targets[i].health -= trigger.effect[j].amount;
+                    break;
+                case "heal":
+                    // Implement heal logic here
+                    targets[i].health += trigger.effect[j].amount;
+                    break;
+                case "defend":
+                    // Implement defend logic here
+                    break;
+                case "surge":
+                    // Implement surge logic here
+                    break;
+                case "decay":
+                    // Implement decay logic here
+                    break;
+                case "destroy":
+                    // Implement destroy logic here
+                    break;
+                case "draw":
+                    // Implement draw logic here
+                    break;
+                case "discard":
+                    // Implement discard logic here
+                    break;
+                case "predict":
+                    // Implement predict logic here
+                    break;
+                case "deploySubcard":
+                    // Implement deploySubcard logic here
+                    break;
+                default:
+                    throw new Error(`Unknown effect kind: ${effect.kind}`);
+            }
         }
     }
 }
 
-function resolveSelection(card) {
-    selection = card.triggers.effect.selection;
-    playerRef = card.triggers.effect.player;
+function resolveSelection(effect) {
+    selection = effect.selection;
+    playerRef = effect.player;
 
     //need to handle player input for everything that isnt self and random iirc
     //and need to be able to read cards currently in play to process summons and constructs instead of always targeting the other player
