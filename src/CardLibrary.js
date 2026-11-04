@@ -11,10 +11,5 @@ export class CardLibrary {
   }
 }
 
-function onPlay() {
-  for (trigger in this.played_card.triggers) {
-    if (trigger === "entry") {
-      resolveEffect.bind(this)(trigger);
-    }
   }
 }
