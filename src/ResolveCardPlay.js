@@ -59,24 +59,20 @@ function resolveSelection(effect) {
     //need to handle player input for everything that isnt self and random iirc
     //and need to be able to read cards currently in play to process summons and constructs instead of always targeting the other player
     switch (selection.mode) {
-        case "direct":
+        /*case "direct":
             // Implement direct selection logic here
-            return resolveTarget.bind(this)(selection);
         case "random":
             // Implement random selection logic here
-            break;
         case "twinned":
             // Implement twinned selection logic here
-            break;
         case "split":
-            // Implement split selection logic here
-            break;
+            // Implement split selection logic here*/
         case "self":
             return this;
         default:
             // Until selection is implemented, default to targeting opponent if not self
             // pls for the love of god delete when selection is implemented
-            if (selection.mode === ["direct", "random", "twinned", "split"].includes(selection.mode)) {
+            if (["direct", "random", "twinned", "split"].includes(selection.mode)) {
                 return resolveTarget.bind(this)(selection);
             }
             throw new Error(`Unknown selection mode: ${selection.mode}`);
@@ -89,24 +85,21 @@ function resolveTarget(selection) {
 
     // Still need to figure out how to handle alignment without excess complexity
     switch (target.kind) {
-        case "spell":
+        /*case "spell":
             // Implement spell target logic here
-            break;
         case "construct":
             // Implement construct target logic here
-            break;
         case "summon":
             // Implement summon target logic here
-            break;
-        case "player":
+        case "player":*/
             // Implement player target logic here
-            return this.opponent;
-            break;
         default:
             // Until selection is implemented, default to targeting opponent if not self
             // pls for the love of god delete when selection is implemented
-            if (selection.mode === ["direct", "random", "twinned", "split"].includes(selection.mode)) {
-                return this.opponent;
+            if (["spell", "construct", "summon", "player"].includes(target.kind)) {
+                if (target.alignment !== 'friendly') {
+                    return this.opponent;
+                } else { return this }
             }
             throw new Error(`Unknown target kind: ${target.kind}`);
     }
