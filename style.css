@@ -17,10 +17,9 @@ body, html {
 	position: absolute;
 	right: 0px;
 	top:50%;
+	font-size: 72px;
+	background-color: #33883355;
 }
-
-
-
 
 #rr-newgame-button {
 	font-size: 72px;
@@ -135,6 +134,6 @@ body, html {
 }
 
 .rr-card-frontside:hover {
-
+	outline: 1px solid white;
   transform: translateY(-3px); /* Lifts the button slightly */
 }

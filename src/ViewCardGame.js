@@ -183,7 +183,7 @@ export class ViewCardGame {
 
 			</div>	
 
-			<button id="rr-btn-end-turn">end turn</button>
+			<div id="rr-btn-end-turn" class="rr-menu-button">end turn</div>
 		`
 
 	}
