@@ -1,5 +1,5 @@
 body, html {
-	background-image: url("./textures/Brick_02.png");
+	background-image: url("./textures/sample9.png");
 	padding: 0px;
 	margin: 0px;
 }
@@ -19,11 +19,32 @@ body, html {
 	top:50%;
 }
 
-#rr-play-button {
+
+
+
+#rr-newgame-button {
 	font-size: 72px;
-	border: inset 15px;
-	background-color: #ffffff99;
+	background-color: #ff000055;
+
 }
+
+#rr-continue-button {
+	font-size: 72px;
+	background-color: #ff888855;
+}
+
+#rr-ready-button {
+	font-size: 72px;
+	background-color: #33883355;
+}
+
+.rr-menu-button:hover {
+	outline: 1px solid white;
+}
+
+
+
+
 
 .rr-opp-battle-stat {
 	text-align: right;

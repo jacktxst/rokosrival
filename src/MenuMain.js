@@ -8,10 +8,10 @@ export function goToMainMenu() {
 	document.body.innerHTML = `
 
 		<div id="rr-menu-main">
-			<div id="rr-newgame-button">
+			<div id="rr-newgame-button" class="rr-menu-button">
 				New Game
 			</div>
-			<div id="rr-continue-button">
+			<div id="rr-continue-button" class="rr-menu-button">
 				Continue
 			</div>
 		</div>

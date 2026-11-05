@@ -26,7 +26,7 @@ export function goToLobby() {
 			<h1> Match No.: ${gameState.matchNumber} </h1>
 
 
-			<div id="rr-ready-button">
+			<div id="rr-ready-button" class="rr-menu-button">
 				Ready
 			</div> 
 			
