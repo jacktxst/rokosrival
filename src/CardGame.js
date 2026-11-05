@@ -29,6 +29,16 @@ export class CardGame {
 	}
 
 	yieldTurn() {
+		// activate any active cards with "rest" triggers
+		// finish for loop with variable for active cards on the game board
+		/*for () {
+			for (trigger in card.triggers) {
+				if (trigger === "rest") {
+					resolveEffect.bind(this)(trigger)
+				}
+			}
+		}*/
+
 		// note that renderBoard also removes event listeners, thus disabling the player from making a move. correct.
 
 		// reset mana for both players at the end of each turn
@@ -43,6 +53,16 @@ export class CardGame {
 		} else {
 			this.currentPlayer = this.player1
 		}
+
+		// activate any active cards with "awaken" triggers
+		// finish for loop with variable for active cards on the game board
+		/*for () {
+			for (trigger in card.triggers) {
+				if (trigger === "awaken") {
+					resolveEffect.bind(this)(trigger)
+				}
+			}
+		}*/
 
 		this.currentPlayer.doTurn()
 

@@ -6,6 +6,7 @@
 
 
 import { CardDeck } from './CardDeck.js'
+import {resolveEffect} from './ResolveCardPlay.js'
 
 /**
 
@@ -38,16 +39,41 @@ export class CardPlayer {
 	}
 
 	playCardFromHand(i, func) {
-		
-		if (this.mana < this.hand[i].cost) {
-			return
-		} else {
-			this.mana -= this.hand[i].cost
+
+		for (let j = 0; j < this.hand[i].costs.length; j++) {	
+			if (this.hand[i].costs[j].kind === "payMana") {
+				if (this.mana < this.hand[i].costs[j].amount) {
+					return
+				} else {
+					this.mana -= this.hand[i].costs[j].amount
+				}
+			}
+			if (this.hand[i].costs[j].kind === "payLife") {
+				if (this.health < this.hand[i].costs[j].amount) {
+					return
+				} else {
+					this.health -= this.hand[i].costs[j].amount
+				}
+			}
+			if (this.hand[i].costs[j].kind === "fizzleFriendlyNonPlayers") {
+				// for now this cost will empty the hand
+				if ((this.hand.length - 1 - i) < this.hand[i].costs[j].amount) {
+					return
+				} else {
+					this.hand.splice(i+1,this.hand[i].costs[j].amount)
+					this.hand = [...this.hand, ...this.deck.drawCards(this.hand[i].costs[j].amount)]
+				}
+			}
 		}
 
 		this.played_card_i = i
 		this.played_card = this.hand[i]
-		this.hand[i].onPlay?.bind(this)()
+		
+		for (let j = 0; j < this.played_card.triggers.length; j++) {
+			if (this.played_card.triggers[j].kind === "entry") {
+			resolveEffect.bind(this)(this.played_card.triggers[j]);
+			}
+		}
 
 		// discard and draw
 
