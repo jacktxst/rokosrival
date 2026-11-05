@@ -1,4 +1,5 @@
 
+import { CardLibrary } from './CardLibrary.js'
 
 
 /*
@@ -13,7 +14,7 @@ export class GameState {
 
 		this.matchNumber = 0
 		this.currentState = ""
-		this.cardLibrary  = null
+		this.cardLibrary  = new CardLibrary()
 
 
 	}

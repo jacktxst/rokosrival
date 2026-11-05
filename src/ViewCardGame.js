@@ -1,7 +1,12 @@
 import { CardPlayer } from './CardPlayer.js'
 import { CardGame } from './CardGame.js'
 import { CardDeck } from './CardDeck.js'
-import { CardLibrary } from './CardLibrary.js'
+
+
+
+import { gameState, GameState } from './GameState.js'
+
+
 
 import { p1Turn } from './GamePlayerController.js'
 import { p2Turn } from './GameBotController.js'
@@ -91,16 +96,15 @@ function renderCardDetails(card) {
 /**
 
 	ALL RENDERING CODE FOR THE CARD GAME	
-c
+
 */
 
 export class ViewCardGame {
 
 
 	constructor() {
-		this.cardLibrary = new CardLibrary()
-		this.p1 = new CardPlayer({turnCallback:p1Turn, deck:new CardDeck(this.cardLibrary.cards), name: "You"})
-		this.p2 = new CardPlayer({turnCallback:p2Turn, deck:new CardDeck(this.cardLibrary.cards), name: "CPU"})
+		this.p1 = new CardPlayer({turnCallback:p1Turn, deck:new CardDeck(gameState.cardLibrary.cards), name: "You"})
+		this.p2 = new CardPlayer({turnCallback:p2Turn, deck:new CardDeck(gameState.cardLibrary.cards), name: "CPU"})
 		this.game = new CardGame(this.p1,this.p2,this)
 		document.body.innerHTML = "<div id='board'></div> <div class='rr-played-card' id='rr-played-card-p1'></div> <div class='rr-played-card' id='rr-played-card-p2'></div>"
 		this.game.beginGame()

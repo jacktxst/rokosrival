@@ -1,4 +1,5 @@
 import { gameState, GameState } from './GameState.js'
+import { ViewCardGame } from './ViewCardGame.js'
 
 /*
 
@@ -43,7 +44,7 @@ export function goToLobby() {
 
 	document.getElementById("rr-ready-button").addEventListener("click",(e)=>{
 
-
+		gameState.currentGameView = new ViewCardGame()
 
 	})
 
