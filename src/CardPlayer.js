@@ -23,6 +23,7 @@ export class CardPlayer {
 		this.name   = args.name || "Default Name"
 		this.deck   = args.deck
 		this.game   = args.game || null
+		this.activeCards = []
 
 	}
 
@@ -38,24 +39,34 @@ export class CardPlayer {
 		this.opponent = (this === this.game.player1) ? this.game.player2 : this.game.player1
 	}
 
+	/*
+
+		i: the index of the card in the player's hand to be played
+		
+		func: a callback function which will be called once all the animations
+		from playing this card are finished
+
+	*/
 	playCardFromHand(i, func) {
 
-		for (let j = 0; j < this.hand[i].costs.length; j++) {	
-			if (this.hand[i].costs[j].kind === "payMana") {
-				if (this.mana < this.hand[i].costs[j].amount) {
+		let card = this.hand[i]
+
+		for (let j = 0; j < card.costs.length; j++) {	
+			if (card.costs[j].kind === "payMana") {
+				if (this.mana < card.costs[j].amount) {
 					return
 				} else {
-					this.mana -= this.hand[i].costs[j].amount
+					this.mana -= card.costs[j].amount
 				}
 			}
-			if (this.hand[i].costs[j].kind === "payLife") {
-				if (this.health < this.hand[i].costs[j].amount) {
+			if (card.costs[j].kind === "payLife") {
+				if (this.health < card.costs[j].amount) {
 					return
 				} else {
 					this.health -= this.hand[i].costs[j].amount
 				}
 			}
-			if (this.hand[i].costs[j].kind === "fizzleFriendlyNonPlayers") {
+			if (card.costs[j].kind === "fizzleFriendlyNonPlayers") {
 				// for now this cost will empty the hand
 				if ((this.hand.length - 1 - i) < this.hand[i].costs[j].amount) {
 					return
@@ -69,13 +80,24 @@ export class CardPlayer {
 		this.played_card_i = i
 		this.played_card = this.hand[i]
 		
-		for (let j = 0; j < this.played_card.triggers.length; j++) {
-			if (this.played_card.triggers[j].kind === "entry") {
-			resolveEffect.bind(this)(this.played_card.triggers[j]);
+		/* deploy the card to the board */
+
+		this.activeCards.push(card)
+
+		/* if applicable, trigger this card's entry effect */
+
+		for (let j = 0; j < card.triggers.length; j++) {
+			if (card.triggers[j].kind === "entry") {
+				resolveEffect.bind(this)(this.played_card.triggers[j]);
 			}
 		}
 
-		// discard and draw
+		/* we need to check if there are cards in play with a GREET trigger that needs
+		to be triggered by this card */
+
+		NOT IMPLEMENTED
+
+		// remove card from hand and draw another
 
 		this.hand.splice(i, 1)
 		this.hand = [...this.hand, ...this.deck.drawCards(1)]
@@ -93,10 +115,6 @@ export class CardPlayer {
 			return
 		} )
 
-		
-
-
-		// this.game.yieldTurn()
 	}
 
 }

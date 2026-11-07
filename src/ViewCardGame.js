@@ -1,15 +1,21 @@
+/*
+
+	This is the code responsible for 
+	rendering the ongoing card match 
+	as visible HTML elements.
+
+*/
+
+
+
 import { CardPlayer } from './CardPlayer.js'
 import { CardGame } from './CardGame.js'
 import { CardDeck } from './CardDeck.js'
-
-
-
 import { gameState, GameState } from './GameState.js'
-
-
-
 import { p1Turn } from './GamePlayerController.js'
 import { p2Turn } from './GameBotController.js'
+
+/* text formatting helpers */
 
 function escapeHtml(value) {
 	return String(value).replace(/[&<>"']/g, (character) => ({
@@ -67,6 +73,10 @@ function formatEffect(effect) {
 	}
 }
 
+
+
+
+
 function renderCardDetails(card) {
 	const title = `${capitalize(card.type.kind)} ${card.type.initialValue}`
 	const costs = card.costs.map(formatCost)
@@ -93,9 +103,9 @@ function renderCardDetails(card) {
 }
 
 
-/**
+/*
 
-	ALL RENDERING CODE FOR THE CARD GAME	
+	Main board rendering code:	
 
 */
 
