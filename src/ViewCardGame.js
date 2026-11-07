@@ -172,6 +172,40 @@ export class ViewCardGame {
 				</div>
 			</div>
 
+
+
+			<div class="active-cards" id="opponents-active-cards">
+				${(()=>{
+					let string = ""
+					for (let card of opponent.activeCards) {
+						string += `
+							<div class="rr-card rr-card-frontside">
+								${renderCardDetails(card)}
+							</div>
+						`
+					}
+					return string
+				})()}
+			</div>
+
+			<div id="frontline"></div>
+
+			<div class="active-cards" id="your-active-cards">
+				${(()=>{
+					let string = ""
+					for (let card of p1.activeCards) {
+						string += `
+							<div class="rr-card rr-card-frontside">
+								${renderCardDetails(card)}
+							</div>
+						`
+					}
+					return string
+				})()}
+			</div>
+
+
+
 			<div class="rr-hand-container">
 				<div class="rr-hand-container" id="rr-user-hand">
 					${(()=>{
@@ -190,7 +224,6 @@ export class ViewCardGame {
 						
 			<div class="rr-user-battle-stat">
 				${p1.name}: ${p1.health} HP ${p1.mana} MP
-
 			</div>	
 
 			<div id="rr-btn-end-turn" class="rr-menu-button">end turn</div>

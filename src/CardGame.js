@@ -31,7 +31,7 @@ export class CardGame {
 	yieldTurn() {
 		// activate any active cards with "rest" triggers
 		for (let card of this.currentPlayer.activeCards) {
-			for (trigger in card.triggers) {
+			for (let trigger of card.triggers) {
 				if (trigger === "rest") {
 					resolveEffect.bind(this)(trigger)
 				}
@@ -55,7 +55,7 @@ export class CardGame {
 
 		// activate any active cards with "awaken" triggers
 		for (let card of this.currentPlayer.activeCards) {
-			for (trigger in card.triggers) {
+			for (let trigger of card.triggers) {
 				if (trigger === "awaken") {
 					resolveEffect.bind(this)(trigger)
 				}

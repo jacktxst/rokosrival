@@ -21,6 +21,28 @@ body, html {
 	background-color: #33883355;
 }
 
+
+
+
+
+.active-cards {
+	height: 5vh;
+	display: flex;
+
+	justify-content: center;
+	flex-direction: row;
+	align-items: center;
+}
+
+#frontline {
+	min-height: 15px;
+	background-color: black;
+}
+
+
+
+
+
 #rr-newgame-button {
 	font-size: 72px;
 	background-color: #ff000055;
@@ -73,6 +95,7 @@ body, html {
 }
 
 .rr-card {
+	flex-shrink: 1;
 	background-image: url("./textures/paper.jpg");
 	background-repeat: repeat;
 	background-size: 300px;

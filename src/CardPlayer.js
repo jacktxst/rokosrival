@@ -19,10 +19,11 @@ export class CardPlayer {
 	 * 	args: {turnCallback : Callable, name : String, deck : Array, game : CardGame}
 	 */
 	constructor(args) {
-		this.doTurn = args.turnCallback
-		this.name   = args.name || "Default Name"
-		this.deck   = args.deck
-		this.game   = args.game || null
+		this.doTurn      = args.turnCallback
+		this.name        = args.name || "Default Name"
+		this.deck        = args.deck
+		this.discard     = args.discard || new CardDeck()
+		this.game        = args.game || null
 		this.activeCards = []
 
 	}
@@ -92,10 +93,8 @@ export class CardPlayer {
 			}
 		}
 
-		/* we need to check if there are cards in play with a GREET trigger that needs
+		/* TODO: we need to check if there are cards in play with a GREET trigger that needs
 		to be triggered by this card */
-
-		NOT IMPLEMENTED
 
 		// remove card from hand and draw another
 
