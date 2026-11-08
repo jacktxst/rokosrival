@@ -1,29 +1,21 @@
 /*
 
-	[PlayerController] -> [CardPlayer] <-> [CardGame] <-> [CardPlayer] <- [BotController]
+	[CardPlayer] <-> [CardGame] <-> [CardPlayer]
 
 */
 
 
 import { CardDeck } from './CardDeck.js'
-import {resolveEffect} from './ResolveCardPlay.js'
+import { resolveEffect } from './ResolveCardPlay.js'
 
-/**
+export class CardPlayerBase {
 
-	An instance of this class exists in each round for both the player and the opponent.
-
-*/
-export class CardPlayer {
-
-	/**
-	 * 	args: {turnCallback : Callable, name : String, deck : Array, game : CardGame}
-	 */
 	constructor(args) {
-		this.doTurn      = args.turnCallback
+
 		this.name        = args.name || "Default Name"
 		this.deck        = args.deck
 		this.discard     = args.discard || new CardDeck()
-		this.game        = args.game || null
+		this.cardGame    = args.game || null
 		this.activeCards = []
 
 	}
@@ -37,7 +29,7 @@ export class CardPlayer {
 		this.deck.unshuffleCards()
 		this.deck.shuffleCards()
 		this.hand = this.deck.drawCards(5)
-		this.opponent = (this === this.game.player1) ? this.game.player2 : this.game.player1
+		this.opponent = (this === this.cardGame.player1) ? this.cardGame.player2 : this.cardGame.player1
 	}
 
 	/*

@@ -1,4 +1,7 @@
 import { Card } from "./Card.js";
+import { assert } from "./Helpers.js"
+import { clampInt } from "./Helpers.js"
+
 
 export const CARD_TYPE = Object.freeze({
   SPELL: "spell",
@@ -79,13 +82,7 @@ export const EFFECT_TARGET_RULES = Object.freeze({
   ]),
 });
 
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
 
-function clampInt(value, min, max) {
-  return Math.max(min, Math.min(max, Math.trunc(value)));
-}
 
 export class TargetSpec {
   constructor({ kind, alignment = ALIGNMENT.ANY }) {

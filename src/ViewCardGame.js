@@ -6,76 +6,13 @@
 
 */
 
-
-
 import { CardPlayer } from './CardPlayer.js'
 import { CardGame } from './CardGame.js'
 import { CardDeck } from './CardDeck.js'
 import { gameState, GameState } from './GameState.js'
 import { p1Turn } from './GamePlayerController.js'
 import { p2Turn } from './GameBotController.js'
-
-/* text formatting helpers */
-
-function escapeHtml(value) {
-	return String(value).replace(/[&<>"']/g, (character) => ({
-		'&': '&amp;',
-		'<': '&lt;',
-		'>': '&gt;',
-		'"': '&quot;',
-		"'": '&#39;',
-	})[character])
-}
-
-function capitalize(value) {
-	return value.charAt(0).toUpperCase() + value.slice(1)
-}
-
-function formatTarget(target) {
-	return `${capitalize(target.alignment)} ${capitalize(target.kind)}`
-}
-
-function formatSelection(selection) {
-	if (selection.mode === 'self') return 'Self'
-	return `${capitalize(selection.mode)} ${formatTarget(selection.target)}`
-}
-
-function formatCost(cost) {
-	switch (cost.kind) {
-		case 'payMana':
-			return `${cost.amount} Mana`
-		case 'payLife':
-			return `${cost.amount} Life`
-		case 'fizzleFriendlyNonPlayers':
-			return `Fizzle ${cost.amount} Friendly non-player(s)`
-		default:
-			return capitalize(cost.kind)
-	}
-}
-
-function formatTrigger(trigger) {
-	if (trigger.kind === 'greet') {
-		return `Greet ${formatTarget(trigger.target)}`
-	}
-	return capitalize(trigger.kind)
-}
-
-function formatEffect(effect) {
-	switch (effect.kind) {
-		case 'destroy':
-			return `Destroy ${formatSelection(effect.selection)}`
-		case 'draw':
-		case 'discard':
-		case 'predict':
-			return `${capitalize(effect.player)} player: ${capitalize(effect.kind)} ${effect.amount}`
-		default:
-			return `${capitalize(effect.kind)} ${effect.amount} ${formatSelection(effect.selection)}`
-	}
-}
-
-
-
-
+import { capitalize, escapeHtml } from './Helpers.js'
 
 function renderCardDetails(card) {
 	const title = `${capitalize(card.type.kind)} ${card.type.initialValue}`
@@ -232,6 +169,8 @@ export class ViewCardGame {
 	}
 
 }
+
+
 
 
 	

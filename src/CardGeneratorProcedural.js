@@ -1,19 +1,7 @@
 // CardGeneratorProcedural.js
 import { Card } from "./Card.js";
 import * as Defs from "./CardDefinitions.js";
-
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
-
-function randomInt(rng, min, max) {
-  return Math.floor(rng() * (max - min + 1)) + min;
-}
-
-function pick(rng, array) {
-  assert(array.length > 0, "can't pick from an empty array.");
-  return array[randomInt(rng, 0, array.length - 1)];
-}
+import {assert, randomInt, pick, capitalize} from "./Helpers.js"
 
 export class CardGenerator {
   constructor({
@@ -271,100 +259,9 @@ export class CardGenerator {
   }
 }
 
-// this is just a stub for the time being.
-// cards will be resolved in the game loop, not in the generator.
-export class GameStateResolver {
-  constructor() {
-    this.cardsInPlay = [];
-  }
 
-  playCard(card) {
-    throw new Error(
-      "NYI",
-    );
-  }
 
-  step(_stepName) {
-    throw new Error(
-      "NYI",
-    );
-  }
-}
 
-export function formatCard(card, indent = 0) {
-  const pad = " ".repeat(indent);
-  const typeLabel = `${capitalize(card.type.kind)} ${card.type.initialValue}`;
-  const costLabel = card.costs.map(formatCost).join(", ") || "Free";
-  const lines = [`${pad}${typeLabel} | Cost: ${costLabel}${card.arcane ? " | Arcane" : ""}`];
 
-  for (const trigger of card.triggers) {
-    lines.push(`${pad}${formatTriggerHeader(trigger)}:`);
-    for (const effect of trigger.effects) {
-      lines.push(`${pad}  ${formatEffect(effect, indent + 2)}`);
-    }
-  }
 
-  return lines.join("\n");
-}
 
-function formatCost(cost) {
-  switch (cost.kind) {
-    case "payMana":
-      return `${cost.amount} Mana`;
-    case "payLife":
-      return `${cost.amount} Life`;
-    case "fizzleFriendlyNonPlayers":
-      return `Fizzle ${cost.amount} Friendly non-player(s)`;
-    default:
-      return cost.kind;
-  }
-}
-
-function formatTriggerHeader(trigger) {
-  switch (trigger.kind) {
-    case Defs.TRIGGER_KIND.AWAKEN:
-      return "Awaken";
-    case Defs.TRIGGER_KIND.REST:
-      return "Rest";
-    case Defs.TRIGGER_KIND.GREET:
-      return `Greet ${formatTarget(trigger.target)}`;
-    case Defs.TRIGGER_KIND.THORN:
-      return "Thorn";
-    case Defs.TRIGGER_KIND.EXIT:
-      return "Exit";
-    case Defs.TRIGGER_KIND.ENTRY:
-      return "Entry";
-    default:
-      return trigger.kind;
-  }
-}
-
-function formatEffect(effect, indent) {
-  switch (effect.kind) {
-    case Defs.EFFECT_KIND.DEPLOY_SUBCARD:
-      return `${capitalize(effect.card.type.kind)} ${effect.card.type.initialValue} {\n${formatCard(effect.card, indent + 2)}\n${" ".repeat(indent)}}`;
-    case Defs.EFFECT_KIND.DESTROY:
-      return `Destroy ${formatSelection(effect.selection)}`;
-    case Defs.EFFECT_KIND.DRAW:
-      return `${capitalize(effect.player)} Player Draw ${effect.amount}`;
-    case Defs.EFFECT_KIND.DISCARD:
-      return `${capitalize(effect.player)} Player Discard ${effect.amount}`;
-    case Defs.EFFECT_KIND.PREDICT:
-      return `${capitalize(effect.player)} Player Predict ${effect.amount}`;
-    default:
-      return `${capitalize(effect.kind)} ${effect.amount} ${formatSelection(effect.selection)}`;
-  }
-}
-
-function formatSelection(selection) {
-  if (selection.mode === Defs.SELECTION_MODE.SELF) return "Self";
-  return `${capitalize(selection.mode)} ${formatTarget(selection.target)}`;
-}
-
-function formatTarget(target) {
-  return `${capitalize(target.alignment)} ${capitalize(target.kind)}`;
-}
-
-function capitalize(value) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
-}

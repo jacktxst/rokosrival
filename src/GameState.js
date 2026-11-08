@@ -20,6 +20,8 @@ export class GameState {
 		this.currentState = ""
 		this.cardLibrary  = new CardLibrary()
 
+		this.playerDeck = cardLibrary.getRandomDeck(50)
+
 
 	}
 }

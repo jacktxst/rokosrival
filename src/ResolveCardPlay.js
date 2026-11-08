@@ -4,21 +4,27 @@ import { CardGame } from "./CardGame.js";
 
 import { assert } from "./Helpers.js"
 
+/* 
+    at the callsite, 'this' should be set to the owner player
+*/
 export function resolveEffect(trigger) {
 
-    for (let j = 0; j < trigger.effects.length; j++) {
-        let targets = []
-        targets = targets.concat(resolveSelection.bind(this)(trigger.effects[j]));
+    for (let effect of trigger.effects) {
 
-        for (let i = 0; i < targets.length; i++) {
-            switch (trigger.effects[j].kind) {
+
+        let targets = []
+
+        targets = targets.concat(resolveSelection.bind(this)(effect));
+
+        for (let target of targets) {
+            switch (effect.kind) {
                 case "attack":
                     // Implement attack logic here
-                    targets[i].health -= trigger.effects[j].amount;
+                    target.health -= effect.amount;
                     break;
                 case "heal":
                     // Implement heal logic here
-                    targets[i].health += trigger.effects[j].amount;
+                    target.health += effect.amount;
                     break;
                 case "defend":
                     // Implement defend logic here
@@ -66,7 +72,7 @@ function resolveSelection(effect) {
         case "split":
             // Implement split selection logic here*/
         case "self":
-            return this;
+            return this; // this is the CardPlayer
         default:
             // Until selection is implemented, default to targeting opponent if not self
             // pls for the love of god delete when selection is implemented

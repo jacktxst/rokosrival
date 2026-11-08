@@ -149,14 +149,14 @@ body, html {
 	
 }
 
-.rr-card-frontside {
+.card-hoverable {
 
 	transition: transform 0.3s ease;
 
 
 }
 
-.rr-card-frontside:hover {
+.card-hoverable:hover {
 	outline: 1px solid white;
   transform: translateY(-3px); /* Lifts the button slightly */
 }
