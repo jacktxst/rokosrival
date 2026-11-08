@@ -20,13 +20,14 @@ export class CardLibrary {
       generator.buildMockupSimpleAttackSpell()
     ];
 
-    for (let i = 0; i < 40; i++) {
-      this.cards.push(gen2.generateCard({forcedType:'spell', forcedTrigger:'entry', forcedEffects:['attack']}));
+    for (let i = 0; i < 100; i++) {
+      this.cards.push(gen2.generateCard());
     }
-
+    /*
     for (let i = 0; i < 20; i++) {
       this.cards.push(gen2.generateCard({forcedType:'spell', forcedTrigger:'entry', forcedEffects:['heal']}));
     }
+    */
   }
 
   /* generates a random deck with n cards. may contain repeats. */

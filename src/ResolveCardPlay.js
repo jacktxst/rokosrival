@@ -2,9 +2,7 @@ import { Card } from "./Card.js";
 import "./CardDefinitions.js";
 import { CardGame } from "./CardGame.js";
 
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
+import { assert } from "./Helpers.js"
 
 export function resolveEffect(trigger) {
 
