@@ -33,12 +33,27 @@ export class CardPlayerBase {
 	}
 
 	/*
-
+	==================================================================================
+		playCardFromHand(i : int, func : Callable)
+	==================================================================================
 		i: the index of the card in the player's hand to be played
 		
 		func: a callback function which will be called once all the animations
 		from playing this card are finished
+	==================================================================================
+		this function incurs the cost of a card,
+		deploys the card to the board,
+		triggers the card's ENTRY trigger,
+		triggers any applicable GREET triggers, (TODO not yet implemented)
+		removes card from hand and draws,
+		reshuffles if necessary,
+		plays an animation,
+		re-renders the board,
+		then returns control to the player so they can play more cards.
 
+		this function can result in player death if they are out of
+		cards and have already reshuffled. (TODO not yet implemented)
+	==================================================================================
 	*/
 	playCardFromHand(i, func) {
 
@@ -79,11 +94,7 @@ export class CardPlayerBase {
 
 		/* if applicable, trigger this card's entry effect */
 
-		for (let j = 0; j < card.triggers.length; j++) {
-			if (card.triggers[j].kind === "entry") {
-				resolveEffect.bind(this)(this.played_card.triggers[j]);
-			}
-		}
+		triggerEffectOnCard( card, "entry" )
 
 		/* TODO: we need to check if there are cards in play with a GREET trigger that needs
 		to be triggered by this card */
@@ -103,6 +114,9 @@ export class CardPlayerBase {
 
 		this.view.showPlayedCard( ()=>{
 			if (func) func.bind(this)()
+			else {
+				this.doTurn()
+			}
 			return
 		} )
 

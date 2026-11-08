@@ -31,11 +31,9 @@ export class CardGame {
 	yieldTurn() {
 		// activate any active cards with "rest" triggers
 		for (let card of this.currentPlayer.activeCards) {
-			for (let trigger of card.triggers) {
-				if (trigger === "rest") {
-					resolveEffect.bind(this)(trigger)
-				}
-			}
+			
+			triggerCard(card, "rest")
+
 		}
 
 		// note that renderBoard also removes event listeners, thus disabling the player from making a move. correct.
@@ -55,11 +53,9 @@ export class CardGame {
 
 		// activate any active cards with "awaken" triggers
 		for (let card of this.currentPlayer.activeCards) {
-			for (let trigger of card.triggers) {
-				if (trigger === "awaken") {
-					resolveEffect.bind(this)(trigger)
-				}
-			}
+
+			triggerCard(card, "awaken")
+
 		}
 
 		this.currentPlayer.doTurn()

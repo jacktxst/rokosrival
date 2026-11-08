@@ -1,5 +1,11 @@
 export class CardPlayerHuman extends CardPlayer {
 
+	/* 
+	give the player the opportunity 
+	to play multiple cards and then 
+	end their turn 
+	*/
+
 	doTurn() {
 
 		let userCardDivs = document.getElementById("rr-user-hand").children
@@ -8,7 +14,7 @@ export class CardPlayerHuman extends CardPlayer {
 		for(let i=0;i<userCardDivs.length;i++) {
 			userCardDivs[i].addEventListener("click",(e)=>{
 
-				this.playCardFromHand(i, this.doTurn )
+				this.playCardFromHand( i )
 				
 				
 			})
@@ -35,7 +41,7 @@ export class CardPlayerHuman extends CardPlayer {
 
 			case "opposing":
 
-				let targetableDivs = document.getElementById("opposing-active-cards").children
+				let targetableDivs = document.getElementById("opponents-active-cards").children
 
 				for (let i=0; i<targetableDivs.length; i++) {
 					if (this.opponent.activeCards[i].kind == kind) {
@@ -44,9 +50,15 @@ export class CardPlayerHuman extends CardPlayer {
 
 						targetableDivs[i].addEventListener("click",(e)=>{
 							if ( targets.includes(i) ) {
+								targetableDivs[i].classList.remove("card-targeted")
 								targets.remove(i)
 							} else {
-								targets.push(i)
+								if (targets.length >= maxTargets) {
+
+								} else {
+									targetableDivs[i].classList.add("card-targeted")
+									targets.push(i)	
+								}
 							}
 						})
 

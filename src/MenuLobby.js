@@ -44,6 +44,11 @@ export function goToLobby() {
 
 	document.getElementById("rr-ready-button").addEventListener("click",(e)=>{
 
+		this.p1   = new CardPlayerHuman({ deck:new CardDeck(gameState.cardLibrary.cards), name: "You"})
+		this.p2   = new CardPlayerBot  ({ deck:new CardDeck(gameState.cardLibrary.cards), name: "CPU"})
+		this.game = new CardGame(this.p1,this.p2,this)
+		this.game.beginGame()
+
 		gameState.currentGameView = new ViewCardGame()
 
 	})

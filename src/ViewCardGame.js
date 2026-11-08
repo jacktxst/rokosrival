@@ -6,12 +6,11 @@
 
 */
 
-import { CardPlayer } from './CardPlayer.js'
 import { CardGame } from './CardGame.js'
 import { CardDeck } from './CardDeck.js'
-import { gameState, GameState } from './GameState.js'
-import { p1Turn } from './GamePlayerController.js'
-import { p2Turn } from './GameBotController.js'
+import { gameState } from './GameState.js'
+import { CardPlayerBot } from './CardPlayerHuman.js'
+import { CardPlayerHuman } from './CardPlayerBot.js'
 import { capitalize, escapeHtml } from './Helpers.js'
 
 function renderCardDetails(card) {
@@ -49,12 +48,12 @@ function renderCardDetails(card) {
 export class ViewCardGame {
 
 
-	constructor() {
-		this.p1 = new CardPlayer({turnCallback:p1Turn, deck:new CardDeck(gameState.cardLibrary.cards), name: "You"})
-		this.p2 = new CardPlayer({turnCallback:p2Turn, deck:new CardDeck(gameState.cardLibrary.cards), name: "CPU"})
-		this.game = new CardGame(this.p1,this.p2,this)
-		document.body.innerHTML = "<div id='board'></div> <div class='rr-played-card' id='rr-played-card-p1'></div> <div class='rr-played-card' id='rr-played-card-p2'></div>"
-		this.game.beginGame()
+	constructor(cardGame) {
+		
+		this.cardGame = cardGame
+		this.p1 = cardGame.p1 
+		this.p2 = cardGame.p2
+		
 	}
 
 	/*
@@ -67,11 +66,11 @@ export class ViewCardGame {
 	*/
 	showPlayedCard(afterFunc) {
 
-		let playedCardDiv = document.getElementById(this.game.currentPlayer === this.game.player1 ? "rr-played-card-p1" : "rr-played-card-p2")
+		let playedCardDiv = document.getElementById(this.cardGame.currentPlayer === this.cardGame.player1 ? "rr-played-card-p1" : "rr-played-card-p2")
 
 		playedCardDiv.innerHTML = `
 			<div class="rr-card rr-card-frontside">
-				${renderCardDetails(this.game.currentPlayer.played_card)}
+				${renderCardDetails(this.cardGame.currentPlayer.played_card)}
 			</div>`
 		playedCardDiv.style.opacity = "100%"
 
@@ -85,9 +84,22 @@ export class ViewCardGame {
 
 	}
 
-
-
+	/*	
+	=========================================
+		renderBoard() 
+	=========================================
+		Clear the screen and render the 
+		ongoing card match as visible 
+		HTML elements. This function
+		has the side effect of disabling
+		player input even if it is their 
+		turn.
+	=========================================
+	*/
 	renderBoard(){ 
+
+		document.body.innerHTML = "<div id='board'></div> <div class='rr-played-card' id='rr-played-card-p1'></div> <div class='rr-played-card' id='rr-played-card-p2'></div>"
+
 		const opponent = this.p2
 		const p1 = this.p1
 		document.getElementById("board").innerHTML = `
