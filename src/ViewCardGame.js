@@ -1,71 +1,18 @@
-import { CardPlayer } from './CardPlayer.js'
+/*
+
+	This is the code responsible for 
+	rendering the ongoing card match 
+	as visible HTML elements.
+
+*/
+
 import { CardGame } from './CardGame.js'
 import { CardDeck } from './CardDeck.js'
-
-
-
-import { gameState, GameState } from './GameState.js'
-
-
-
-import { p1Turn } from './GamePlayerController.js'
-import { p2Turn } from './GameBotController.js'
-
-function escapeHtml(value) {
-	return String(value).replace(/[&<>"']/g, (character) => ({
-		'&': '&amp;',
-		'<': '&lt;',
-		'>': '&gt;',
-		'"': '&quot;',
-		"'": '&#39;',
-	})[character])
-}
-
-function capitalize(value) {
-	return value.charAt(0).toUpperCase() + value.slice(1)
-}
-
-function formatTarget(target) {
-	return `${capitalize(target.alignment)} ${capitalize(target.kind)}`
-}
-
-function formatSelection(selection) {
-	if (selection.mode === 'self') return 'Self'
-	return `${capitalize(selection.mode)} ${formatTarget(selection.target)}`
-}
-
-function formatCost(cost) {
-	switch (cost.kind) {
-		case 'payMana':
-			return `${cost.amount} Mana`
-		case 'payLife':
-			return `${cost.amount} Life`
-		case 'fizzleFriendlyNonPlayers':
-			return `Fizzle ${cost.amount} Friendly non-player(s)`
-		default:
-			return capitalize(cost.kind)
-	}
-}
-
-function formatTrigger(trigger) {
-	if (trigger.kind === 'greet') {
-		return `Greet ${formatTarget(trigger.target)}`
-	}
-	return capitalize(trigger.kind)
-}
-
-function formatEffect(effect) {
-	switch (effect.kind) {
-		case 'destroy':
-			return `Destroy ${formatSelection(effect.selection)}`
-		case 'draw':
-		case 'discard':
-		case 'predict':
-			return `${capitalize(effect.player)} player: ${capitalize(effect.kind)} ${effect.amount}`
-		default:
-			return `${capitalize(effect.kind)} ${effect.amount} ${formatSelection(effect.selection)}`
-	}
-}
+import { gameState } from './GameState.js'
+import { CardPlayerHuman } from './CardPlayerHuman.js'
+import { CardPlayerBot } from './CardPlayerBot.js'
+import { capitalize, escapeHtml } from './Helpers.js'
+import { formatCost, formatTrigger, formatCard, formatEffect } from './CardFormatHelpers.js'
 
 function renderCardDetails(card) {
 	const title = `${capitalize(card.type.kind)} ${card.type.initialValue}`
@@ -75,13 +22,13 @@ function renderCardDetails(card) {
 			<strong>${escapeHtml(formatTrigger(trigger))}</strong>
 			${trigger.effects.length
 				? `<ul>${trigger.effects.map((effect) => `
-					<li>
+					<li> 
 						${effect.kind === 'deploySubcard'
 							? `Deploy ${escapeHtml(capitalize(effect.card.type.kind))} ${effect.card.type.initialValue}${renderCardDetails(effect.card)}`
 							: escapeHtml(formatEffect(effect))}
 					</li>
 				`).join('')}</ul>`
-				: ''}
+				: '..no effects..'}
 		</li>
 	`).join('')
 
@@ -93,21 +40,21 @@ function renderCardDetails(card) {
 }
 
 
-/**
+/*
 
-	ALL RENDERING CODE FOR THE CARD GAME	
+	Main board rendering code:	
 
 */
 
 export class ViewCardGame {
 
 
-	constructor() {
-		this.p1 = new CardPlayer({turnCallback:p1Turn, deck:new CardDeck(gameState.cardLibrary.cards), name: "You"})
-		this.p2 = new CardPlayer({turnCallback:p2Turn, deck:new CardDeck(gameState.cardLibrary.cards), name: "CPU"})
-		this.game = new CardGame(this.p1,this.p2,this)
-		document.body.innerHTML = "<div id='board'></div> <div class='rr-played-card' id='rr-played-card-p1'></div> <div class='rr-played-card' id='rr-played-card-p2'></div>"
-		this.game.beginGame()
+	constructor(cardGame) {
+		
+		this.cardGame = cardGame
+		this.p1 = cardGame.player1 
+		this.p2 = cardGame.player2
+		
 	}
 
 	/*
@@ -120,11 +67,11 @@ export class ViewCardGame {
 	*/
 	showPlayedCard(afterFunc) {
 
-		let playedCardDiv = document.getElementById(this.game.currentPlayer === this.game.player1 ? "rr-played-card-p1" : "rr-played-card-p2")
+		let playedCardDiv = document.getElementById(this.cardGame.currentPlayer === this.cardGame.player1 ? "rr-played-card-p1" : "rr-played-card-p2")
 
 		playedCardDiv.innerHTML = `
 			<div class="rr-card rr-card-frontside">
-				${renderCardDetails(this.game.currentPlayer.played_card)}
+				${renderCardDetails(this.cardGame.currentPlayer.played_card)}
 			</div>`
 		playedCardDiv.style.opacity = "100%"
 
@@ -138,9 +85,22 @@ export class ViewCardGame {
 
 	}
 
-
-
+	/*	
+	=========================================
+		renderBoard() 
+	=========================================
+		Clear the screen and render the 
+		ongoing card match as visible 
+		HTML elements. This function
+		has the side effect of disabling
+		player input even if it is their 
+		turn.
+	=========================================
+	*/
 	renderBoard(){ 
+
+		document.body.innerHTML = "<div id='board'></div> <div class='rr-played-card' id='rr-played-card-p1'></div> <div class='rr-played-card' id='rr-played-card-p2'></div>"
+
 		const opponent = this.p2
 		const p1 = this.p1
 		document.getElementById("board").innerHTML = `
@@ -163,13 +123,47 @@ export class ViewCardGame {
 					</div>
 				</div>
 	
+	
+	
+				<div class="active-cards" id="opponents-active-cards">
+					${(()=>{
+						let string = ""
+						for (let card of opponent.activeCards) {
+							string += `
+								<div class="rr-card rr-card-frontside">
+									${renderCardDetails(card)}
+								</div>
+							`
+						}
+						return string
+					})()}
+				</div>
+	
+				<div id="frontline"></div>
+	
+				<div class="active-cards" id="your-active-cards">
+					${(()=>{
+						let string = ""
+						for (let card of p1.activeCards) {
+							string += `
+								<div class="rr-card rr-card-frontside">
+									${renderCardDetails(card)}
+								</div>
+							`
+						}
+						return string
+					})()}
+				</div>
+	
+	
+	
 				<div class="rr-hand-container">
 					<div class="rr-hand-container" id="rr-user-hand">
 						${(()=>{
 							let string = ""
 							for (let i=0;i<p1.hand.length;i++) {
 								string += `
-									<div class="rr-card rr-card-frontside">
+									<div class="rr-card rr-card-frontside card-hoverable">
 										${renderCardDetails(p1.hand[i])}
 									</div>
 								`
@@ -182,7 +176,6 @@ export class ViewCardGame {
 						
 			<div class="rr-user-battle-stat">
 				${p1.name}: ${p1.health} HP ${p1.mana} MP
-
 			</div>	
 
 			<div id="rr-btn-end-turn" class="rr-menu-button">end turn</div>
@@ -191,6 +184,8 @@ export class ViewCardGame {
 	}
 
 }
+
+
 
 
 	
