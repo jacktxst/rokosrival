@@ -38,28 +38,29 @@ export class CardPlayerHuman extends CardPlayerBase {
 	selectTargets( maxTargets, targetAlignment, targetKind, callback ) {
 
 		let targets = []
+		let targetableDivs = []
 
 		switch (targetAlignment) {
 
 			case "opposing":
 
-				let targetableDivs = document.getElementById("opponents-active-cards").children
+				targetableDivs = document.getElementById("opponents-active-cards").children
 
 				for (let i=0; i<targetableDivs.length; i++) {
-					if (this.opponent.activeCards[i].kind == kind) {
+					if (this.opponent.activeCards[i].kind === targetKind) {
 
 						targetableDivs[i].classList.add("card-hoverable")
 
 						targetableDivs[i].addEventListener("click",(e)=>{
-							if ( targets.includes(i) ) {
+							if ( targets.includes(this.opponent.activeCards[i]) ) {
 								targetableDivs[i].classList.remove("card-targeted")
-								targets.remove(i)
+								targets.remove(this.opponent.activeCards[i])
 							} else {
 								if (targets.length >= maxTargets) {
 
 								} else {
 									targetableDivs[i].classList.add("card-targeted")
-									targets.push(i)	
+									targets.push(this.opponent.activeCards[i])	
 								}
 							}
 						})
@@ -69,8 +70,82 @@ export class CardPlayerHuman extends CardPlayerBase {
 
 				break;
 			case "friendly":
+
+				targetableDivs = document.getElementById("your-active-cards").children
+
+				for (let i=0; i<targetableDivs.length; i++) {
+					if (this.activeCards[i].kind === targetKind) {
+
+						targetableDivs[i].classList.add("card-hoverable")
+
+						targetableDivs[i].addEventListener("click",(e)=>{
+							if ( targets.includes(this.activeCards[i]) ) {
+								targetableDivs[i].classList.remove("card-targeted")
+								targets.remove(this.activeCards[i])
+							} else {
+								if (targets.length >= maxTargets) {
+
+								} else {
+									targetableDivs[i].classList.add("card-targeted")
+									targets.push(this.activeCards[i])	
+								}
+							}
+						})
+
+					}
+				}
+
 				break;
 			case "any":
+
+				targetableDivs = document.getElementById("opponents-active-cards").children
+
+				for (let i=0; i<targetableDivs.length; i++) {
+					if (this.opponent.activeCards[i].kind === targetKind) {
+
+						targetableDivs[i].classList.add("card-hoverable")
+
+						targetableDivs[i].addEventListener("click",(e)=>{
+							if ( targets.includes(this.opponent.activeCards[i]) ) {
+								targetableDivs[i].classList.remove("card-targeted")
+								targets.remove(this.opponent.activeCards[i])
+							} else {
+								if (targets.length >= maxTargets) {
+
+								} else {
+									targetableDivs[i].classList.add("card-targeted")
+									targets.push(this.opponent.activeCards[i])	
+								}
+							}
+						})
+
+					}
+				}
+
+				targetableDivs = document.getElementById("your-active-cards").children
+
+				for (let i=0; i<targetableDivs.length; i++) {
+					if (this.activeCards[i].kind === targetKind) {
+
+						targetableDivs[i].classList.add("card-hoverable")
+
+						targetableDivs[i].addEventListener("click",(e)=>{
+							if ( targets.includes(this.activeCards[i]) ) {
+								targetableDivs[i].classList.remove("card-targeted")
+								targets.remove(this.activeCards[i])
+							} else {
+								if (targets.length >= maxTargets) {
+
+								} else {
+									targetableDivs[i].classList.add("card-targeted")
+									targets.push(this.activeCards[i])	
+								}
+							}
+						})
+
+					}
+				}
+
 				break;
 
 		}
