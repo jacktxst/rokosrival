@@ -108,17 +108,19 @@ export class ViewCardGame {
 				${opponent.name}: ${opponent.health} HP
 			</div>
 
-			<div class="rr-hand-container">
-				<div class="rr-hand-container" id="rr-opp-hand">
-					${(()=>{
-						let string = ""
-						for (let i=0;i<opponent.hand.length;i++) {
-							string += `
-								<div class="rr-card rr-card-backside"></div>
-							`
-						}
-						return string
-					})()}
+			<div class="innerboard">
+				<div class="rr-hand-container">
+					<div class="rr-hand-container" id="rr-opp-hand">
+						${(()=>{
+							let string = ""
+							for (let i=0;i<opponent.hand.length;i++) {
+								string += `
+									<div class="rr-card rr-card-backside"></div>
+								`
+							}
+							return string
+						})()}
+					</div>
 				</div>
 			</div>
 
