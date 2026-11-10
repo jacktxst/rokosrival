@@ -7,6 +7,10 @@
 	[CardPlayer] <-> [CardGame] <-> [CardPlayer]
 
 */
+
+import { TriggerCardEvent, ReturnControlEvent, eventQueue } from './ResolveCardPlay.js'
+
+
 export class CardGame {
 
 	constructor(player1, player2, gameView) {
@@ -32,7 +36,11 @@ export class CardGame {
 		// activate any active cards with "rest" triggers
 		for (let card of this.currentPlayer.activeCards) {
 			
-			triggerCard(card, "rest")
+			eventQueue.push(  
+
+				new TriggerCardEvent( card, "rest" ),
+
+			)
 
 		}
 
@@ -54,11 +62,17 @@ export class CardGame {
 		// activate any active cards with "awaken" triggers
 		for (let card of this.currentPlayer.activeCards) {
 
-			triggerCard(card, "awaken")
+			eventQueue.push(  
+
+				new TriggerCardEvent( card, "awaken" ),
+
+			)
 
 		}
 
-		this.currentPlayer.doTurn()
+		eventQueue.push(
+			new ReturnControlEvent()
+		)
 
 	}
 

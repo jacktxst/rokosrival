@@ -1,7 +1,7 @@
 import { Card } from "./Card.js";
 import "./CardDefinitions.js";
 import { CardGame } from "./CardGame.js";
-
+import { gameState } from './GameState.js'
 import { assert } from "./Helpers.js"
 
 let isEffectInProgress = false
@@ -10,31 +10,39 @@ export let eventQueue = []
 
 export class TriggerCardEvent {
 	constructor(target, triggerKind) {
+		this.state = "hasnt-started"
 		this.kind = "trigger-card"
 		this.target = target 
 		this.triggerKind = triggerKind
+		this.timeRemaining = 0
 	}
 }
 
 export class GatherTargetsEvent {
 	constructor(originator, effect) {
+		this.state = "hasnt-started"
 		this.kind = "gather-targets"
 		this.originator = originator
 		this.effect = effect
+		this.timeRemaining = 0
 	}
 }
 
 export class AnimateEffectEvent {
 	constructor(effect) {
+		this.state = "hasnt-started"
 		this.kind = "animate-effect"
 		this.targetList = [] // will be filled when a GatherTargetsEvent runs beforehand
 		this.effect = effect
+		this.timeRemaining = 0
 	}
 }
 
 export class ReturnControlEvent {
 	constructor() {
+		this.state = "hasnt-started"
 		this.kind = "return-control"
+		this.timeRemaining = 0
 	}
 }
 
@@ -57,12 +65,14 @@ function resolveLoop(timestamp) {
 			switch (e.kind) {
 
 				case "trigger-card": // expand into each triggered effect
-
+					console.log(`card triggered! targettypekind: ${e.target.type.kind} triggerkind:${e.triggerKind} `)
 					let newEvents = []
 
 					for (let trigger of e.target.triggers) {
 						if (trigger.kind === e.triggerKind) {
+							console.log("matching trigger found on card!")
 							for (let effect of trigger.effects) {
+								console.log("effect queued...")
 								newEvents.push( 
 									new GatherTargetsEvent(e.target, effect),
 									new AnimateEffectEvent(effect)
@@ -71,50 +81,59 @@ function resolveLoop(timestamp) {
 						}
 					}
 					eventQueue.splice(0,1)
-					eventQueue.concat(newEvents, eventQueue)
+					eventQueue = [...newEvents, ...eventQueue]
 
 					break;
 
 				case "gather-targets":
+					e.state = "in-progress"
+					console.log(`gather targets! owner: ${e.originator.owner.name} `)
+					if (!e.effect.selection) {
+						console.log("no selection required, skipping...")
+						eventQueue.splice(0,1)
 
-					switch( e.effect.selection.mode ) {
+					} else {
+						switch( e.effect.selection.mode ) {
 
-						case "direct":
-							e.originator.owner.selectTargets(1, e.effect.selection.target.alignment, e.effect.selection.target.kind, (targets)=>{
+							case "direct":
+								e.originator.owner.selectTargets(1, e.effect.selection.target.alignment, e.effect.selection.target.kind, (targets)=>{
+									eventQueue.splice(0,1)
+									eventQueue[0].targetList = targets
+								})
+								break;
+							case "random":
 								eventQueue.splice(0,1)
-								eventQueue[0].targetList = targets
-							})
-							break;
-						case "random":
-							eventQueue.splice(0,1)
-							// TODO : implement RANDOM select mode
-							eventQueue[0].targetList = []
-							break;
-						case "twinned":
-							e.originator.owner.selectTargets(2, e.effect.selection.target.alignment, e.effect.selection.target.kind, (targets)=>{
+								// TODO : implement RANDOM select mode
+								eventQueue[0].targetList = []
+								break;
+							case "twinned":
+								e.originator.owner.selectTargets(2, e.effect.selection.target.alignment, e.effect.selection.target.kind, (targets)=>{
+									eventQueue.splice(0,1)
+									eventQueue[0].targetList = targets
+								})
+								break;
+							case "split":
+								e.originator.owner.selectTargets(2, e.effect.selection.target.alignment, e.effect.selection.target.kind, (targets)=>{
+									eventQueue.splice(0,1)
+									eventQueue[0].targetList = targets
+								})
+								break;
+							case "self":
 								eventQueue.splice(0,1)
-								eventQueue[0].targetList = targets
-							})
-							break;
-						case "split":
-							e.originator.owner.selectTargets(2, e.effect.selection.target.alignment, e.effect.selection.target.kind, (targets)=>{
-								eventQueue.splice(0,1)
-								eventQueue[0].targetList = targets
-							})
-							break;
-						case "self":
-							eventQueue.splice(0,1)
-							eventQueue[0].targetList = [e.originator]
-							break;
+								eventQueue[0].targetList = [e.originator]
+								break;
 
 
 
+						}	
 					}
+					
 
 					break;
 
 				case "animate-effect":
-
+					console.log("animate-effect")
+					e.state = "in-progress"
 					switch (e.effect.kind) {
 
 						case "attack": // can trigger: THORN, EXIT
@@ -161,6 +180,7 @@ function resolveLoop(timestamp) {
 					break;
 
 				case "return-control":
+					console.log("return control")
 					eventQueue = [];
 					isEffectInProgress = false;
 					gameState.currentGameView.cardGame.currentPlayer.doTurn()

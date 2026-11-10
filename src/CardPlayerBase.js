@@ -4,9 +4,8 @@
 
 */
 
-import { TriggerCardEvent, ReturnControlEvent } from './ResolveCardPlay.js'
+import { TriggerCardEvent, ReturnControlEvent, eventQueue } from './ResolveCardPlay.js'
 import { CardDeck } from './CardDeck.js'
-import {eventQueue} from './ResolveCardPlay.js'
 
 export class CardPlayerBase {
 
@@ -91,6 +90,7 @@ export class CardPlayerBase {
 		/* deploy the card to the board */
 
 		this.activeCards.push(card)
+		card.owner = this
 
 		/* if applicable, trigger this card's entry effect */
 
@@ -114,6 +114,8 @@ export class CardPlayerBase {
 		// a side effect of this function is it disables input to the game
 
 		this.view.renderBoard()
+
+		this.doTurn()
 
 		/* give control to the current player after animation plays */
 
