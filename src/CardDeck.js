@@ -1,6 +1,10 @@
 
 /**
  	represents a deck of cards.
+ 	can be shuffled and cards can 
+ 	be removed and added, but 
+ 	retains a emory of its original 
+ 	that can always be restored.
  */
 export class CardDeck {
 

@@ -28,7 +28,7 @@ export function goToMainMenu() {
 	document.getElementById("rr-continue-button").addEventListener("click",(e)=>{
 
 		// gameState.loadFrom()
-		goToLobby()
+		
 	})
 
 }

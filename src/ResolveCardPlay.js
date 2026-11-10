@@ -1,106 +1,229 @@
 import { Card } from "./Card.js";
 import "./CardDefinitions.js";
 import { CardGame } from "./CardGame.js";
+import { gameState } from './GameState.js'
+import { assert } from "./Helpers.js"
 
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
+let isEffectInProgress = false
+
+export let eventQueue = []
+
+export class TriggerCardEvent {
+	constructor(target, triggerKind) {
+		this.state = "hasnt-started"
+		this.kind = "trigger-card"
+		this.target = target 
+		this.triggerKind = triggerKind
+		this.timeRemaining = 0
+	}
 }
 
-export function resolveEffect(trigger) {
-
-    for (let j = 0; j < trigger.effects.length; j++) {
-        let targets = []
-        targets = targets.concat(resolveSelection.bind(this)(trigger.effects[j]));
-
-        for (let i = 0; i < targets.length; i++) {
-            switch (trigger.effects[j].kind) {
-                case "attack":
-                    // Implement attack logic here
-                    targets[i].health -= trigger.effects[j].amount;
-                    break;
-                case "heal":
-                    // Implement heal logic here
-                    targets[i].health += trigger.effects[j].amount;
-                    break;
-                case "defend":
-                    // Implement defend logic here
-                    break;
-                case "surge":
-                    // Implement surge logic here
-                    break;
-                case "decay":
-                    // Implement decay logic here
-                    break;
-                case "destroy":
-                    // Implement destroy logic here
-                    break;
-                case "draw":
-                    // Implement draw logic here
-                    break;
-                case "discard":
-                    // Implement discard logic here
-                    break;
-                case "predict":
-                    // Implement predict logic here
-                    break;
-                case "deploySubcard":
-                    // Implement deploySubcard logic here
-                    break;
-                default:
-                    throw new Error(`Unknown effect kind: ${trigger.effects[j].kind}`);
-            }
-        }
-    }
+export class GatherTargetsEvent {
+	constructor(originator, effect) {
+		this.state = "hasnt-started"
+		this.kind = "gather-targets"
+		this.originator = originator
+		this.effect = effect
+		this.timeRemaining = 0
+	}
 }
 
-function resolveSelection(effect) {
-    let selection = effect.selection
-
-    //need to handle player input for everything that isnt self and random iirc
-    //and need to be able to read cards currently in play to process summons and constructs instead of always targeting the other player
-    switch (selection.mode) {
-        /*case "direct":
-            // Implement direct selection logic here
-        case "random":
-            // Implement random selection logic here
-        case "twinned":
-            // Implement twinned selection logic here
-        case "split":
-            // Implement split selection logic here*/
-        case "self":
-            return this;
-        default:
-            // Until selection is implemented, default to targeting opponent if not self
-            // pls for the love of god delete when selection is implemented
-            if (["direct", "random", "twinned", "split"].includes(selection.mode)) {
-                return resolveTarget.bind(this)(selection);
-            }
-            throw new Error(`Unknown selection mode: ${selection.mode}`);
-    }
+export class AnimateEffectEvent {
+	constructor(originator, effect) {
+		this.state = "hasnt-started"
+		this.kind = "animate-effect"
+		this.originator = originator
+		this.targetList = [] // will be filled when a GatherTargetsEvent runs beforehand
+		this.effect = effect
+		this.timeRemaining = 0
+	}
 }
 
-function resolveTarget(selection) {
-    assert(selection.mode !== "self", "Self-targeting should be handled by the resolver, not the target-kind list.");
-    let target = selection.target
-
-    // Still need to figure out how to handle alignment without excess complexity
-    switch (target.kind) {
-        /*case "spell":
-            // Implement spell target logic here
-        case "construct":
-            // Implement construct target logic here
-        case "summon":
-            // Implement summon target logic here
-        case "player":*/
-            // Implement player target logic here
-        default:
-            // Until selection is implemented, default to targeting opponent if not self
-            // pls for the love of god delete when selection is implemented
-            if (["spell", "construct", "summon", "player"].includes(target.kind)) {
-                if (target.alignment !== 'friendly') {
-                    return this.opponent;
-                } else { return this }
-            }
-            throw new Error(`Unknown target kind: ${target.kind}`);
-    }
+export class ReturnControlEvent {
+	constructor() {
+		this.state = "hasnt-started"
+		this.kind = "return-control"
+		this.timeRemaining = 0
+	}
 }
+
+let lastTime = null
+
+function resolveLoop(timestamp) {
+
+	if (!lastTime) lastTime = timestamp; 
+	const deltaTime = (timestamp - lastTime);
+	lastTime = timestamp;
+
+	requestAnimationFrame(resolveLoop)
+	let e = eventQueue[0]
+	if (!e) return
+
+	switch (e.state) {
+
+		case "hasnt-started":
+
+			switch (e.kind) {
+
+				case "trigger-card": // expand into each triggered effect
+					console.log(`card triggered! targettypekind: ${e.target.type.kind} triggerkind:${e.triggerKind} `)
+					let newEvents = []
+
+					for (let trigger of e.target.triggers) {
+						if (trigger.kind === e.triggerKind) {
+							console.log("matching trigger found on card!")
+							for (let effect of trigger.effects) {
+								console.log("effect queued...")
+								newEvents.push( 
+									new GatherTargetsEvent(e.target, effect),
+									new AnimateEffectEvent(e.target, effect)
+								)
+							}
+						}
+					}
+					eventQueue.splice(0,1)
+					eventQueue = [...newEvents, ...eventQueue]
+
+					break;
+
+				case "gather-targets":
+					e.state = "in-progress"
+					console.log(`gather targets! owner: ${e.originator.owner.name} `)
+					if (!e.effect.selection) {
+						console.log("no selection required, skipping...")
+						eventQueue.splice(0,1)
+
+					} else {
+						switch( e.effect.selection.mode ) {
+
+							case "direct":
+								if (e.effect.selection.target.kind === "player") {
+									eventQueue.splice(0,1)
+									console.log("targeting player")
+									switch (e.effect.selection.target.alignment) {
+										case "friendly":
+											eventQueue[0].targetList = [e.originator.owner]
+											break;
+										case "enemy":
+											eventQueue[0].targetList = [e.originator.owner.opponent]
+											break;
+									}
+								}
+								e.originator.owner.selectTargets(1, e.effect.selection.target.alignment, e.effect.selection.target.kind, (targets)=>{
+									eventQueue.splice(0,1)
+									eventQueue[0].targetList = targets
+								})
+								break;
+							case "random":
+								eventQueue.splice(0,1)
+								// TODO : implement RANDOM select mode
+								eventQueue[0].targetList = []
+								break;
+							case "twinned":
+								e.originator.owner.selectTargets(2, e.effect.selection.target.alignment, e.effect.selection.target.kind, (targets)=>{
+									eventQueue.splice(0,1)
+									eventQueue[0].targetList = targets
+								})
+								break;
+							case "split":
+								e.originator.owner.selectTargets(2, e.effect.selection.target.alignment, e.effect.selection.target.kind, (targets)=>{
+									eventQueue.splice(0,1)
+									eventQueue[0].targetList = targets
+								})
+								break;
+							case "self":
+								eventQueue.splice(0,1)
+								eventQueue[0].targetList = [e.originator]
+								break;
+
+
+
+						}	
+					}
+					
+
+					break;
+
+				case "animate-effect":
+					console.log(`animate-effect ${e.effect.kind}`)
+					e.state = "in-progress"
+					switch (e.effect.kind) {
+
+						case "attack": // can trigger: THORN, EXIT
+							let damage = e.effect.amount
+							if (e.effect.selection.mode === "split") {
+								damage /= e.targetList.length
+							}
+							for (let target of e.targetList) {
+								target.health -= damage
+								eventQueue.splice(1, 0, new TriggerCardEvent(target, "thorn") )
+								e.timeRemaining = 500
+							}
+							break;
+						case "heal":
+							let healAmount = e.effect.amount
+							if (e.effect.selection.mode === "split") {
+								healAmount /= e.targetList.length
+							}
+							for (let target of e.targetList) {
+								if (target.type.kind === "spell") {
+									target = target.owner
+								}
+								target.health += healAmount
+								e.timeRemaining = 500
+							}
+							break;
+						case "defend":
+							break;
+						case "surge":
+							break;
+						case "decay":
+							break;
+						case "destroy": // can trigger: EXIT
+							break;
+						case "draw":
+							break;
+						case "discard":
+							break;
+						case "predict":
+							break;
+						case "deploySubcard": // can trigger: GREET, ENTRY
+							console.log(`DEPLOYING SUBCARD..? ${e.effect.card.type.kind}`)
+							let subcard = e.effect.card
+							e.timeRemaining = 500
+							e.originator.owner.activeCards.push(subcard)
+							eventQueue.splice(1,0,new TriggerCardEvent(subcard,"entry"))
+							gameState.currentGameView.renderBoard()
+							subcard.owner = e.originator.owner
+							break;
+
+					}
+
+					break;
+
+				case "return-control":
+					console.log("return control")
+					eventQueue = [];
+					isEffectInProgress = false;
+					gameState.currentGameView.cardGame.currentPlayer.doTurn()
+					break;
+			}
+
+			break;
+
+		case "in-progress":
+			if (e.kind === "gather-targets") break;
+			e.timeRemaining -= deltaTime
+			if (e.timeRemaining <= 0) {
+				eventQueue.splice(0,1)
+			}
+			break;
+
+	}
+
+	
+
+}
+
+resolveLoop()
+

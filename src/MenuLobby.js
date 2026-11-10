@@ -1,5 +1,10 @@
 import { gameState, GameState } from './GameState.js'
 import { ViewCardGame } from './ViewCardGame.js'
+import {CardPlayerBot} from './CardPlayerBot.js'
+import {CardPlayerHuman} from './CardPlayerHuman.js'
+import {CardDeck} from './CardDeck.js'
+import {CardGame} from './CardGame.js'
+
 
 /*
 
@@ -44,7 +49,15 @@ export function goToLobby() {
 
 	document.getElementById("rr-ready-button").addEventListener("click",(e)=>{
 
-		gameState.currentGameView = new ViewCardGame()
+		let p1   = new CardPlayerHuman({ deck:new CardDeck(gameState.cardLibrary.cards), name: "You"})
+		let p2   = new CardPlayerBot  ({ deck:new CardDeck(gameState.cardLibrary.cards), name: "CPU"})
+		let game = new CardGame(p1, p2, null)
+		
+
+		gameState.currentGameView = new ViewCardGame(game)
+		game.view = gameState.currentGameView
+
+		game.beginGame()
 
 	})
 

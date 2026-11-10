@@ -7,6 +7,10 @@
 	[CardPlayer] <-> [CardGame] <-> [CardPlayer]
 
 */
+
+import { TriggerCardEvent, ReturnControlEvent, eventQueue } from './ResolveCardPlay.js'
+
+
 export class CardGame {
 
 	constructor(player1, player2, gameView) {
@@ -14,8 +18,8 @@ export class CardGame {
 		this.player1 = player1
 		this.player2 = player2
 		this.currentPlayer = player1
-		player1.game = this
-		player2.game = this
+		player1.cardGame = this
+		player2.cardGame = this
 	}
 
 	/** */
@@ -30,14 +34,15 @@ export class CardGame {
 
 	yieldTurn() {
 		// activate any active cards with "rest" triggers
-		// finish for loop with variable for active cards on the game board
-		/*for () {
-			for (trigger in card.triggers) {
-				if (trigger === "rest") {
-					resolveEffect.bind(this)(trigger)
-				}
-			}
-		}*/
+		for (let card of this.currentPlayer.activeCards) {
+			
+			eventQueue.push(  
+
+				new TriggerCardEvent( card, "rest" ),
+
+			)
+
+		}
 
 		// note that renderBoard also removes event listeners, thus disabling the player from making a move. correct.
 
@@ -55,16 +60,19 @@ export class CardGame {
 		}
 
 		// activate any active cards with "awaken" triggers
-		// finish for loop with variable for active cards on the game board
-		/*for () {
-			for (trigger in card.triggers) {
-				if (trigger === "awaken") {
-					resolveEffect.bind(this)(trigger)
-				}
-			}
-		}*/
+		for (let card of this.currentPlayer.activeCards) {
 
-		this.currentPlayer.doTurn()
+			eventQueue.push(  
+
+				new TriggerCardEvent( card, "awaken" ),
+
+			)
+
+		}
+
+		eventQueue.push(
+			new ReturnControlEvent()
+		)
 
 	}
 
