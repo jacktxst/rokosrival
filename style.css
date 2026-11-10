@@ -149,6 +149,10 @@ body, html {
 	
 }
 
+.card-targeted {
+	outline: 15px solid green;
+}
+
 .card-hoverable {
 
 	transition: transform 0.3s ease;

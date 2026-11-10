@@ -9,9 +9,10 @@
 import { CardGame } from './CardGame.js'
 import { CardDeck } from './CardDeck.js'
 import { gameState } from './GameState.js'
-import { CardPlayerBot } from './CardPlayerHuman.js'
-import { CardPlayerHuman } from './CardPlayerBot.js'
+import { CardPlayerHuman } from './CardPlayerHuman.js'
+import { CardPlayerBot } from './CardPlayerBot.js'
 import { capitalize, escapeHtml } from './Helpers.js'
+import { formatCost, formatTrigger, formatCard, formatEffect } from './CardFormatHelpers.js'
 
 function renderCardDetails(card) {
 	const title = `${capitalize(card.type.kind)} ${card.type.initialValue}`
@@ -21,13 +22,13 @@ function renderCardDetails(card) {
 			<strong>${escapeHtml(formatTrigger(trigger))}</strong>
 			${trigger.effects.length
 				? `<ul>${trigger.effects.map((effect) => `
-					<li>
+					<li> 
 						${effect.kind === 'deploySubcard'
 							? `Deploy ${escapeHtml(capitalize(effect.card.type.kind))} ${effect.card.type.initialValue}${renderCardDetails(effect.card)}`
 							: escapeHtml(formatEffect(effect))}
 					</li>
 				`).join('')}</ul>`
-				: ''}
+				: '..no effects..'}
 		</li>
 	`).join('')
 
@@ -51,8 +52,8 @@ export class ViewCardGame {
 	constructor(cardGame) {
 		
 		this.cardGame = cardGame
-		this.p1 = cardGame.p1 
-		this.p2 = cardGame.p2
+		this.p1 = cardGame.player1 
+		this.p2 = cardGame.player2
 		
 	}
 

@@ -1,4 +1,6 @@
-export class CardPlayerHuman extends CardPlayer {
+import {CardPlayerBase} from './CardPlayerBase.js'
+
+export class CardPlayerHuman extends CardPlayerBase {
 
 	/* 
 	give the player the opportunity 
@@ -14,7 +16,7 @@ export class CardPlayerHuman extends CardPlayer {
 		for(let i=0;i<userCardDivs.length;i++) {
 			userCardDivs[i].addEventListener("click",(e)=>{
 
-				this.playCardFromHand( i )
+				this.deployCardFromHand( i )
 				
 				
 			})
@@ -74,6 +76,11 @@ export class CardPlayerHuman extends CardPlayer {
 		}
 
 		/* TODO: create a submit selection thing */
+		document.getElementById("rr-btn-end-turn").innerHTML = "submit selection"
+		document.getElementById("rr-btn-end-turn").addEventListener("click",(e)=>{
+			this.cardGame.view.renderBoard()
+			callback(targets)
+		})
 
 	}
 

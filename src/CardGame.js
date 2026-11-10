@@ -14,8 +14,8 @@ export class CardGame {
 		this.player1 = player1
 		this.player2 = player2
 		this.currentPlayer = player1
-		player1.game = this
-		player2.game = this
+		player1.cardGame = this
+		player2.cardGame = this
 	}
 
 	/** */

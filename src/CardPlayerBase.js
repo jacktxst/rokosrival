@@ -4,9 +4,8 @@
 
 */
 
-
+import { TriggerCardEvent, ReturnControlEvent } from './ResolveCardPlay.js'
 import { CardDeck } from './CardDeck.js'
-import { resolveEffect } from './ResolveCardPlay.js'
 
 export class CardPlayerBase {
 
@@ -34,7 +33,7 @@ export class CardPlayerBase {
 
 	/*
 	==================================================================================
-		playCardFromHand(i : int, func : Callable)
+		deployCardFromHand(i : int, func : Callable)
 	==================================================================================
 		i: the index of the card in the player's hand to be played
 		
@@ -55,32 +54,32 @@ export class CardPlayerBase {
 		cards and have already reshuffled. (TODO not yet implemented)
 	==================================================================================
 	*/
-	playCardFromHand(i, func) {
+	deployCardFromHand(i, func) {
 
 		let card = this.hand[i]
 
-		for (let j = 0; j < card.costs.length; j++) {	
-			if (card.costs[j].kind === "payMana") {
-				if (this.mana < card.costs[j].amount) {
+		for (let cost of card.costs) {	
+			if (cost.kind === "payMana") {
+				if (this.mana < cost.amount) {
 					return
 				} else {
-					this.mana -= card.costs[j].amount
+					this.mana -= cost.amount
 				}
 			}
-			if (card.costs[j].kind === "payLife") {
-				if (this.health < card.costs[j].amount) {
+			if (cost.kind === "payLife") {
+				if (this.health < cost.amount) {
 					return
 				} else {
-					this.health -= this.hand[i].costs[j].amount
+					this.health -= cost.amount
 				}
 			}
-			if (card.costs[j].kind === "fizzleFriendlyNonPlayers") {
+			if (cost.kind === "fizzleFriendlyNonPlayers") {
 				// for now this cost will empty the hand
-				if ((this.hand.length - 1 - i) < this.hand[i].costs[j].amount) {
+				if ((this.hand.length - 1 - i) < cost.amount) {
 					return
 				} else {
-					this.hand.splice(i+1,this.hand[i].costs[j].amount)
-					this.hand = [...this.hand, ...this.deck.drawCards(this.hand[i].costs[j].amount)]
+					this.hand.splice(i+1,cost.amount)
+					this.hand = [...this.hand, ...this.deck.drawCards(cost.amount)]
 				}
 			}
 		}
@@ -95,6 +94,13 @@ export class CardPlayerBase {
 		/* if applicable, trigger this card's entry effect */
 
 		triggerEffectOnCard( card, "entry" )
+
+		eventQueue.push(  
+
+			new TriggerCardEvent( card, "entry" ),
+			new ReturnControlEvent()
+
+		)
 
 		/* TODO: we need to check if there are cards in play with a GREET trigger that needs
 		to be triggered by this card */
@@ -111,14 +117,6 @@ export class CardPlayerBase {
 		this.view.renderBoard()
 
 		/* give control to the current player after animation plays */
-
-		this.view.showPlayedCard( ()=>{
-			if (func) func.bind(this)()
-			else {
-				this.doTurn()
-			}
-			return
-		} )
 
 	}
 

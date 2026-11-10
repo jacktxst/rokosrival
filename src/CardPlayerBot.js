@@ -1,7 +1,9 @@
-export class CardPlayerBot extends CardPlayer {
+import {CardPlayerBase} from './CardPlayerBase.js'
+
+export class CardPlayerBot extends CardPlayerBase {
 
 	doTurn() {
-		this.playCardFromHand(0, ()=>{this.cardGame.yieldTurn()})
+		this.deployCardFromHand(0, ()=>{this.cardGame.yieldTurn()})
 	}
 
 	selectTargets( max, alignment, kind, callback ) {

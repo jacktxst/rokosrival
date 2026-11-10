@@ -19,8 +19,8 @@ export class GameState {
 		this.matchNumber = 0
 		this.currentState = ""
 		this.cardLibrary  = new CardLibrary()
-
-		this.playerDeck = cardLibrary.getRandomDeck(50)
+		this.currentGameView = null
+		this.playerDeck = this.cardLibrary.getRandomDeck(50)
 
 
 	}

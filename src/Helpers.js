@@ -19,7 +19,7 @@ export function pick(rng, array) {
   return array[randomInt(rng, 0, array.length - 1)];
 }
 
-function escapeHtml(value) {
+export function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (character) => ({
     '&': '&amp;',
     '<': '&lt;',

@@ -1,13 +1,13 @@
-function formatTarget(target) {
+import {capitalize} from './Helpers.js'
+import * as Defs from './CardDefinitions.js' 
+
+
+export function formatTarget(target) {
 	return `${capitalize(target.alignment)} ${capitalize(target.kind)}`
 }
 
-function formatSelection(selection) {
-	if (selection.mode === 'self') return 'Self'
-	return `${capitalize(selection.mode)} ${formatTarget(selection.target)}`
-}
 
-function formatCost(cost) {
+export function formatCost(cost) {
 	switch (cost.kind) {
 		case 'payMana':
 			return `${cost.amount} Mana`
@@ -20,40 +20,19 @@ function formatCost(cost) {
 	}
 }
 
-function formatTrigger(trigger) {
+
+export function formatTrigger(trigger) {
 	if (trigger.kind === 'greet') {
 		return `Greet ${formatTarget(trigger.target)}`
 	}
 	return capitalize(trigger.kind)
 }
 
-function formatEffect(effect) {
-	switch (effect.kind) {
-		case 'destroy':
-			return `Destroy ${formatSelection(effect.selection)}`
-		case 'draw':
-		case 'discard':
-		case 'predict':
-			return `${capitalize(effect.player)} player: ${capitalize(effect.kind)} ${effect.amount}`
-		default:
-			return `${capitalize(effect.kind)} ${effect.amount} ${formatSelection(effect.selection)}`
-	}
-}
 
-function formatCost(cost) {
-  switch (cost.kind) {
-    case "payMana":
-      return `${cost.amount} Mana`;
-    case "payLife":
-      return `${cost.amount} Life`;
-    case "fizzleFriendlyNonPlayers":
-      return `Fizzle ${cost.amount} Friendly non-player(s)`;
-    default:
-      return cost.kind;
-  }
-}
 
-function formatTriggerHeader(trigger) {
+
+
+export function formatTriggerHeader(trigger) {
   switch (trigger.kind) {
     case Defs.TRIGGER_KIND.AWAKEN:
       return "Awaken";
@@ -72,7 +51,9 @@ function formatTriggerHeader(trigger) {
   }
 }
 
-function formatEffect(effect, indent) {
+
+
+export function formatEffect(effect, indent) {
   switch (effect.kind) {
     case Defs.EFFECT_KIND.DEPLOY_SUBCARD:
       return `${capitalize(effect.card.type.kind)} ${effect.card.type.initialValue} {\n${formatCard(effect.card, indent + 2)}\n${" ".repeat(indent)}}`;
@@ -89,14 +70,14 @@ function formatEffect(effect, indent) {
   }
 }
 
-function formatSelection(selection) {
+
+
+export function formatSelection(selection) {
   if (selection.mode === Defs.SELECTION_MODE.SELF) return "Self";
   return `${capitalize(selection.mode)} ${formatTarget(selection.target)}`;
 }
 
-function formatTarget(target) {
-  return `${capitalize(target.alignment)} ${capitalize(target.kind)}`;
-}
+
 
 export function formatCard(card, indent = 0) {
   const pad = " ".repeat(indent);
