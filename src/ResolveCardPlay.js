@@ -6,7 +6,7 @@ import { assert } from "./Helpers.js"
 
 let isEffectInProgress = false
 
-let eventQueue = []
+export let eventQueue = []
 
 export class TriggerCardEvent {
 	constructor(target, triggerKind) {
@@ -45,7 +45,7 @@ function resolveLoop(timestamp) {
 	if (!lastTime) lastTime = timestamp; 
 	const deltaTime = (timestamp - lastTime);
 	lastTime = timestamp;
-	
+
 	requestAnimationFrame(resolveLoop)
 	let e = eventQueue[0]
 	if (!e) return

@@ -76,16 +76,10 @@ export class CardGenerator {
   generateTrigger({ depth = 0, forcedTrigger = null, forcedEffects = [] } = {}) {
     const kind = forcedTrigger ?? pick(this.rng, Object.values(Defs.TRIGGER_KIND));
     const target = kind === Defs.TRIGGER_KIND.GREET ? this.generateTargetSpec() : null;
-    const effectCount = forcedEffects.length ?? randomInt(this.rng, 1, 2);
+    const effectCount = randomInt(this.rng, 1, 2);
     const effects = [];
 
-    if (forcedEffects) {
-      for (let i = 0; i < forcedEffects.length; i++) {
-        effects.push(this.generateEffect({depth:depth, forcedEffect:forcedEffects[i]}))
-      }
-    }
-
-    for (let i = forcedEffects.length ?? 0; i < effectCount; i += 1) {
+    for (let i =  0; i < effectCount; i += 1) {
       effects.push(this.generateEffect({depth:depth}));
     }
 

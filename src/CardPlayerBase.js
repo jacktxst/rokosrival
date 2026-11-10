@@ -6,6 +6,7 @@
 
 import { TriggerCardEvent, ReturnControlEvent } from './ResolveCardPlay.js'
 import { CardDeck } from './CardDeck.js'
+import {eventQueue} from './ResolveCardPlay.js'
 
 export class CardPlayerBase {
 
@@ -92,8 +93,6 @@ export class CardPlayerBase {
 		this.activeCards.push(card)
 
 		/* if applicable, trigger this card's entry effect */
-
-		triggerEffectOnCard( card, "entry" )
 
 		eventQueue.push(  
 
