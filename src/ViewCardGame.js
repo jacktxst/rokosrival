@@ -162,7 +162,7 @@ export class ViewCardGame {
 						let string = ""
 						for (let i=0;i<p1.hand.length;i++) {
 							string += `
-								<div class="rr-card rr-card-frontside">
+								<div class="rr-card rr-card-frontside card-hoverable">
 									${renderCardDetails(p1.hand[i])}
 								</div>
 							`

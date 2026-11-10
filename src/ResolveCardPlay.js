@@ -29,9 +29,10 @@ export class GatherTargetsEvent {
 }
 
 export class AnimateEffectEvent {
-	constructor(effect) {
+	constructor(originator, effect) {
 		this.state = "hasnt-started"
 		this.kind = "animate-effect"
+		this.originator = originator
 		this.targetList = [] // will be filled when a GatherTargetsEvent runs beforehand
 		this.effect = effect
 		this.timeRemaining = 0
@@ -75,7 +76,7 @@ function resolveLoop(timestamp) {
 								console.log("effect queued...")
 								newEvents.push( 
 									new GatherTargetsEvent(e.target, effect),
-									new AnimateEffectEvent(effect)
+									new AnimateEffectEvent(e.target, effect)
 								)
 							}
 						}
@@ -96,6 +97,18 @@ function resolveLoop(timestamp) {
 						switch( e.effect.selection.mode ) {
 
 							case "direct":
+								if (e.effect.selection.target.kind === "player") {
+									eventQueue.splice(0,1)
+									console.log("targeting player")
+									switch (e.effect.selection.target.alignment) {
+										case "friendly":
+											eventQueue[0].targetList = [e.originator.owner]
+											break;
+										case "enemy":
+											eventQueue[0].targetList = [e.originator.owner.opponent]
+											break;
+									}
+								}
 								e.originator.owner.selectTargets(1, e.effect.selection.target.alignment, e.effect.selection.target.kind, (targets)=>{
 									eventQueue.splice(0,1)
 									eventQueue[0].targetList = targets
@@ -132,7 +145,7 @@ function resolveLoop(timestamp) {
 					break;
 
 				case "animate-effect":
-					console.log("animate-effect")
+					console.log(`animate-effect ${e.effect.kind}`)
 					e.state = "in-progress"
 					switch (e.effect.kind) {
 
@@ -153,6 +166,9 @@ function resolveLoop(timestamp) {
 								healAmount /= e.targetList.length
 							}
 							for (let target of e.targetList) {
+								if (target.type.kind === "spell") {
+									target = target.owner
+								}
 								target.health += healAmount
 								e.timeRemaining = 500
 							}
@@ -171,8 +187,14 @@ function resolveLoop(timestamp) {
 							break;
 						case "predict":
 							break;
-						case "deploy-subcard": // can trigger: GREET, ENTRY
-
+						case "deploySubcard": // can trigger: GREET, ENTRY
+							console.log(`DEPLOYING SUBCARD..? ${e.effect.card.type.kind}`)
+							let subcard = e.effect.card
+							e.timeRemaining = 500
+							e.originator.owner.activeCards.push(subcard)
+							eventQueue.splice(1,0,new TriggerCardEvent(subcard,"entry"))
+							gameState.currentGameView.renderBoard()
+							subcard.owner = e.originator.owner
 							break;
 
 					}

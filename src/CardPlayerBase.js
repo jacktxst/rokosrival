@@ -115,7 +115,7 @@ export class CardPlayerBase {
 
 		this.view.renderBoard()
 
-		this.doTurn()
+		// this.doTurn()
 
 		/* give control to the current player after animation plays */
 

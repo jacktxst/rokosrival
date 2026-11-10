@@ -92,13 +92,13 @@ export class CardGenerator {
     const choices = [
       Defs.EFFECT_KIND.ATTACK,
       Defs.EFFECT_KIND.HEAL,
-      Defs.EFFECT_KIND.DEFEND,
-      Defs.EFFECT_KIND.SURGE,
-      Defs.EFFECT_KIND.DECAY,
-      Defs.EFFECT_KIND.DESTROY,
-      Defs.EFFECT_KIND.DRAW,
-      Defs.EFFECT_KIND.DISCARD,
-      Defs.EFFECT_KIND.PREDICT,
+      //Defs.EFFECT_KIND.DEFEND,
+      //Defs.EFFECT_KIND.SURGE,
+      //Defs.EFFECT_KIND.DECAY,
+      //Defs.EFFECT_KIND.DESTROY,
+      //Defs.EFFECT_KIND.DRAW,
+      //Defs.EFFECT_KIND.DISCARD,
+      //Defs.EFFECT_KIND.PREDICT,
     ];
 
     if (canCreateSubcard) choices.push(Defs.EFFECT_KIND.DEPLOY_SUBCARD);
