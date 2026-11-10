@@ -122,55 +122,55 @@ export class ViewCardGame {
 						})()}
 					</div>
 				</div>
-			</div>
-
-
-
-			<div class="active-cards" id="opponents-active-cards">
-				${(()=>{
-					let string = ""
-					for (let card of opponent.activeCards) {
-						string += `
-							<div class="rr-card rr-card-frontside">
-								${renderCardDetails(card)}
-							</div>
-						`
-					}
-					return string
-				})()}
-			</div>
-
-			<div id="frontline"></div>
-
-			<div class="active-cards" id="your-active-cards">
-				${(()=>{
-					let string = ""
-					for (let card of p1.activeCards) {
-						string += `
-							<div class="rr-card rr-card-frontside">
-								${renderCardDetails(card)}
-							</div>
-						`
-					}
-					return string
-				})()}
-			</div>
-
-
-
-			<div class="rr-hand-container">
-				<div class="rr-hand-container" id="rr-user-hand">
+	
+	
+	
+				<div class="active-cards" id="opponents-active-cards">
 					${(()=>{
 						let string = ""
-						for (let i=0;i<p1.hand.length;i++) {
+						for (let card of opponent.activeCards) {
 							string += `
-								<div class="rr-card rr-card-frontside card-hoverable">
-									${renderCardDetails(p1.hand[i])}
+								<div class="rr-card rr-card-frontside">
+									${renderCardDetails(card)}
 								</div>
 							`
 						}
 						return string
 					})()}
+				</div>
+	
+				<div id="frontline"></div>
+	
+				<div class="active-cards" id="your-active-cards">
+					${(()=>{
+						let string = ""
+						for (let card of p1.activeCards) {
+							string += `
+								<div class="rr-card rr-card-frontside">
+									${renderCardDetails(card)}
+								</div>
+							`
+						}
+						return string
+					})()}
+				</div>
+	
+	
+	
+				<div class="rr-hand-container">
+					<div class="rr-hand-container" id="rr-user-hand">
+						${(()=>{
+							let string = ""
+							for (let i=0;i<p1.hand.length;i++) {
+								string += `
+									<div class="rr-card rr-card-frontside card-hoverable">
+										${renderCardDetails(p1.hand[i])}
+									</div>
+								`
+							}
+							return string
+						})()}
+					</div>
 				</div>
 			</div>
 						
