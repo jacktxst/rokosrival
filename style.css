@@ -1,5 +1,5 @@
 body, html {
-	background-image: url("./textures/sample9.png");
+	background-image: url("./textures/wood2.png");
 	padding: 0px;
 	margin: 0px;
 }
@@ -81,6 +81,12 @@ body, html {
 
 #board {
 	height: 100vh;
+	display: grid;
+	grid-template-rows: 10vh 80vh 10vh;
+	align-items: center;
+}
+.innerboard {
+	height: 100%;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
