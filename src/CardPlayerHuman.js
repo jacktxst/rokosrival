@@ -47,14 +47,15 @@ export class CardPlayerHuman extends CardPlayerBase {
 				targetableDivs = document.getElementById("opponents-active-cards").children
 
 				for (let i=0; i<targetableDivs.length; i++) {
-					if (this.opponent.activeCards[i].kind === targetKind) {
+					if (this.opponent.activeCards[i].type.kind === targetKind) {
 
 						targetableDivs[i].classList.add("card-hoverable")
 
 						targetableDivs[i].addEventListener("click",(e)=>{
 							if ( targets.includes(this.opponent.activeCards[i]) ) {
 								targetableDivs[i].classList.remove("card-targeted")
-								targets.remove(this.opponent.activeCards[i])
+								targets = targets.filter(target => target !== this.opponent.activeCards[i])
+
 							} else {
 								if (targets.length >= maxTargets) {
 
@@ -74,14 +75,15 @@ export class CardPlayerHuman extends CardPlayerBase {
 				targetableDivs = document.getElementById("your-active-cards").children
 
 				for (let i=0; i<targetableDivs.length; i++) {
-					if (this.activeCards[i].kind === targetKind) {
+					if (this.activeCards[i].type.kind === targetKind) {
 
 						targetableDivs[i].classList.add("card-hoverable")
 
 						targetableDivs[i].addEventListener("click",(e)=>{
 							if ( targets.includes(this.activeCards[i]) ) {
 								targetableDivs[i].classList.remove("card-targeted")
-								targets.remove(this.activeCards[i])
+								targets = targets.filter(target => target !== this.activeCards[i])
+
 							} else {
 								if (targets.length >= maxTargets) {
 
@@ -101,14 +103,14 @@ export class CardPlayerHuman extends CardPlayerBase {
 				targetableDivs = document.getElementById("opponents-active-cards").children
 
 				for (let i=0; i<targetableDivs.length; i++) {
-					if (this.opponent.activeCards[i].kind === targetKind) {
+					if (this.opponent.activeCards[i].type.kind === targetKind) {
 
 						targetableDivs[i].classList.add("card-hoverable")
 
 						targetableDivs[i].addEventListener("click",(e)=>{
 							if ( targets.includes(this.opponent.activeCards[i]) ) {
 								targetableDivs[i].classList.remove("card-targeted")
-								targets.remove(this.opponent.activeCards[i])
+								targets = targets.filter(target => target !== this.opponent.activeCards[i])
 							} else {
 								if (targets.length >= maxTargets) {
 
@@ -125,14 +127,15 @@ export class CardPlayerHuman extends CardPlayerBase {
 				targetableDivs = document.getElementById("your-active-cards").children
 
 				for (let i=0; i<targetableDivs.length; i++) {
-					if (this.activeCards[i].kind === targetKind) {
+					if (this.activeCards[i].type.kind === targetKind) {
 
 						targetableDivs[i].classList.add("card-hoverable")
 
 						targetableDivs[i].addEventListener("click",(e)=>{
 							if ( targets.includes(this.activeCards[i]) ) {
 								targetableDivs[i].classList.remove("card-targeted")
-								targets.remove(this.activeCards[i])
+								targets = targets.filter(target => target !== this.activeCards[i])
+
 							} else {
 								if (targets.length >= maxTargets) {
 

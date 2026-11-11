@@ -34,7 +34,7 @@ function renderCardDetails(card) {
 
 	return `
 		<h3 class="rr-card-title">${escapeHtml(title)}</h3>
-		<div class="rr-card-cost">${costs.length ? costs.map(escapeHtml).join(', ') : 'Free'}${card.arcane ? ' · Arcane' : ''}</div>
+		<div class="rr-card-cost">Cost: ${costs.length ? costs.map(escapeHtml).join(', ') : 'Free'}${card.arcane ? ' · Arcane' : ''}</div>
 		${triggers ? `<ul class="rr-card-triggers">${triggers}</ul>` : '<div class="rr-card-triggers">No triggers</div>'}
 	`
 }
