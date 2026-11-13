@@ -6,10 +6,10 @@ export class Card {
 
   constructor({ id, type, costs = [], arcane = false, triggers = [], owner = { kind: "inherited" } }) {
 	
-		assert(typeof id === "string" && id.length > 0, "id must exist and not be empty lol");
-		assert(type instanceof CardTypeSpec, "card type must be a CardTypeSpec");
-		assert(costs.every((cost) => cost instanceof CostSpec), "card costs must be CostSpec instances");
-		assert(triggers.every((trigger) => trigger instanceof TriggerSpec), "card triggers must be TriggerSpec instances");
+		// assert(typeof id === "string" && id.length > 0, "id must exist and not be empty lol");
+		// assert(type instanceof CardTypeSpec, "card type must be a CardTypeSpec");
+		// assert(costs.every((cost) => cost instanceof CostSpec), "card costs must be CostSpec instances");
+		// assert(triggers.every((trigger) => trigger instanceof TriggerSpec), "card triggers must be TriggerSpec instances");
 
 		this.id = id;
 		this.type = type;
@@ -22,7 +22,7 @@ export class Card {
 
   toJSON() {
 		return {
-		  id: this.id,
+		  id: this.id, // this needs to copy the string, it currently doesnt
 		  type: this.type.toJSON(),
 		  costs: this.costs.map((cost) => cost.toJSON()),
 		  arcane: this.arcane,

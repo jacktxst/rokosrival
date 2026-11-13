@@ -3,7 +3,7 @@
 	[CardPlayer] <-> [CardGame] <-> [CardPlayer]
 
 */
-
+import { DeployedCard } from './DeployedCard.js'
 import { TriggerCardEvent, ReturnControlEvent, eventQueue } from './ResolveCardPlay.js'
 import { CardDeck } from './CardDeck.js'
 
@@ -88,15 +88,14 @@ export class CardPlayerBase {
 		this.played_card = this.hand[i]
 		
 		/* deploy the card to the board */
-
-		this.activeCards.push(card)
-		card.owner = this
+		let deployedCard = new DeployedCard(card, this)
+		this.activeCards.push(deployedCard)
 
 		/* if applicable, trigger this card's entry effect */
 
 		eventQueue.push(  
 
-			new TriggerCardEvent( card, "entry" ),
+			new TriggerCardEvent( deployedCard, "entry" ),
 			new ReturnControlEvent()
 
 		)

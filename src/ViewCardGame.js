@@ -15,7 +15,7 @@ import { capitalize, escapeHtml } from './Helpers.js'
 import { formatCost, formatTrigger, formatCard, formatEffect } from './CardFormatHelpers.js'
 
 function renderCardDetails(card) {
-	const title = `${capitalize(card.type.kind)} ${card.type.initialValue}`
+	const title = `${capitalize(card.type.kind)} (${card.isDeployed ? card.getHeaderNumber() : card.type.initialValue})`
 	const costs = card.costs.map(formatCost)
 	const triggers = card.triggers.map((trigger) => `
 		<li>
@@ -70,7 +70,7 @@ export class ViewCardGame {
 		let playedCardDiv = document.getElementById(this.cardGame.currentPlayer === this.cardGame.player1 ? "rr-played-card-p1" : "rr-played-card-p2")
 
 		playedCardDiv.innerHTML = `
-			<div class="rr-card rr-card-frontside">
+			<div class="rr-card">
 				${renderCardDetails(this.cardGame.currentPlayer.played_card)}
 			</div>`
 		playedCardDiv.style.opacity = "100%"
@@ -109,28 +109,27 @@ export class ViewCardGame {
 			</div>
 
 			<div class="innerboard">
-				<div class="rr-hand-container">
-					<div class="rr-hand-container" id="rr-opp-hand">
-						${(()=>{
-							let string = ""
-							for (let i=0;i<opponent.hand.length;i++) {
-								string += `
-									<div class="rr-card rr-card-backside"></div>
-								`
-							}
-							return string
-						})()}
-					</div>
+
+				<div class="rr-hand-container" id="rr-opp-hand">
+					
+					${(()=>{
+						let string = ""
+						for (let i=0;i<opponent.hand.length;i++) {
+							string += `
+								<div class="rr-card rr-card-backside"></div>
+							`
+						}
+						return string
+					})()}
+					
 				</div>
-	
-	
 	
 				<div class="active-cards" id="opponents-active-cards">
 					${(()=>{
 						let string = ""
 						for (let card of opponent.activeCards) {
 							string += `
-								<div class="rr-card rr-card-frontside">
+								<div class="rr-card">
 									${renderCardDetails(card)}
 								</div>
 							`
@@ -146,7 +145,7 @@ export class ViewCardGame {
 						let string = ""
 						for (let card of p1.activeCards) {
 							string += `
-								<div class="rr-card rr-card-frontside">
+								<div class="rr-card">
 									${renderCardDetails(card)}
 								</div>
 							`
@@ -155,23 +154,20 @@ export class ViewCardGame {
 					})()}
 				</div>
 	
-	
-	
-				<div class="rr-hand-container">
-					<div class="rr-hand-container" id="rr-user-hand">
-						${(()=>{
-							let string = ""
-							for (let i=0;i<p1.hand.length;i++) {
-								string += `
-									<div class="rr-card rr-card-frontside card-hoverable">
-										${renderCardDetails(p1.hand[i])}
-									</div>
-								`
-							}
-							return string
-						})()}
-					</div>
+				<div class="rr-hand-container" id="rr-user-hand">
+					${(()=>{
+						let string = ""
+						for (let i=0;i<p1.hand.length;i++) {
+							string += `
+								<div class="rr-card card-hoverable">
+									${renderCardDetails(p1.hand[i])}
+								</div>
+							`
+						}
+						return string
+					})()}
 				</div>
+							
 			</div>
 						
 			<div class="rr-user-battle-stat">

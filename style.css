@@ -12,7 +12,7 @@ body, html {
 	align-items: center;
 
 }
-
+ 
 #rr-btn-end-turn {
 	position: absolute;
 	right: 0px;
@@ -81,10 +81,11 @@ body, html {
 
 #board {
 	height: 100vh;
-	display: grid;
-	grid-template-rows: 10vh 80vh 10vh;
+	display: flex;
+	flex-direction: column;
 	align-items: center;
 }
+
 .innerboard {
 	height: 100%;
 	display: flex;
@@ -95,6 +96,7 @@ body, html {
 .rr-hand-container {
 	height: 40vh;
 	display: flex;
+	overflow: cutoff;
 	justify-content: center;
 	flex-direction: row;
 	align-items: center;
@@ -170,3 +172,4 @@ body, html {
 	outline: 1px solid white;
   transform: translateY(-3px); /* Lifts the button slightly */
 }
+

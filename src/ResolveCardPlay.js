@@ -1,4 +1,6 @@
 import { Card } from "./Card.js";
+import { DeployedCard } from './DeployedCard.js'
+
 import "./CardDefinitions.js";
 import { CardGame } from "./CardGame.js";
 import { gameState } from './GameState.js'
@@ -189,7 +191,7 @@ function resolveLoop(timestamp) {
 							break;
 						case "deploySubcard": // can trigger: GREET, ENTRY
 							console.log(`DEPLOYING SUBCARD..? ${e.effect.card.type.kind}`)
-							let subcard = e.effect.card
+							let subcard = new DeployedCard(e.effect.card , e.originator.owner)
 							e.timeRemaining = 500
 							e.originator.owner.activeCards.push(subcard)
 							eventQueue.splice(1,0,new TriggerCardEvent(subcard,"entry"))
