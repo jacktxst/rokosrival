@@ -6,48 +6,63 @@ import { CardGame } from "./CardGame.js";
 import { gameState } from './GameState.js'
 import { assert } from "./Helpers.js"
 
-let isEffectInProgress = false
+/*
 
-export let eventQueue = []
+	Outside of this module, events come from two places:
 
-export class TriggerCardEvent {
-	constructor(target, triggerKind) {
+	the play card function in CardPlayerBase
+
+	and the yieldTurn function in CardGame.js
+
+*/
+
+export class GamePlayEvent {
+	constructor() {
 		this.state = "hasnt-started"
+		this.timeRemaining = 0
+
+	}
+}
+
+export class TriggerCardEvent extends GamePlayEvent {
+	constructor(target, triggerKind) {
+		super()
 		this.kind = "trigger-card"
+
 		this.target = target 
 		this.triggerKind = triggerKind
-		this.timeRemaining = 0
 	}
 }
 
-export class GatherTargetsEvent {
+export class GatherTargetsEvent extends GamePlayEvent {
 	constructor(originator, effect) {
-		this.state = "hasnt-started"
+		super()
 		this.kind = "gather-targets"
+
 		this.originator = originator
 		this.effect = effect
-		this.timeRemaining = 0
 	}
 }
 
-export class AnimateEffectEvent {
+export class AnimateEffectEvent extends GamePlayEvent {
 	constructor(originator, effect) {
-		this.state = "hasnt-started"
+		super()
 		this.kind = "animate-effect"
+
 		this.originator = originator
 		this.targetList = [] // will be filled when a GatherTargetsEvent runs beforehand
 		this.effect = effect
-		this.timeRemaining = 0
 	}
 }
 
-export class ReturnControlEvent {
+export class ReturnControlEvent extends GamePlayEvent {
 	constructor() {
-		this.state = "hasnt-started"
+		super()
 		this.kind = "return-control"
-		this.timeRemaining = 0
 	}
 }
+
+export let eventQueue = []
 
 let lastTime = null
 
@@ -58,6 +73,7 @@ function resolveLoop(timestamp) {
 	lastTime = timestamp;
 
 	requestAnimationFrame(resolveLoop)
+
 	let e = eventQueue[0]
 	if (!e) return
 
@@ -206,7 +222,6 @@ function resolveLoop(timestamp) {
 				case "return-control":
 					console.log("return control")
 					eventQueue = [];
-					isEffectInProgress = false;
 					gameState.currentGameView.cardGame.currentPlayer.doTurn()
 					break;
 			}

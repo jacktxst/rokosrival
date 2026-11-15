@@ -18,24 +18,26 @@ function renderCardDetails(card) {
 	const title = `${capitalize(card.type.kind)} (${card.isDeployed ? card.getHeaderNumber() : card.type.initialValue})`
 	const costs = card.costs.map(formatCost)
 	const triggers = card.triggers.map((trigger) => `
-		<li>
-			<strong>${escapeHtml(formatTrigger(trigger))}</strong>
-			${trigger.effects.length
-				? `<ul>${trigger.effects.map((effect) => `
-					<li> 
-						${effect.kind === 'deploySubcard'
-							? `Deploy ${escapeHtml(capitalize(effect.card.type.kind))} ${effect.card.type.initialValue}${renderCardDetails(effect.card)}`
-							: escapeHtml(formatEffect(effect))}
-					</li>
-				`).join('')}</ul>`
-				: '..no effects..'}
-		</li>
+		<div>	
+			<details>
+				<summary> <strong>${escapeHtml(formatTrigger(trigger))}</strong> </summary>
+				${trigger.effects.length
+					? `<ul>${trigger.effects.map((effect) => `
+						<li> 
+							${effect.kind === 'deploySubcard'
+								? `Deploy ${escapeHtml(capitalize(effect.card.type.kind))} ${effect.card.type.initialValue}${renderCardDetails(effect.card)}`
+								: escapeHtml(formatEffect(effect))}
+						</li>
+					`).join('')}</ul>`
+					: '..no effects..'}
+			</details>
+		</div>
 	`).join('')
 
 	return `
 		<h3 class="rr-card-title">${escapeHtml(title)}</h3>
 		<div class="rr-card-cost">Cost: ${costs.length ? costs.map(escapeHtml).join(', ') : 'Free'}${card.arcane ? ' · Arcane' : ''}</div>
-		${triggers ? `<ul class="rr-card-triggers">${triggers}</ul>` : '<div class="rr-card-triggers">No triggers</div>'}
+		${triggers ? `<div class="rr-card-triggers">${triggers}</div>` : '<div class="rr-card-triggers">No triggers</div>'}
 	`
 }
 
@@ -110,13 +112,13 @@ export class ViewCardGame {
 
 			<div class="innerboard">
 
-				<div class="rr-hand-container" id="rr-opp-hand">
+				<div id="opponents-hand">
 					
 					${(()=>{
 						let string = ""
 						for (let i=0;i<opponent.hand.length;i++) {
 							string += `
-								<div class="rr-card rr-card-backside"></div>
+								<div class="opponents-card"></div>
 							`
 						}
 						return string
@@ -174,7 +176,7 @@ export class ViewCardGame {
 				${p1.name}: ${p1.health} HP ${p1.mana} MP
 			</div>	
 
-			<div id="rr-btn-end-turn" class="rr-menu-button">end turn</div>
+			<div id="rr-btn-end-turn" class="stone-button">End Turn</div>
 		`
 
 	}

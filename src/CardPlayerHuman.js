@@ -16,6 +16,10 @@ export class CardPlayerHuman extends CardPlayerBase {
 		for(let i=0;i<userCardDivs.length;i++) {
 			userCardDivs[i].addEventListener("click",(e)=>{
 
+				if (event.target.closest('details')) {
+				    return;
+				}
+
 				this.deployCardFromHand( i )
 				
 				
