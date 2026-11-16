@@ -1,25 +1,134 @@
 body, html {
-	background-image: url("./textures/wood2.png");
+	background-image: url("./textures/sample9.png");
 	padding: 0px;
 	margin: 0px;
 }
 
-#rr-menu-main {
+
+.shadow-overlay {
+	color: lightgray;
+	background-color: #000000aa;
+}
+
+
+
+#lobby {
+	margin: auto;
+	max-width: 500px;
 	display: flex;
 	height: 100vh;
 	flex-direction: column;
 	justify-content: center;
-	align-items: center;
-
+	align-items: stretch
 }
 
+#main-menu {
+	margin: auto;
+	max-width: 500px;
+	display: flex;
+	height: 100vh;
+	flex-direction: column;
+	justify-content: center;
+	align-items: stretch
+
+}
+ 
 #rr-btn-end-turn {
 	position: absolute;
 	right: 0px;
 	top:50%;
-	font-size: 72px;
-	background-color: #33883355;
 }
+
+
+
+
+#opponents-hand {
+	display: flex;
+	flex-direction: row;
+}
+
+.opponents-card {
+	width: 50px;
+	height: 90px;
+
+	background-image: url("./textures/paper.jpg");
+	background-repeat: repeat;
+	background-size: 300px;
+	border-radius: 15px;
+
+	box-sizing: content-box;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.stone-button {
+
+  -webkit-user-select: none; /* Safari */
+  user-select: none;
+
+  /* Background Image Setup */
+  background-image: url('textures/stone.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* Text & Sizing */
+  text-align: center;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* Keeps text readable over images */
+  padding: 12px 28px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+  cursor: pointer;
+
+  /* 3D Outset Effect */
+  box-shadow: 
+    inset 2px 2px 3px rgba(255, 255, 255, 0.6),  /* Top-left highlight */
+    inset -2px -2px 3px rgba(0, 0, 0, 0.6),      /* Bottom-right bevel */
+    0 4px 6px rgba(0, 0, 0, 0.3);                /* Outer drop shadow */
+  transition: all 0.1s ease;
+}
+
+/* Pressed-in (Inset) state on click */
+.stone-button:active {
+  transform: translateY(2px);
+  box-shadow: 
+    inset 2px 2px 4px rgba(0, 0, 0, 0.7),        /* Inverted top-left shadow */
+    inset -2px -2px 3px rgba(255, 255, 255, 0.4),/* Inverted bottom-right highlight */
+    0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -43,25 +152,6 @@ body, html {
 
 
 
-#rr-newgame-button {
-	font-size: 72px;
-	background-color: #ff000055;
-
-}
-
-#rr-continue-button {
-	font-size: 72px;
-	background-color: #ff888855;
-}
-
-#rr-ready-button {
-	font-size: 72px;
-	background-color: #33883355;
-}
-
-.rr-menu-button:hover {
-	outline: 1px solid white;
-}
 
 
 
@@ -69,22 +159,27 @@ body, html {
 
 .rr-opp-battle-stat {
 	text-align: right;
-	background-color: #ffffffaa;
+	color: lightgray;
+	background-color: #000000aa;
 	font-size: 48px;
+	padding: 15px;
 }
 
 .rr-user-battle-stat {
 	text-align: left;
-	background-color: #ffffffaa;
+	color: lightgray;
+	background-color: #000000aa;
 	font-size: 48px;
+	padding: 15px;
 }
 
 #board {
 	height: 100vh;
-	display: grid;
-	grid-template-rows: 10vh 80vh 10vh;
+	display: flex;
+	flex-direction: column;
 	align-items: center;
 }
+
 .innerboard {
 	height: 100%;
 	display: flex;
@@ -95,13 +190,15 @@ body, html {
 .rr-hand-container {
 	height: 40vh;
 	display: flex;
+	overflow: cutoff;
 	justify-content: center;
 	flex-direction: row;
 	align-items: center;
 }
 
 .rr-card {
-	flex-shrink: 1;
+	color: black;
+	flex-shrink: 0;
 	background-image: url("./textures/paper.jpg");
 	background-repeat: repeat;
 	background-size: 300px;
@@ -111,8 +208,7 @@ body, html {
 	height: 180px;
 	margin: 15px;
 	font-family: fantasy;
-	overflow-y: auto;
-	box-sizing: content-box;
+	overflow: clip;
 	font-size: 13px;
 	line-height: 1.25;
 }
@@ -127,33 +223,11 @@ body, html {
 }
 
 .rr-card-triggers {
+	padding: 5px;
+	overflow: auto;
 	margin: 0;
-	padding-left: 16px;
 }
 
-.rr-card-triggers ul {
-	margin: 2px 0 5px;
-	padding-left: 14px;
-}
-
-.rr-played-card {
-	display: grid;
-   	place-items: center;
-	position: absolute;
-	top: 0px;
-	opacity: 0;
-	pointer-events: none;
-	width: 100vw;
-	height: 100vh;
-
-	transition: opacity 0.25s, display 0.25s allow-discrete;
-
-}
-
-
-.rr-card-backside {
-	
-}
 
 .card-targeted {
 	outline: 15px solid green;
@@ -170,3 +244,4 @@ body, html {
 	outline: 1px solid white;
   transform: translateY(-3px); /* Lifts the button slightly */
 }
+

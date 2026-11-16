@@ -7,25 +7,28 @@ export function goToMainMenu() {
 
 	document.body.innerHTML = `
 
-		<div id="rr-menu-main">
-			<div id="rr-newgame-button" class="rr-menu-button">
+		<div id="main-menu">
+
+			<div id="new-game-button" class="stone-button">
 				New Game
 			</div>
-			<div id="rr-continue-button" class="rr-menu-button">
+
+			<div id="continue-button" class="stone-button">
 				Continue
 			</div>
+
 		</div>
 
 	`
 
-	document.getElementById("rr-newgame-button").addEventListener("click",(e)=>{
+	document.getElementById("new-game-button").addEventListener("click",(e)=>{
 
 		/* game state for a new game is already initialized in GameState.js */
 		goToLobby()
 
 	})
 
-	document.getElementById("rr-continue-button").addEventListener("click",(e)=>{
+	document.getElementById("continue-button").addEventListener("click",(e)=>{
 
 		// gameState.loadFrom()
 		

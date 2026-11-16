@@ -1,6 +1,7 @@
 
 import { CardLibrary } from './CardLibrary.js'
-
+import { CardDeck } from './CardDeck.js'
+ 
 
 /*
 
@@ -20,7 +21,7 @@ export class GameState {
 		this.currentState = ""
 		this.cardLibrary  = new CardLibrary()
 		this.currentGameView = null
-		this.playerDeck = this.cardLibrary.getRandomDeck(50)
+		this.playerDeck = new CardDeck( this.cardLibrary.getRandomDeck(50) )
 
 
 	}
