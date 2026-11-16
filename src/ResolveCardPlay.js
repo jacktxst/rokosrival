@@ -4,7 +4,7 @@ import { DeployedCard } from './DeployedCard.js'
 import "./CardDefinitions.js";
 import { CardGame } from "./CardGame.js";
 import { gameState } from './GameState.js'
-import { assert } from "./Helpers.js"
+import { assert, randomInt } from "./Helpers.js"
 
 /*
 
@@ -66,6 +66,37 @@ export let eventQueue = []
 
 let lastTime = null
 
+function getSelectionCandidates(selection, originator) {
+
+	let alignedCards = []
+	let candidates = []
+
+	switch (selection.targets.alignment) {
+		case "any":
+			alignedCards = [...originator.owner.activeCards, ...originator.owner.opponent.activeCards, originator.owner, originator.owner.opponent]
+			
+			break;
+		case "friendly":
+			alignedCards = [...originator.owner.activeCards, originator.owner]
+			break;
+		case "enemy":
+			alignedCards = [...originator.owner.opponent.activeCards, originator.owner.opponent]
+			break;
+		default:
+			console.log(`unknown selection.targets.alignment: ${selection.targets.alignment}`)
+			break;
+	}
+
+	for (let deployedCard of alignedCards) {
+		if (selection.targets.types.includes( deployedCard.type.kind )) {
+			candidates.push(deployedCard)
+		}
+	}
+
+	return candidates;
+}
+
+
 function resolveLoop(timestamp) {
 
 	if (!lastTime) lastTime = timestamp; 
@@ -84,14 +115,14 @@ function resolveLoop(timestamp) {
 			switch (e.kind) {
 
 				case "trigger-card": // expand into each triggered effect
-					console.log(`card triggered! targettypekind: ${e.target.type.kind} triggerkind:${e.triggerKind} `)
+					console.log(`${e.target.type.kind} card triggered! trigger kind: ${e.triggerKind}`)
 					let newEvents = []
 
 					for (let trigger of e.target.triggers) {
 						if (trigger.kind === e.triggerKind) {
 							console.log("matching trigger found on card!")
 							for (let effect of trigger.effects) {
-								console.log("effect queued...")
+								console.log(`${effect.kind} effect queued...`)
 								newEvents.push( 
 									new GatherTargetsEvent(e.target, effect),
 									new AnimateEffectEvent(e.target, effect)
@@ -112,50 +143,55 @@ function resolveLoop(timestamp) {
 						eventQueue.splice(0,1)
 
 					} else {
-						switch( e.effect.selection.mode ) {
+						switch( e.effect.selection.kind ) {
 
-							case "direct":
-								if (e.effect.selection.target.kind === "player") {
-									eventQueue.splice(0,1)
-									console.log("targeting player")
-									switch (e.effect.selection.target.alignment) {
-										case "friendly":
-											eventQueue[0].targetList = [e.originator.owner]
-											break;
-										case "enemy":
-											eventQueue[0].targetList = [e.originator.owner.opponent]
-											break;
-									}
+							case "specified":
+								{
+									const candidates = getSelectionCandidates(e.effect.selection, e.originator)
+
+									e.originator.owner.selectFromCandidates(1, candidates, (targets)=>{
+										eventQueue.splice(0,1)
+										eventQueue[0].targetList = targets
+									})
 								}
-								e.originator.owner.selectTargets(1, e.effect.selection.target.alignment, e.effect.selection.target.kind, (targets)=>{
-									eventQueue.splice(0,1)
-									eventQueue[0].targetList = targets
-								})
 								break;
 							case "random":
-								eventQueue.splice(0,1)
-								// TODO : implement RANDOM select mode
-								eventQueue[0].targetList = []
-								break;
-							case "twinned":
-								e.originator.owner.selectTargets(2, e.effect.selection.target.alignment, e.effect.selection.target.kind, (targets)=>{
+								{
+									const candidates = getSelectionCandidates(e.effect.selection, e.originator)
 									eventQueue.splice(0,1)
-									eventQueue[0].targetList = targets
-								})
+									eventQueue[0].targetList = [ candidates[ randomInt( Math.random(), 0, candidates.length - 1 ) ] ]
+								}		
 								break;
-							case "split":
-								e.originator.owner.selectTargets(2, e.effect.selection.target.alignment, e.effect.selection.target.kind, (targets)=>{
+							case "each":
+								{
+									const candidates = getSelectionCandidates(e.effect.selection, e.originator)
 									eventQueue.splice(0,1)
-									eventQueue[0].targetList = targets
-								})
+									eventQueue[0].targetList = candidates
+								}
+								break;
+							case "split among":
+								{
+									const candidates = getSelectionCandidates(e.effect.selection, e.originator)
+
+									e.originator.owner.selectFromCandidates(1, candidates, (targets)=>{
+										eventQueue.splice(0,1)
+										eventQueue[0].targetList = targets
+									})
+								}
 								break;
 							case "self":
-								eventQueue.splice(0,1)
-								eventQueue[0].targetList = [e.originator]
+								{
+									eventQueue.splice(0,1)
+									if (e.originator.type.kind === "spell") {
+										eventQueue[0].targetList = [e.originator.owner]
+									} else {
+										eventQueue[0].targetList = [e.originator]		
+									}
+								}
 								break;
-
-
-
+							default:
+								console.log(`unknown selection mode! ${e.effect.selection.kind}`)
+								break;
 						}	
 					}
 					
@@ -167,26 +203,23 @@ function resolveLoop(timestamp) {
 					e.state = "in-progress"
 					switch (e.effect.kind) {
 
-						case "attack": // can trigger: THORN, EXIT
+						case "attack": // should trigger: THORN, EXIT, GRIEVE
 							let damage = e.effect.amount
-							if (e.effect.selection.mode === "split") {
+							if (e.effect.selection.kind === "split among") {
 								damage /= e.targetList.length
 							}
 							for (let target of e.targetList) {
 								target.health -= damage
-								eventQueue.splice(1, 0, new TriggerCardEvent(target, "thorn") )
+								if (target.type.kind !== "player") eventQueue.splice(1, 0, new TriggerCardEvent(target, "thorn") )
 								e.timeRemaining = 500
 							}
 							break;
 						case "heal":
 							let healAmount = e.effect.amount
-							if (e.effect.selection.mode === "split") {
+							if (e.effect.selection.kind === "split among") {
 								healAmount /= e.targetList.length
 							}
 							for (let target of e.targetList) {
-								if (target.type.kind === "spell") {
-									target = target.owner
-								}
 								target.health += healAmount
 								e.timeRemaining = 500
 							}
@@ -197,13 +230,11 @@ function resolveLoop(timestamp) {
 							break;
 						case "decay":
 							break;
-						case "destroy": // can trigger: EXIT
+						case "destroy": // can trigger: EXIT, GRIEVE
 							break;
 						case "draw":
 							break;
 						case "discard":
-							break;
-						case "predict":
 							break;
 						case "deploySubcard": // can trigger: GREET, ENTRY
 							console.log(`DEPLOYING SUBCARD..? ${e.effect.card.type.kind}`)
@@ -243,4 +274,6 @@ function resolveLoop(timestamp) {
 }
 
 resolveLoop()
+
+
 

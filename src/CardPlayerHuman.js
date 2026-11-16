@@ -39,129 +39,47 @@ export class CardPlayerHuman extends CardPlayerBase {
 
 	*/
 
-	selectTargets( maxTargets, targetAlignment, targetKind, callback ) {
+	selectFromCandidates( maxTargets, candidates, resultsCallback ) {
 
-		let targets = []
-		let targetableDivs = []
+		let selection = []
 
-		switch (targetAlignment) {
+		const opponentCardDivs = document.getElementById("opponent-deployed-cards").children
+		const playerCardDivs   = document.getElementById(  "player-deployed-cards").children
 
-			case "opposing":
 
-				targetableDivs = document.getElementById("opponent-deployed-cards").children
+		function prepareActiveCards(divs, player) {
 
-				for (let i=0; i<targetableDivs.length; i++) {
-					if (this.opponent.activeCards[i].type.kind === targetKind) {
-
-						targetableDivs[i].classList.add("card-hoverable")
-
-						targetableDivs[i].addEventListener("click",(e)=>{
-							if ( targets.includes(this.opponent.activeCards[i]) ) {
-								targetableDivs[i].classList.remove("card-targeted")
-								targets = targets.filter(target => target !== this.opponent.activeCards[i])
-
-							} else {
-								if (targets.length >= maxTargets) {
-
-								} else {
-									targetableDivs[i].classList.add("card-targeted")
-									targets.push(this.opponent.activeCards[i])	
+			for (let i = 0; i < divs.length; i++) {
+				if ( candidates.includes( player.activeCards[i] ) ) {
+					divs[i].classList.add("card-hoverable")
+					divs[i].addEventListener("click", (e)=>{
+						switch ( selection.includes( player.activeCards[i] ) ) {
+							case true:
+								selection = selection.filter( item => item !== player.activeCards[i] )
+								divs[i].classList.remove("card-targeted")
+								break;
+							case false:
+								if (selection.length < maxTargets) {
+									selection.push(player.activeCards[i])
+									divs[i].classList.add("card-targeted")
 								}
-							}
-						})
-
-					}
+								break;
+						}
+					}) 
 				}
-
-				break;
-			case "friendly":
-
-				targetableDivs = document.getElementById("player-active-cards").children
-
-				for (let i=0; i<targetableDivs.length; i++) {
-					if (this.activeCards[i].type.kind === targetKind) {
-
-						targetableDivs[i].classList.add("card-hoverable")
-
-						targetableDivs[i].addEventListener("click",(e)=>{
-							if ( targets.includes(this.activeCards[i]) ) {
-								targetableDivs[i].classList.remove("card-targeted")
-								targets = targets.filter(target => target !== this.activeCards[i])
-
-							} else {
-								if (targets.length >= maxTargets) {
-
-								} else {
-									targetableDivs[i].classList.add("card-targeted")
-									targets.push(this.activeCards[i])	
-								}
-							}
-						})
-
-					}
-				}
-
-				break;
-			case "any":
-
-				targetableDivs = document.getElementById("opponent-active-cards").children
-
-				for (let i=0; i<targetableDivs.length; i++) {
-					if (this.opponent.activeCards[i].type.kind === targetKind) {
-
-						targetableDivs[i].classList.add("card-hoverable")
-
-						targetableDivs[i].addEventListener("click",(e)=>{
-							if ( targets.includes(this.opponent.activeCards[i]) ) {
-								targetableDivs[i].classList.remove("card-targeted")
-								targets = targets.filter(target => target !== this.opponent.activeCards[i])
-							} else {
-								if (targets.length >= maxTargets) {
-
-								} else {
-									targetableDivs[i].classList.add("card-targeted")
-									targets.push(this.opponent.activeCards[i])	
-								}
-							}
-						})
-
-					}
-				}
-
-				targetableDivs = document.getElementById("player-active-cards").children
-
-				for (let i=0; i<targetableDivs.length; i++) {
-					if (this.activeCards[i].type.kind === targetKind) {
-
-						targetableDivs[i].classList.add("card-hoverable")
-
-						targetableDivs[i].addEventListener("click",(e)=>{
-							if ( targets.includes(this.activeCards[i]) ) {
-								targetableDivs[i].classList.remove("card-targeted")
-								targets = targets.filter(target => target !== this.activeCards[i])
-
-							} else {
-								if (targets.length >= maxTargets) {
-
-								} else {
-									targetableDivs[i].classList.add("card-targeted")
-									targets.push(this.activeCards[i])	
-								}
-							}
-						})
-
-					}
-				}
-
-				break;
+			}
 
 		}
 
-		/* TODO: create a submit selection thing */
-		document.getElementById("end-turn-button").innerHTML = "submit selection"
+		prepareActiveCards(opponentCardDivs, this.opponent)
+		prepareActiveCards(playerCardDivs, this)
+
+		// TODO: make players selectable somehow
+
+		document.getElementById("end-turn-button").innerHTML = "Submit Selection"
 		document.getElementById("end-turn-button").addEventListener("click",(e)=>{
 			this.cardGame.view.renderBoard()
-			callback(targets)
+			callback(selection)
 		})
 
 	}

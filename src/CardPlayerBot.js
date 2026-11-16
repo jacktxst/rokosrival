@@ -3,6 +3,9 @@ import {CardPlayerBase} from './CardPlayerBase.js'
 export class CardPlayerBot extends CardPlayerBase {
 
 	doTurn() {
+
+		this.cardGame.yieldTurn()
+
 		if (this.hasPlayed) {
 			this.hasPlayed = false
 			this.cardGame.yieldTurn()

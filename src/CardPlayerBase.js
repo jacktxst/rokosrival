@@ -17,6 +17,8 @@ export class CardPlayerBase {
 		this.cardGame    = args.game || null
 		this.activeCards = []
 
+		this.type = { kind: "player" }
+
 	}
 
 	/** called by CardGame when the game begins */
