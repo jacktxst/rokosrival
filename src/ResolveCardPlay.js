@@ -264,6 +264,7 @@ function resolveLoop(timestamp) {
 			e.timeRemaining -= deltaTime
 			if (e.timeRemaining <= 0) {
 				eventQueue.splice(0,1)
+				gameState.currentGameView.renderBoard()
 			}
 			break;
 
