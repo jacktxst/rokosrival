@@ -33,6 +33,9 @@ export function formatTrigger(trigger) {
 	if (trigger.kind === 'greet') {
 		return `Greet ${formatTarget(trigger.targets)}`
 	}
+  if (trigger.kind === 'grieve') {
+    return `Grieve ${formatTarget(trigger.targets)}`;
+  }
 	return capitalize(trigger.kind)
 }
 
@@ -45,6 +48,8 @@ export function formatTriggerHeader(trigger) {
       return "Rest";
     case Defs.TRIGGER.GREET:
       return `Greet ${formatTarget(trigger.targets)}`;
+    case Defs.TRIGGER.GRIEVE:
+      return "Grieve";
     case Defs.TRIGGER.THORN:
       return "Thorn";
     case Defs.TRIGGER.EXIT:
