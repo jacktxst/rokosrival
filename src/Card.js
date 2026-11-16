@@ -1,11 +1,8 @@
 // Card.js
 import { CardType, TYPE } from "./CardDefinitions.js";
 import {assert} from "./Helpers.js"
-import { CardTypeSpec, CostSpec, TriggerSpec } from "./CardDefinitions.js";
 import { capitalize, escapeHtml } from './Helpers.js'
 import { formatCost, formatTrigger, formatCard, formatEffect } from './CardFormatHelpers.js'
-
-import { assert } from './Helpers.js'
 
 export class Card {
 
