@@ -4,7 +4,7 @@ export class DeployedCard extends Card  {
 
 	constructor( card , owner) {
 
-		super( card.toJSON() )
+		super( card.getData() )
 
 		this.owner  = owner
 		this.health = 0

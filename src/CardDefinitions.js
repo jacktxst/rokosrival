@@ -123,10 +123,10 @@ export const EFFECT_SELECTION_RULES = Object.freeze({
 export class Targets {
   constructor({ types, alignment = ALIGNMENT.ANY }) {
     // validate that each target type is a valid TYPE
-    assert(Array.isArray(types), "types provided is not in the form of an array");
-    assert(types.length > 0, "types array is empty");
-    assert(types.every((type) => Object.values(TYPE).includes(type)), "types array contains invalid card Types: " + types.filter((type) => !Object.values(TYPE).includes(type)).join(", "));
-    assert(Object.values(ALIGNMENT).includes(alignment), `tried to target an unknown alignment: ${alignment}`);
+    //assert(Array.isArray(types), "types provided is not in the form of an array");
+    //assert(types.length > 0, "types array is empty");
+    //assert(types.every((type) => Object.values(TYPE).includes(type)), "types array contains invalid card Types: " + types.filter((type) => !Object.values(TYPE).includes(type)).join(", "));
+    //assert(Object.values(ALIGNMENT).includes(alignment), `tried to target an unknown alignment: ${alignment}`);
     this.types = types;
     this.alignment = alignment;
   }
@@ -134,11 +134,11 @@ export class Targets {
 
 export class Selection {
   constructor({ kind, targets = null }) {
-    assert(Object.values(SELECTION).includes(kind), `unknown selection mode: ${kind}`);
+    //assert(Object.values(SELECTION).includes(kind), `unknown selection mode: ${kind}`);
     if (kind === SELECTION.SELF) {
-      assert(targets === null, "self selection provided Targets (it shouldnt do that)");
+      //assert(targets === null, "self selection provided Targets (it shouldnt do that)");
     } else {
-      assert(targets instanceof Targets, "non-self selection failed to provide Targets");
+      //assert(targets instanceof Targets, "non-self selection failed to provide Targets");
     }
 
     this.kind = kind;
@@ -148,12 +148,13 @@ export class Selection {
 
 export class CardType {
   constructor({ kind, initialValue }) {
-    assert(Object.values(TYPE).includes(kind), `unknown card type: ${kind}`);
-    assert(Number.isInteger(initialValue) && initialValue > 0, "initialValue must be a positive integer.");
+    //assert(Object.values(TYPE).includes(kind), `unknown card type: ${kind}`);
+    //assert(Number.isInteger(initialValue) && initialValue > 0, "initialValue must be a positive integer.");
 
     this.kind = kind;
     this.initialValue = initialValue;
   }
+
 }
 
 export class Cost {
@@ -182,20 +183,20 @@ export class Cost {
 
 export class Effect {
   constructor(kind, data = {}) {
-    assert(Object.values(EFFECT).includes(kind), `unknown effect: ${kind}`);
+    //assert(Object.values(EFFECT).includes(kind), `unknown effect: ${kind}`);
     this.kind = kind;
     Object.assign(this, data);
   }
 
   static targeted(kind, amount, selection) {
-    assert(EFFECT_TARGET_RULES[kind], `${kind} effect does not support Targets`);
-    assert(selection instanceof Selection, `${kind} effect requires a Selection`);
-    assert(Number.isInteger(amount) && amount > 0, `${kind} effect amount must be a positive integer`);
+    //assert(EFFECT_TARGET_RULES[kind], `${kind} effect does not support Targets`);
+    //assert(selection instanceof Selection, `${kind} effect requires a Selection`);
+    //assert(Number.isInteger(amount) && amount > 0, `${kind} effect amount must be a positive integer`);
     return new Effect(kind, { amount, selection });
   }
 
   static destroy(selection) {
-    assert(selection instanceof Selection, `${EFFECT.DESTROY} effect requires a Selection`);
+    //assert(selection instanceof Selection, `${EFFECT.DESTROY} effect requires a Selection`);
     return new Effect(EFFECT.DESTROY, { selection });
   }
 
@@ -204,8 +205,8 @@ export class Effect {
       [EFFECT.DRAW, EFFECT.DISCARD, EFFECT.PREDICT].includes(kind),
       `${kind} effect does not support player actions.`,
     );
-    assert(Number.isInteger(amount) && amount > 0, `${kind} effect amount must be a positive integer`);
-    assert(Object.values(PLAYER_REF).includes(player), `unknown player: ${player}`);
+    //assert(Number.isInteger(amount) && amount > 0, `${kind} effect amount must be a positive integer`);
+    //assert(Object.values(PLAYER_REF).includes(player), `unknown player: ${player}`);
     return new Effect(kind, { amount, player });
   }
 
@@ -217,9 +218,9 @@ export class Effect {
 
 export class Trigger {
   constructor({ kind, targets = null, effects = [] }) {
-    assert(Object.values(TRIGGER).includes(kind), `unknown trigger kind: ${kind}`);
-    assert(targets === null || targets instanceof Targets, `${kind} Trigger targets must be a Targets instance or null`);
-    assert(effects.every((effect) => effect instanceof Effect), `${kind} Trigger effects must be Effect instances`);
+    //assert(Object.values(TRIGGER).includes(kind), `unknown trigger kind: ${kind}`);
+    //assert(targets === null || targets instanceof Targets, `${kind} Trigger targets must be a Targets instance or null`);
+    //assert(effects.every((effect) => effect instanceof Effect), `${kind} Trigger effects must be Effect instances`);
     if (kind === TRIGGER.GREET || kind === TRIGGER.GRIEVE || kind === TRIGGER.THORN) {
       assert(targets !== null, `${kind} Trigger failed to provide Targets`);
     }

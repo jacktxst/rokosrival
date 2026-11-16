@@ -2,6 +2,7 @@
 import { Card } from "./Card.js";
 import * as Defs from "./CardDefinitions.js";
 import {assert, randomInt, pick, capitalize} from "./Helpers.js"
+
 export class CardGenerator {
   // example usage:
   // const myGenerator1 = new CardGenerator({ idPrefix: "basic", seed: 0.67 });

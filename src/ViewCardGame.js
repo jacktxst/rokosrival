@@ -14,34 +14,6 @@ import { CardPlayerBot } from './CardPlayerBot.js'
 import { capitalize, escapeHtml } from './Helpers.js'
 import { formatCost, formatTrigger, formatCard, formatEffect } from './CardFormatHelpers.js'
 
-function renderCardDetails(card) {
-	const title = `${capitalize(card.type.kind)} (${card.isDeployed ? card.getHeaderNumber() : card.type.initialValue})`
-	const costs = card.costs.map(formatCost)
-	const triggers = card.triggers.map((trigger) => `
-		<div>	
-			<details>
-				<summary> <strong>${escapeHtml(formatTrigger(trigger))}</strong> </summary>
-				${trigger.effects.length
-					? `<ul>${trigger.effects.map((effect) => `
-						<li> 
-							${effect.kind === 'deploySubcard'
-								? `Deploy ${escapeHtml(capitalize(effect.card.type.kind))} ${effect.card.type.initialValue}${renderCardDetails(effect.card)}`
-								: escapeHtml(formatEffect(effect))}
-						</li>
-					`).join('')}</ul>`
-					: '..no effects..'}
-			</details>
-		</div>
-	`).join('')
-
-	return `
-		<h3 class="rr-card-title">${escapeHtml(title)}</h3>
-		<div class="rr-card-cost">Cost: ${costs.length ? costs.map(escapeHtml).join(', ') : 'Free'}${card.arcane ? ' · Arcane' : ''}</div>
-		${triggers ? `<div class="rr-card-triggers">${triggers}</div>` : '<div class="rr-card-triggers">No triggers</div>'}
-	`
-}
-
-
 /*
 
 	Main board rendering code:	
@@ -59,34 +31,6 @@ export class ViewCardGame {
 		
 	}
 
-	/*
-
-		After a card is played (by you or the opponent), 
-		briefly show the card in the middle of the screen. 
-		Otherwise you will not be able to know what your 
-		opponent just played. 
-
-	*/
-	showPlayedCard(afterFunc) {
-
-		let playedCardDiv = document.getElementById(this.cardGame.currentPlayer === this.cardGame.player1 ? "rr-played-card-p1" : "rr-played-card-p2")
-
-		playedCardDiv.innerHTML = `
-			<div class="rr-card">
-				${renderCardDetails(this.cardGame.currentPlayer.played_card)}
-			</div>`
-		playedCardDiv.style.opacity = "100%"
-
-		setTimeout( (()=>{
-
-			playedCardDiv.style.opacity = "0%"
-
-			afterFunc()
-			
-		}).bind(this), 1000)
-
-	}
-
 	/*	
 	=========================================
 		renderBoard() 
@@ -101,82 +45,87 @@ export class ViewCardGame {
 	*/
 	renderBoard(){ 
 
-		document.body.innerHTML = "<div id='board'></div> <div class='rr-played-card' id='rr-played-card-p1'></div> <div class='rr-played-card' id='rr-played-card-p2'></div>"
 
 		const opponent = this.p2
 		const p1 = this.p1
-		document.getElementById("board").innerHTML = `
-			<div class="rr-opp-battle-stat">
-				${opponent.name}: ${opponent.health} HP
-			</div>
 
-			<div class="innerboard">
+		document.body.innerHTML = `
 
-				<div id="opponents-hand">
+			<div id="board">
+
+				<div id="opponent-hud" class="shadow-bg" style="display: flex; justify-content: space-between;">
+
+					<div id="opponent-hand">
 					
 					${(()=>{
 						let string = ""
 						for (let i=0;i<opponent.hand.length;i++) {
 							string += `
-								<div class="opponents-card"></div>
+								<div class="opponent-card"></div>
 							`
 						}
 						return string
 					})()}
 					
+					</div>
+
+					<div>
+					${opponent.name}: [${opponent.health} Health]
+
+					</div>
 				</div>
+
+				
 	
-				<div class="active-cards" id="opponents-active-cards">
+				<div class="deployed-cards" id="opponent-deployed-cards">
 					${(()=>{
 						let string = ""
 						for (let card of opponent.activeCards) {
 							string += `
-								<div class="rr-card">
-									${renderCardDetails(card)}
-								</div>
+									${card.renderHTML()}
 							`
 						}
 						return string
 					})()}
 				</div>
 	
-				<div id="frontline"></div>
+				<div id="frontline">
+						<div id="end-turn-button" class="stone-button"> End Turn </div>
+				</div>
 	
-				<div class="active-cards" id="your-active-cards">
+				<div class="deployed-cards" id="player-deployed-cards">
 					${(()=>{
 						let string = ""
 						for (let card of p1.activeCards) {
 							string += `
-								<div class="rr-card">
-									${renderCardDetails(card)}
-								</div>
+									${card.renderHTML()}
 							`
 						}
 						return string
 					})()}
 				</div>
-	
-				<div class="rr-hand-container" id="rr-user-hand">
+		
+				<div id="player-hud" class="shadow-bg" style="display:flex; flex-direction: row;">
+
+					<div>
+					${p1.name}: [${p1.health} Health] [${p1.mana} Mana]
+					</div>
+
+					<div id="player-hand">
 					${(()=>{
 						let string = ""
-						for (let i=0;i<p1.hand.length;i++) {
+						for (let card of p1.hand) {
 							string += `
-								<div class="rr-card card-hoverable">
-									${renderCardDetails(p1.hand[i])}
-								</div>
+								${card.renderHTML()}
 							`
 						}
 						return string
 					})()}
-				</div>
-							
-			</div>
-						
-			<div class="rr-user-battle-stat">
-				${p1.name}: ${p1.health} HP ${p1.mana} MP
-			</div>	
+					</div>
 
-			<div id="rr-btn-end-turn" class="stone-button">End Turn</div>
+				</div>	
+			</div>
+			
 		`
 
 	}

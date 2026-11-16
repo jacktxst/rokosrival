@@ -4,74 +4,11 @@ body, html {
 	margin: 0px;
 }
 
-
-.shadow-overlay {
-	color: lightgray;
-	background-color: #000000aa;
-}
-
-
-
-#lobby {
-	margin: auto;
-	max-width: 500px;
-	display: flex;
-	height: 100vh;
-	flex-direction: column;
-	justify-content: center;
-	align-items: stretch
-}
-
-#main-menu {
-	margin: auto;
-	max-width: 500px;
-	display: flex;
-	height: 100vh;
-	flex-direction: column;
-	justify-content: center;
-	align-items: stretch
-
-}
- 
-#rr-btn-end-turn {
-	position: absolute;
-	right: 0px;
-	top:50%;
-}
-
-
-
-
-#opponents-hand {
-	display: flex;
-	flex-direction: row;
-}
-
-.opponents-card {
-	width: 50px;
-	height: 90px;
-
-	background-image: url("./textures/paper.jpg");
-	background-repeat: repeat;
-	background-size: 300px;
-	border-radius: 15px;
-
-	box-sizing: content-box;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/*
+========================================================================
+			COMMON
+========================================================================
+*/
 
 .stone-button {
 
@@ -112,101 +49,22 @@ body, html {
     0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.active-cards {
-	height: 5vh;
-	display: flex;
-
-	justify-content: center;
-	flex-direction: row;
-	align-items: center;
-}
-
-#frontline {
-	min-height: 15px;
-	background-color: black;
-}
-
-
-
-
-
-
-
-
-
-
-.rr-opp-battle-stat {
-	text-align: right;
+.shadow-bg {
 	color: lightgray;
 	background-color: #000000aa;
-	font-size: 48px;
-	padding: 15px;
 }
 
-.rr-user-battle-stat {
-	text-align: left;
-	color: lightgray;
-	background-color: #000000aa;
-	font-size: 48px;
-	padding: 15px;
-}
-
-#board {
-	height: 100vh;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-.innerboard {
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-}
-
-.rr-hand-container {
-	height: 40vh;
-	display: flex;
-	overflow: cutoff;
-	justify-content: center;
-	flex-direction: row;
-	align-items: center;
-}
-
-.rr-card {
+.card {
 	color: black;
 	flex-shrink: 0;
 	background-image: url("./textures/paper.jpg");
 	background-repeat: repeat;
 	background-size: 300px;
 	padding: 15px;
-	width: 100px;
+	width: 90px;
 	border-radius: 15px;
-	height: 180px;
-	margin: 15px;
+	height: 150px;
+	margin: 5px;
 	font-family: fantasy;
 	overflow: clip;
 	font-size: 13px;
@@ -245,3 +103,107 @@ body, html {
   transform: translateY(-3px); /* Lifts the button slightly */
 }
 
+/*
+========================================================================
+			MENUS
+========================================================================
+*/
+
+#lobby {
+	margin: auto;
+	max-width: 500px;
+	display: flex;
+	height: 100vh;
+	flex-direction: column;
+	justify-content: center;
+	align-items: stretch
+}
+
+#main-menu {
+	margin: auto;
+	max-width: 500px;
+	display: flex;
+	height: 100vh;
+	flex-direction: column;
+	justify-content: center;
+	align-items: stretch
+
+}
+ 
+/*
+========================================================================
+			IN-GAME
+========================================================================
+*/
+
+#end-turn-button {
+	position: absolute;
+	right: 0px;
+}
+
+#opponent-hand {
+	display: flex;
+	flex-direction: row;
+}
+
+.opponent-card {
+	width: 50px;
+	height: 90px;
+
+	margin: 5px;
+
+	background-image: url("./textures/paper.jpg");
+	background-repeat: repeat;
+	background-size: 300px;
+	border-radius: 15px;
+
+	box-sizing: content-box;
+}
+
+.deployed-cards {
+	height: 90px;
+	display: flex;
+
+	justify-content: center;
+	flex-direction: row;
+	align-items: center;
+}
+
+#frontline {
+	min-height: 15px;
+	background-color: black;
+}
+
+#opponent-hud {
+	text-align: right;
+	font-size: 48px;
+	padding: 5px;
+}
+
+#player-hud {
+	text-align: left;
+	font-size: 48px;
+	padding: 5px;
+}
+
+#board {
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.innerboard {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+#player-hand {
+	width: 100%;
+	display: flex;
+	justify-content: right;
+	flex-direction: row;
+	align-items: center;
+}

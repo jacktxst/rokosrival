@@ -34,15 +34,15 @@ export function goToLobby() {
 				Exit To Main Menu
 			</div> 
 			
-			<h1 class="shadow-overlay"> Match No.: ${gameState.matchNumber} </h1>
+			<h1 class="shadow-bg"> Match No.: ${gameState.matchNumber} </h1>
 
 			<div id="ready-button" class="stone-button">
 				Ready
 			</div> 
 			
-			<h1 class="shadow-overlay"> Your Deck: </h1>
+			<h1 class="shadow-bg"> Your Deck: </h1>
 
-			<div class="shadow-overlay" style="max-height: 300px; display: grid; grid-template-columns: auto auto auto; overflow: auto; ">
+			<div class="shadow-bg" style="max-height: 300px; display: grid; grid-template-columns: auto auto auto; overflow: auto; ">
 
 			${ 
 				(()=>{let text = ""

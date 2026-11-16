@@ -10,7 +10,7 @@ export class CardPlayerHuman extends CardPlayerBase {
 
 	doTurn() {
 
-		let userCardDivs = document.getElementById("rr-user-hand").children
+		let userCardDivs = document.getElementById("player-hand").children
 		if (!userCardDivs) return
 
 		for(let i=0;i<userCardDivs.length;i++) {
@@ -26,7 +26,7 @@ export class CardPlayerHuman extends CardPlayerBase {
 			})
 		}
 
-		document.getElementById("rr-btn-end-turn").addEventListener("click",(e)=>{
+		document.getElementById("end-turn-button").addEventListener("click",(e)=>{
 			this.cardGame.yieldTurn()
 		})
 
@@ -48,7 +48,7 @@ export class CardPlayerHuman extends CardPlayerBase {
 
 			case "opposing":
 
-				targetableDivs = document.getElementById("opponents-active-cards").children
+				targetableDivs = document.getElementById("opponent-deployed-cards").children
 
 				for (let i=0; i<targetableDivs.length; i++) {
 					if (this.opponent.activeCards[i].type.kind === targetKind) {
@@ -76,7 +76,7 @@ export class CardPlayerHuman extends CardPlayerBase {
 				break;
 			case "friendly":
 
-				targetableDivs = document.getElementById("your-active-cards").children
+				targetableDivs = document.getElementById("player-active-cards").children
 
 				for (let i=0; i<targetableDivs.length; i++) {
 					if (this.activeCards[i].type.kind === targetKind) {
@@ -104,7 +104,7 @@ export class CardPlayerHuman extends CardPlayerBase {
 				break;
 			case "any":
 
-				targetableDivs = document.getElementById("opponents-active-cards").children
+				targetableDivs = document.getElementById("opponent-active-cards").children
 
 				for (let i=0; i<targetableDivs.length; i++) {
 					if (this.opponent.activeCards[i].type.kind === targetKind) {
@@ -128,7 +128,7 @@ export class CardPlayerHuman extends CardPlayerBase {
 					}
 				}
 
-				targetableDivs = document.getElementById("your-active-cards").children
+				targetableDivs = document.getElementById("player-active-cards").children
 
 				for (let i=0; i<targetableDivs.length; i++) {
 					if (this.activeCards[i].type.kind === targetKind) {
@@ -158,8 +158,8 @@ export class CardPlayerHuman extends CardPlayerBase {
 		}
 
 		/* TODO: create a submit selection thing */
-		document.getElementById("rr-btn-end-turn").innerHTML = "submit selection"
-		document.getElementById("rr-btn-end-turn").addEventListener("click",(e)=>{
+		document.getElementById("end-turn-button").innerHTML = "submit selection"
+		document.getElementById("end-turn-button").addEventListener("click",(e)=>{
 			this.cardGame.view.renderBoard()
 			callback(targets)
 		})

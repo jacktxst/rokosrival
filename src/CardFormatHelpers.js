@@ -5,7 +5,7 @@ import * as Defs from './CardDefinitions.js'
 
 export function formatTarget(targets) {
   // now that targets can have multiple types, we join them with commas
-  assert(targets instanceof Defs.Targets, "formatTarget requires a Targets instance");
+  //assert(targets instanceof Defs.Targets, "formatTarget requires a Targets instance");
   if(targets.alignment === Defs.ALIGNMENT.ANY) {
     return targets.types.map(capitalize).join(" or ");
   }

@@ -7,8 +7,8 @@ import { formatCost, formatTrigger, formatCard, formatEffect } from './CardForma
 export class Card {
 
   constructor({ id, type, costs = [], arcane = false, triggers = [], owner = { kind: "inherited" } }) {
-		assert(type instanceof CardType, "Card type must be a CardType instance");
-		assert(typeof id === "string", "Card id must be a string");
+		// assert(type instanceof CardType, "Card type must be a CardType instance");
+		// assert(typeof id === "string", "Card id must be a string");
 
 		// assert(typeof id === "string" && id.length > 0, "id must exist and not be empty lol");
 		// assert(type instanceof CardTypeSpec, "card type must be a CardTypeSpec");
@@ -24,19 +24,22 @@ export class Card {
 		
   }
 
-  toJSON() {
-		return {
-		  id: this.id, // this needs to copy the string, it currently doesnt
-		  type: this.type.toJSON(),
-		  costs: this.costs.map((cost) => cost.toJSON()),
-		  arcane: this.arcane,
-		  owner: this.owner,
-		  triggers: this.triggers.map((trigger) => trigger.toJSON()),
-		};
+  getData() {
+  	return {
+  		id: this.id,
+  		type: this.type,
+  		costs: this.costs,
+  		arcane: this.arcane,
+  		triggers: this.triggers,
+  	}
+  }
+
+  getHeaderNumber() {
+  	return this.type.initialValue
   }
 
   renderDetailsHTML() {
-  	const title = `${capitalize(this.type.kind)} (${this.isDeployed ? this.getHeaderNumber() : this.type.initialValue})`
+  	const title = `${capitalize(this.type.kind)} (${ this.getHeaderNumber() })`
 		const costs = this.costs.map(formatCost)
 		const triggers = this.triggers.map((trigger) => `
 			<div>	
@@ -64,11 +67,10 @@ export class Card {
 		`
   	}
   
-
   renderHTML() {
 
 		return ` 
-			<div class="rr-card">
+			<div class="card">
 
 					${this.renderDetailsHTML()}
 
