@@ -23,6 +23,8 @@ export class CardGenerator {
     this.sequence = 0;
   }
 
+  // generates a unique ID for each card, optionally with a suffix
+  // the ID is composed of the idPrefix, a zero-padded sequence number, and the optional suffix
   nextId(suffix = "") {
     this.sequence += 1;
     return `${this.idPrefix}-${String(this.sequence).padStart(4, "0")}${suffix}`;
@@ -31,19 +33,19 @@ export class CardGenerator {
   generateCard(options = {}) {
     const depth = options.depth ?? 0; // if depth is not provided, default to 0
     assert(depth <= this.maxNestedDepth, "depth exceeds maxNestedDepth");
-
     const type = new Defs.CardType({
-      kind: options.forcedType ?? pick(this.seed, Object.values(Defs.TYPE)),
+      kind: options.forcedType ?? pick(this.seed, [Defs.TYPE.SPELL, Defs.TYPE.SUMMON, Defs.TYPE.CONSTRUCT]),
       initialValue: randomInt(this.seed, this.typeValueRange[0], this.typeValueRange[1]),
     });
 
-    const costs = options.subcard ? [] : this.generateCosts(type.kind, type.initialValue);
-    const arcane = options.subcard ? false : this.seed() < 0.25;
-    const explicitTriggerCount = 1 ? options.forcedTrigger : randomInt(this.seed, 1, 3);
+    const costs = options.depth > 0 ? [] : this.generateCosts(type.kind, type.initialValue);
+    const arcane = options.depth > 0 ? false : this.seed() < 0.25;
     const triggers = [];
-
-    for (let i = 0; i < explicitTriggerCount; i += 1) {
-      triggers.push(this.generateTrigger({depth:depth}));
+    // generate a random number of triggers for the card.
+    // subcards generate with fewer triggers to avoid excessive complexity
+    const triggerCount = randomInt(this.seed, 1, 3 - depth);
+    for (let i = 0; i < triggerCount; i += 1) {
+      triggers.push(this.generateTrigger({ depth }));
     }
 
     return new Card({
@@ -70,19 +72,19 @@ export class CardGenerator {
 
   // generates a "Target" object used to describe which card type(s) of which alignments are valid targets 
   // used when generating both effects AND triggers.
-  generateTargets( { legalTypes, legalAlignments } = {}) {
+  generateTargets( { legalTypes, legalAlignments = [Defs.ALIGNMENT.ANY] } = {}) {
     // if legalAlignments is provided, pick an alignment from that list. otherwise, alignment defaults to ANY.
-    const alignment = legalAlignments ? pick(this.seed, legalAlignments) : [Defs.ALIGNMENT.ANY];
+    const alignment = pick(this.seed, legalAlignments);
     const typeChoices = legalTypes ?? Object.values(Defs.TYPE);
     const types = [];
-    const targetTypeCount = randomInt(this.seed, 1, legalTypes.length);
+    const targetTypeCount = randomInt(this.seed, 1, typeChoices.length);
     types.push(pick(this.seed, typeChoices, targetTypeCount));
     
     return new Defs.Targets({ types, alignment });
   }
 
   generateSelectionForEffect(effectKind) {
-    // self is always valid because the resolver function should own the ial
+    // self is always valid because the resolver function should own the card
     // fallback behavior for effects that target themselves
     if (this.seed() < 0.4) {
       return new Defs.Selection({ kind: Defs.SELECTION.SELF });
@@ -97,34 +99,37 @@ export class CardGenerator {
 
     return new Defs.Selection({
       kind: pick(this.seed, allowedSelectionKinds),
-      targets: this.generateTargets(allowedTypes, allowedAlignmentKinds),
+      targets: this.generateTargets({ legalTypes: allowedTypes, legalAlignments: allowedAlignmentKinds }),
     });
   } 
 
-  generateEffect({depth = 0, forcedEffect = null} = {}) {
-    const canCreateSubcard = depth < this.maxNestedDepth;
+  generateEffect({depth = 0, legalEffects = []} = {}) {
 
-    const choices = [
-      Defs.EFFECT.ATTACK,
-      Defs.EFFECT.HEAL,
-      //Defs.EFFECT.DEFEND,
-      //Defs.EFFECT.SURGE,
-      //Defs.EFFECT.DECAY,
-      //Defs.EFFECT.DESTROY,
-      //Defs.EFFECT.DRAW,
-      //Defs.EFFECT.DISCARD,
-      //Defs.EFFECT.PREDICT,
+    const defaultLegalEffects = [
+      Defs.EFFECT.ATTACK, 
+      Defs.EFFECT.HEAL, 
+      // Defs.EFFECT.DEFEND, 
+      // Defs.EFFECT.SURGE, 
+      // Defs.EFFECT.DECAY, 
+      // Defs.EFFECT.DESTROY, 
+      // Defs.EFFECT.DRAW, 
+      // Defs.EFFECT.DISCARD, 
+      // Defs.EFFECT.PREDICT
     ];
 
-    if (canCreateSubcard) choices.push(Defs.EFFECT.DEPLOY_SUBCARD);
+    if (legalEffects.length === 0) {
+      legalEffects = defaultLegalEffects;
+      if (depth === 0) {
+        legalEffects.push(Defs.EFFECT.DEPLOY_SUBCARD);
+      }
+    }
 
-    const kind = forcedEffect ?? pick(this.seed, choices);
+    const  kind = pick(this.seed, legalEffects);
 
     if (kind === Defs.EFFECT.DEPLOY_SUBCARD) {
       return Defs.Effect.deploySubcard(
         this.generateCard({
           depth: depth + 1,
-          forcedType: pick(this.seed, Object.values(Defs.TYPE)),
           subcard: true,
         }),
       );
@@ -153,23 +158,26 @@ export class CardGenerator {
   // a card can have multiple triggers, and each trigger can have multiple effects.
   // the trigger kind determines when the trigger is activated, and the effects determine what happens when the trigger is activated.
   // triggers should be able to generate with multiple valid targets
-  generateTrigger({ depth = 0, legalTriggers = null, legalEffects = [] } = {}) {
+  generateTrigger({ depth = 0, legalTriggers = [], legalEffects = [] } = {}) {
     
-    // if legalTriggers is provided, pick a trigger kind from that list. otherwise, pick a trigger kind from the full list of trigger kinds.
-    const triggerKind = legalTriggers ? pick(this.seed, legalTriggers) : pick(this.seed, Object.values(Defs.TRIGGER));
-
-    // player is not a valid target type for triggers, so we exclude it here
     const legalTypes = [Defs.TYPE.SPELL, Defs.TYPE.SUMMON, Defs.TYPE.CONSTRUCT];
     const targets = this.generateTargets( {legalTypes} );
+    // if legalTriggers is provided, pick a trigger kind from that list. otherwise, pick a trigger kind from the full list of trigger kinds.
+    const triggerKind = legalTriggers.length > 0 ? pick(this.seed, legalTriggers) : pick(this.seed, Object.values(Defs.TRIGGER));
 
 
-    const effectCount = randomInt(this.seed, 1, 2);
+    const effectCount = randomInt(this.seed, 1, legalEffects.length);
     const effects = [];
-    for (let i =  0; i < effectCount; i += 1) {
-      effects.push(this.generateEffect({depth:depth}));
+
+    for (let i = 0; i < effectCount; i += 1) {
+      const newEffect = this.generateEffect({ depth, legalEffects });
+      // remove the kind of the newly generated effect from the list of legal effects 
+      // to avoid duplicate effect kinds within the same trigger
+      legalEffects = legalEffects.filter(e => e !== newEffect.kind);
+      effects.push(newEffect);
     }
 
-    return new Defs.Trigger({ triggerKind, targets, effects });
+    return new Defs.Trigger({ kind: triggerKind, targets, effects });
   }
 
 
@@ -182,7 +190,6 @@ export class CardGenerator {
       costs: [Defs.Cost.payMana(1)],
       arcane: false,
       triggers: [
-        ...Defs.CARD_TYPE_RULES[Defs.TYPE.SPELL].defaultTriggers(),
         new Defs.Trigger({
           kind: Defs.TRIGGER.ENTRY,
           effects: [

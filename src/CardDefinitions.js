@@ -26,11 +26,11 @@ export const ALIGNMENT = Object.freeze({
 });
 
 export const SELECTION = Object.freeze({
-  DIRECT: "direct",   // exactly one target from among Targets is selected by the player (or AI) and affected by the effect
-  RANDOM: "random",   // exactly one target from among Targets is randomly selected
-  EACH: "each",       // each of the valid Targets are all affected by the effect (same amount is applied to each)
-  SPLIT: "split",     // one or more targets from among Targets must be selected, and the effect amount is split among them (rounded down)
-  SELF: "self",       // the card itself is the target, no selection needed. Refers to the owner of the card in the case of SPELLs.
+  DIRECT: "specified",  // exactly one target from among Targets is selected by the player (or AI) and affected by the effect
+  RANDOM: "random",     // exactly one target from among Targets is randomly selected
+  EACH: "each",         // each of the valid Targets are all affected by the effect (same amount is applied to each)
+  SPLIT: "split among", // one or more targets from among Targets must be selected, and the effect amount is split among them (rounded down)
+  SELF: "self",         // the card itself is the target, no selection needed. Refers to the owner of the card in the case of SPELLs.
 });
 
 export const TRIGGER = Object.freeze({
@@ -173,7 +173,7 @@ export class Cost {
 
   static paySacrifice(amount) {
     return new Cost(
-      "paySacrifice",
+      "Sacrifice",
       clampInt(amount, 0, Number.MAX_SAFE_INTEGER),
       new Targets({ types: [TYPE.SUMMON, TYPE.CONSTRUCT, TYPE.SPELL], alignment: ALIGNMENT.FRIENDLY }),
     );
@@ -235,29 +235,17 @@ export const CARD_TYPE_RULES = Object.freeze({
     fizzleAtZero: true,
     canBeDefended: false,
     canBeHealed: false,
-    defaultTriggers: () => [
-      new Trigger({
-        kind: TRIGGER.REST,
-        effects: [Effect.targeted(
-          EFFECT.DECAY,
-          1,
-          new Selection({ kind: SELECTION.SELF }),
-        )],
-      }),
-    ],
   }),
   [TYPE.CONSTRUCT]: Object.freeze({
     resource: "shield",
     fizzleAtZero: true,
     canBeDefended: true,
     canBeHealed: false,
-    defaultTriggers: () => [],
   }),
   [TYPE.SUMMON]: Object.freeze({
     resource: "life",
     fizzleAtZero: true,
     canBeDefended: true,
     canBeHealed: true,
-    defaultTriggers: () => [],
   }),
 });

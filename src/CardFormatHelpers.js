@@ -1,9 +1,15 @@
 import {capitalize} from './Helpers.js'
+import {assert} from './Helpers.js'
 import * as Defs from './CardDefinitions.js' 
 
 
-export function formatTarget(target) {
-	return `${capitalize(target.alignment)} ${capitalize(target.kind)}`
+export function formatTarget(targets) {
+  // now that targets can have multiple types, we join them with commas
+  assert(targets instanceof Defs.Targets, "formatTarget requires a Targets instance");
+  if(targets.alignment === Defs.ALIGNMENT.ANY) {
+    return targets.types.map(capitalize).join(" or ");
+  }
+  return `${capitalize(targets.alignment)} ${targets.types.map(capitalize).join(" or ")}`;
 }
 
 
@@ -13,8 +19,10 @@ export function formatCost(cost) {
 			return `${cost.amount} Mana`
 		case 'payLife':
 			return `${cost.amount} Life`
-		case 'fizzleFriendlyNonPlayers':
-			return `Fizzle ${cost.amount} Friendly non-player(s)`
+		case 'sacrifice':
+			return `Sacrifice ${cost.amount} ${formatTarget(cost.targets)}s`
+    case 'free':
+      return "Free!";
 		default:
 			return capitalize(cost.kind)
 	}
@@ -23,28 +31,25 @@ export function formatCost(cost) {
 
 export function formatTrigger(trigger) {
 	if (trigger.kind === 'greet') {
-		return `Greet ${formatTarget(trigger.target)}`
+		return `Greet ${formatTarget(trigger.targets)}`
 	}
 	return capitalize(trigger.kind)
 }
 
 
-
-
-
 export function formatTriggerHeader(trigger) {
   switch (trigger.kind) {
-    case Defs.TRIGGER_KIND.AWAKEN:
+    case Defs.TRIGGER.AWAKEN:
       return "Awaken";
-    case Defs.TRIGGER_KIND.REST:
+    case Defs.TRIGGER.REST:
       return "Rest";
-    case Defs.TRIGGER_KIND.GREET:
-      return `Greet ${formatTarget(trigger.target)}`;
-    case Defs.TRIGGER_KIND.THORN:
+    case Defs.TRIGGER.GREET:
+      return `Greet ${formatTarget(trigger.targets)}`;
+    case Defs.TRIGGER.THORN:
       return "Thorn";
-    case Defs.TRIGGER_KIND.EXIT:
+    case Defs.TRIGGER.EXIT:
       return "Exit";
-    case Defs.TRIGGER_KIND.ENTRY:
+    case Defs.TRIGGER.ENTRY:
       return "Entry";
     default:
       return trigger.kind;
@@ -55,15 +60,15 @@ export function formatTriggerHeader(trigger) {
 
 export function formatEffect(effect, indent) {
   switch (effect.kind) {
-    case Defs.EFFECT_KIND.DEPLOY_SUBCARD:
-      return `${capitalize(effect.card.type.kind)} ${effect.card.type.initialValue} {\n${formatCard(effect.card, indent + 2)}\n${" ".repeat(indent)}}`;
-    case Defs.EFFECT_KIND.DESTROY:
+    case Defs.EFFECT.DEPLOY_SUBCARD:
+      return `{\n${formatCard(effect.card, indent + 2)}\n${" ".repeat(indent)}}`;
+    case Defs.EFFECT.DESTROY:
       return `Destroy ${formatSelection(effect.selection)}`;
-    case Defs.EFFECT_KIND.DRAW:
+    case Defs.EFFECT.DRAW:
       return `${capitalize(effect.player)} Player Draw ${effect.amount}`;
-    case Defs.EFFECT_KIND.DISCARD:
+    case Defs.EFFECT.DISCARD:
       return `${capitalize(effect.player)} Player Discard ${effect.amount}`;
-    case Defs.EFFECT_KIND.PREDICT:
+    case Defs.EFFECT.PREDICT:
       return `${capitalize(effect.player)} Player Predict ${effect.amount}`;
     default:
       return `${capitalize(effect.kind)} ${effect.amount} ${formatSelection(effect.selection)}`;
@@ -73,8 +78,8 @@ export function formatEffect(effect, indent) {
 
 
 export function formatSelection(selection) {
-  if (selection.mode === Defs.SELECTION_MODE.SELF) return "Self";
-  return `${capitalize(selection.mode)} ${formatTarget(selection.target)}`;
+  if (selection.kind === Defs.SELECTION.SELF) return "Self";
+  return `${capitalize(selection.kind)} ${formatTarget(selection.targets)}`;
 }
 
 
@@ -82,8 +87,9 @@ export function formatSelection(selection) {
 export function formatCard(card, indent = 0) {
   const pad = " ".repeat(indent);
   const typeLabel = `${capitalize(card.type.kind)} ${card.type.initialValue}`;
-  const costLabel = card.costs.map(formatCost).join(", ") || "Free";
-  const lines = [`${pad}${typeLabel} | Cost: ${costLabel}${card.arcane ? " | Arcane" : ""}`];
+  // if a card contains the "free" cost, we omit the "Cost: " line entirely.
+  const costLabel = card.costs.map(formatCost).filter(label => label !== "Free!").join(", ");
+  const lines = [`${pad}${typeLabel}${costLabel ? " | Cost: " + costLabel : ""}${card.arcane ? " | Arcane" : ""}`];
 
   for (const trigger of card.triggers) {
     lines.push(`${pad}${formatTriggerHeader(trigger)}:`);
