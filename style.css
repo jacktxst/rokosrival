@@ -208,7 +208,7 @@ body, html {
 	height: 180px;
 	margin: 15px;
 	font-family: fantasy;
-	overflow-y: auto;
+	overflow: clip;
 	font-size: 13px;
 	line-height: 1.25;
 }
@@ -223,29 +223,10 @@ body, html {
 }
 
 .rr-card-triggers {
+	padding: 5px;
+	overflow: auto;
 	margin: 0;
-	padding-left: 16px;
 }
-
-.rr-card-triggers ul {
-	margin: 2px 0 5px;
-	padding-left: 14px;
-}
-
-.rr-played-card {
-	display: grid;
-   	place-items: center;
-	position: absolute;
-	top: 0px;
-	opacity: 0;
-	pointer-events: none;
-	width: 100vw;
-	height: 100vh;
-
-	transition: opacity 0.25s, display 0.25s allow-discrete;
-
-}
-
 
 
 .card-targeted {
