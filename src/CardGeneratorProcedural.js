@@ -2,19 +2,20 @@
 import { Card } from "./Card.js";
 import * as Defs from "./CardDefinitions.js";
 import {assert, randomInt, pick, capitalize} from "./Helpers.js"
-
 export class CardGenerator {
+  // example usage:
+  // const myGenerator1 = new CardGenerator({ idPrefix: "basic", seed: 0.67 });
   constructor({
-    rng = Math.random,
-    idPrefix = "card",
-    maxNestedDepth = 2,
-    typeValueRange = [1, 7],
-    effectAmountRange = [1, 6],
+    seed = Math.random, // seed between 0 and 1. can be replaced with a seeded RNG for reproducibility
+    idPrefix = "card", // allows you to determine which generator created the card. useful for debugging
+    maxNestedDepth = 2, // maximum depth of nested subcards
+    typeValueRange = [1, 7], // initial value range for card types. used to determine the initial value of a card type when generating a new card
+    effectAmountRange = [1, 6], // amount range for effects. used to determine the amount of an effect when generating a new effect
   } = {}) {
-    assert(typeof rng === "function", "rng must be between 0 and 1");
+    assert(typeof seed === "function", "seed must be between 0 and 1");
     assert(maxNestedDepth >= 0, "maxNestedDepth must be >= 0");
 
-    this.rng = rng;
+    this.seed = seed;
     this.idPrefix = idPrefix;
     this.maxNestedDepth = maxNestedDepth;
     this.typeValueRange = typeValueRange;
@@ -22,31 +23,29 @@ export class CardGenerator {
     this.sequence = 0;
   }
 
+  // generates a unique ID for each card, optionally with a suffix
+  // the ID is composed of the idPrefix, a zero-padded sequence number, and the optional suffix
   nextId(suffix = "") {
     this.sequence += 1;
     return `${this.idPrefix}-${String(this.sequence).padStart(4, "0")}${suffix}`;
   }
 
-  generate(options = {}) {
-    const depth = options.depth ?? 0;
-    const forcedType = options.forcedType ?? pick(this.rng, Object.values(Defs.CARD_TYPE));
-    return this.generateCard({ depth:depth, forcedType:forcedType });
-  }
-
-  generateCard({ depth = 0, forcedType = null, forcedTrigger = null, forcedEffects = [], subcard = false } = {}) {
-    const kind = forcedType ?? pick(this.rng, Object.values(Defs.CARD_TYPE));
-    const type = new Defs.CardTypeSpec({
-      kind,
-      initialValue: randomInt(this.rng, this.typeValueRange[0], this.typeValueRange[1]),
+  generateCard(options = {}) {
+    const depth = options.depth ?? 0; // if depth is not provided, default to 0
+    assert(depth <= this.maxNestedDepth, "depth exceeds maxNestedDepth");
+    const type = new Defs.CardType({
+      kind: options.forcedType ?? pick(this.seed, [Defs.TYPE.SPELL, Defs.TYPE.SUMMON, Defs.TYPE.CONSTRUCT]),
+      initialValue: randomInt(this.seed, this.typeValueRange[0], this.typeValueRange[1]),
     });
 
-    const costs = subcard ? [] : this.generateCosts(kind, type.initialValue);
-    const arcane = subcard ? false : this.rng() < 0.25;
-    const explicitTriggerCount = 1 ? forcedTrigger: randomInt(this.rng, 1, 3);
-    const triggers = [this.generateTrigger({depth:depth, forcedTrigger:forcedTrigger, forcedEffects:forcedEffects})] ?? [...Defs.CARD_TYPE_RULES[kind].defaultTriggers()];
-
-    for (let i = 0; i < explicitTriggerCount; i += 1) {
-      triggers.push(this.generateTrigger({depth:depth}));
+    const costs = options.depth > 0 ? [] : this.generateCosts(type.kind, type.initialValue);
+    const arcane = options.depth > 0 ? false : this.seed() < 0.25;
+    const triggers = [];
+    // generate a random number of triggers for the card.
+    // subcards generate with fewer triggers to avoid excessive complexity
+    const triggerCount = randomInt(this.seed, 1, 3 - depth);
+    for (let i = 0; i < triggerCount; i += 1) {
+      triggers.push(this.generateTrigger({ depth }));
     }
 
     return new Card({
@@ -60,136 +59,147 @@ export class CardGenerator {
 
   generateCosts(kind, initialValue) {
     const costs = [];
-    // non-subcards must require at least one cost
-    if (this.rng() < 0.8) {
-      costs.push(Defs.CostSpec.payMana(Math.max(1, Math.ceil(initialValue / 2))));
+    if (this.seed() < 0.8) {
+      costs.push(Defs.Cost.payMana(Math.max(1, Math.ceil(initialValue / 2))));
     } else {
-      costs.push(Defs.CostSpec.payLife(randomInt(this.rng, 1, 3)));
+      costs.push(Defs.Cost.payLife(randomInt(this.seed, 1, 3)));
     }
-
-    if (this.rng() < 0.18) {
-      costs.push(Defs.CostSpec.fizzleFriendlyNonPlayers(randomInt(this.rng, 1, 2)));
+    if (this.seed() < 0.18) {
+      costs.push(Defs.Cost.paySacrifice(randomInt(this.seed, 1, 2), )); // fizzle friendly non player cards
     }
     return costs;
   }
 
-  generateTrigger({ depth = 0, forcedTrigger = null, forcedEffects = [] } = {}) {
-    const kind = forcedTrigger ?? pick(this.rng, Object.values(Defs.TRIGGER_KIND));
-    const target = kind === Defs.TRIGGER_KIND.GREET ? this.generateTargetSpec() : null;
-    const effectCount = randomInt(this.rng, 1, 2);
-    const effects = [];
-
-    for (let i =  0; i < effectCount; i += 1) {
-      effects.push(this.generateEffect({depth:depth}));
-    }
-
-    return new Defs.TriggerSpec({ kind, target, effects });
+  // generates a "Target" object used to describe which card type(s) of which alignments are valid targets 
+  // used when generating both effects AND triggers.
+  generateTargets( { legalTypes, legalAlignments = [Defs.ALIGNMENT.ANY] } = {}) {
+    // if legalAlignments is provided, pick an alignment from that list. otherwise, alignment defaults to ANY.
+    const alignment = pick(this.seed, legalAlignments);
+    const typeChoices = legalTypes ?? Object.values(Defs.TYPE);
+    const types = [];
+    const targetTypeCount = randomInt(this.seed, 1, typeChoices.length);
+    types.push(pick(this.seed, typeChoices, targetTypeCount));
+    
+    return new Defs.Targets({ types, alignment });
   }
 
-  generateEffect({depth = 0, forcedEffect = null} = {}) {
-    const canCreateSubcard = depth < this.maxNestedDepth;
+  generateSelectionForEffect(effectKind) {
+    // self is always valid because the resolver function should own the card
+    // fallback behavior for effects that target themselves
+    if (this.seed() < 0.4) {
+      return new Defs.Selection({ kind: Defs.SELECTION.SELF });
+    }
 
-    const choices = [
-      Defs.EFFECT_KIND.ATTACK,
-      Defs.EFFECT_KIND.HEAL,
-      //Defs.EFFECT_KIND.DEFEND,
-      //Defs.EFFECT_KIND.SURGE,
-      //Defs.EFFECT_KIND.DECAY,
-      //Defs.EFFECT_KIND.DESTROY,
-      //Defs.EFFECT_KIND.DRAW,
-      //Defs.EFFECT_KIND.DISCARD,
-      //Defs.EFFECT_KIND.PREDICT,
+    // CardDefinitions.js describes which effect kinds can target which card types, and which selection kinds are valid for each effect kind.
+    // constructs a Set of allowed alignment kinds for the given effect kind, or an empty Set if none are specified. 
+    // The spread operator is used to convert the Set into an array for easier manipulation.
+    const allowedTypes = [...(Defs.EFFECT_TARGET_RULES[effectKind] ?? new Set())];
+    const allowedSelectionKinds = [...(Defs.EFFECT_SELECTION_RULES[effectKind] ?? new Set())];
+    const allowedAlignmentKinds = [...(Defs.EFFECT_ALIGNMENT_RULES[effectKind] ?? new Set())];
+
+    return new Defs.Selection({
+      kind: pick(this.seed, allowedSelectionKinds),
+      targets: this.generateTargets({ legalTypes: allowedTypes, legalAlignments: allowedAlignmentKinds }),
+    });
+  } 
+
+  generateEffect({depth = 0, legalEffects = []} = {}) {
+
+    const defaultLegalEffects = [
+      Defs.EFFECT.ATTACK, 
+      Defs.EFFECT.HEAL, 
+      // Defs.EFFECT.DEFEND, 
+      // Defs.EFFECT.SURGE, 
+      // Defs.EFFECT.DECAY, 
+      // Defs.EFFECT.DESTROY, 
+      // Defs.EFFECT.DRAW, 
+      // Defs.EFFECT.DISCARD, 
+      // Defs.EFFECT.PREDICT
     ];
 
-    if (canCreateSubcard) choices.push(Defs.EFFECT_KIND.DEPLOY_SUBCARD);
+    if (legalEffects.length === 0) {
+      legalEffects = defaultLegalEffects;
+      if (depth === 0) {
+        legalEffects.push(Defs.EFFECT.DEPLOY_SUBCARD);
+      }
+    }
 
-    const kind = forcedEffect ?? pick(this.rng, choices);
+    const  kind = pick(this.seed, legalEffects);
 
-    if (kind === Defs.EFFECT_KIND.DEPLOY_SUBCARD) {
-      return Defs.EffectSpec.deploySubcard(
+    if (kind === Defs.EFFECT.DEPLOY_SUBCARD) {
+      return Defs.Effect.deploySubcard(
         this.generateCard({
           depth: depth + 1,
-          forcedType: pick(this.rng, Object.values(Defs.CARD_TYPE)),
           subcard: true,
         }),
       );
     }
 
-    if ([Defs.EFFECT_KIND.DRAW, Defs.EFFECT_KIND.DISCARD, Defs.EFFECT_KIND.PREDICT].includes(kind)) {
-      return Defs.EffectSpec.player(
+    if ([Defs.EFFECT.DRAW, Defs.EFFECT.DISCARD, Defs.EFFECT.PREDICT].includes(kind)) {
+      return Defs.Effect.player(
         kind,
-        randomInt(this.rng, this.effectAmountRange[0], this.effectAmountRange[1]),
-        pick(this.rng, Object.values(Defs.PLAYER_REF)),
+        randomInt(this.seed, this.effectAmountRange[0], this.effectAmountRange[1]),
+        pick(this.seed, Object.values(Defs.PLAYER_REF)),
       );
     }
 
-    if (kind === Defs.EFFECT_KIND.DESTROY) {
-      return Defs.EffectSpec.destroy(this.generateSelectionForEffect(kind));
+    if (kind === Defs.EFFECT.DESTROY) {
+      return Defs.Effect.destroy(this.generateSelectionForEffect(kind));
     }
 
-    return Defs.EffectSpec.targeted(
+    return Defs.Effect.targeted(
       kind,
-      randomInt(this.rng, this.effectAmountRange[0], this.effectAmountRange[1]),
+      randomInt(this.seed, this.effectAmountRange[0], this.effectAmountRange[1]),
       this.generateSelectionForEffect(kind),
     );
   }
 
-  generateSelectionForEffect(effectKind) {
-    // self is always valid because the resolver function should own the special
-    // fallback behavior for effects that target themselves
-    if (this.rng() < 0.15) {
-      return new Defs.SelectionSpec({ mode: Defs.SELECTION_MODE.SELF });
+  // a trigger is a collection of effects that are executed when the trigger condition is met.
+  // a card can have multiple triggers, and each trigger can have multiple effects.
+  // the trigger kind determines when the trigger is activated, and the effects determine what happens when the trigger is activated.
+  // triggers should be able to generate with multiple valid targets
+  generateTrigger({ depth = 0, legalTriggers = [], legalEffects = [] } = {}) {
+    
+    const legalTypes = [Defs.TYPE.SPELL, Defs.TYPE.SUMMON, Defs.TYPE.CONSTRUCT];
+    const targets = this.generateTargets( {legalTypes} );
+    // if legalTriggers is provided, pick a trigger kind from that list. otherwise, pick a trigger kind from the full list of trigger kinds.
+    const triggerKind = legalTriggers.length > 0 ? pick(this.seed, legalTriggers) : pick(this.seed, Object.values(Defs.TRIGGER));
+
+
+    const effectCount = randomInt(this.seed, 1, legalEffects.length);
+    const effects = [];
+
+    for (let i = 0; i < effectCount; i += 1) {
+      const newEffect = this.generateEffect({ depth, legalEffects });
+      // remove the kind of the newly generated effect from the list of legal effects 
+      // to avoid duplicate effect kinds within the same trigger
+      legalEffects = legalEffects.filter(e => e !== newEffect.kind);
+      effects.push(newEffect);
     }
 
-    const allowedTargetKinds = [...(Defs.EFFECT_TARGET_RULES[effectKind] ?? new Set())];
-    assert(allowedTargetKinds.length > 0, `No target rules for ${effectKind}.`);
-
-    const kind = pick(this.rng, allowedTargetKinds);
-    const alignment = this.generateAlignmentForTarget(kind);
-    const mode = pick(this.rng, [
-      Defs.SELECTION_MODE.DIRECT,
-      Defs.SELECTION_MODE.RANDOM,
-      Defs.SELECTION_MODE.TWINNED,
-      Defs.SELECTION_MODE.SPLIT,
-    ]);
-
-    return new Defs.SelectionSpec({
-      mode,
-      target: new Defs.TargetSpec({ kind, alignment }),
-    });
+    return new Defs.Trigger({ kind: triggerKind, targets, effects });
   }
 
-  generateTargetSpec() {
-    const kind = pick(this.rng, Object.values(Defs.TARGET_KIND));
-    return new Defs.TargetSpec({ kind, alignment: this.generateAlignmentForTarget(kind) });
-  }
 
-  generateAlignmentForTarget(kind) {
-    if (kind === Defs.TARGET_KIND.PLAYER) {
-      return pick(this.rng, [Defs.ALIGNMENT.FRIENDLY, Defs.ALIGNMENT.OPPOSING]);
-    }
-    return pick(this.rng, Object.values(Defs.ALIGNMENT));
-  }
 
 // regression testing simple
   buildMockupSimpleAttackSpell() {
     return new Card({
       id: this.nextId(),
-      type: new Defs.CardTypeSpec({ kind: Defs.CARD_TYPE.SPELL, initialValue: 1 }),
-      costs: [Defs.CostSpec.payMana(1)],
+      type: new Defs.CardType({ kind: Defs.TYPE.SPELL, initialValue: 1 }),
+      costs: [Defs.Cost.payMana(1)],
       arcane: false,
       triggers: [
-        ...Defs.CARD_TYPE_RULES[Defs.CARD_TYPE.SPELL].defaultTriggers(),
-        new Defs.TriggerSpec({
-          kind: Defs.TRIGGER_KIND.ENTRY,
+        new Defs.Trigger({
+          kind: Defs.TRIGGER.ENTRY,
           effects: [
-            Defs.EffectSpec.targeted(
-              Defs.EFFECT_KIND.ATTACK,
+            Defs.Effect.targeted(
+              Defs.EFFECT.ATTACK,
               5,
-              new Defs.SelectionSpec({
-                mode: Defs.SELECTION_MODE.DIRECT,
-                target: new Defs.TargetSpec({
-                  kind: Defs.TARGET_KIND.PLAYER,
+              new Defs.Selection({
+                kind: Defs.SELECTION.DIRECT,
+                targets: new Defs.Targets({
+                  types: [Defs.TYPE.PLAYER, Defs.TYPE.SUMMON],
                   alignment: Defs.ALIGNMENT.OPPOSING,
                 }),
               }),
@@ -204,30 +214,30 @@ export class CardGenerator {
   buildMockupComplexSpell() {
     const summonedCard = new Card({
       id: this.nextId("-sub"),
-      type: new Defs.CardTypeSpec({ kind: Defs.CARD_TYPE.SUMMON, initialValue: 5 }),
+      type: new Defs.CardType({ kind: Defs.TYPE.SUMMON, initialValue: 5 }),
       costs: [],
       arcane: false,
       triggers: [
-        new Defs.TriggerSpec({
-          kind: Defs.TRIGGER_KIND.REST,
+        new Defs.Trigger({
+          kind: Defs.TRIGGER.REST,
           effects: [
-            Defs.EffectSpec.targeted(
-              Defs.EFFECT_KIND.HEAL,
+            Defs.Effect.targeted(
+              Defs.EFFECT.HEAL,
               2,
-              new Defs.SelectionSpec({ mode: Defs.SELECTION_MODE.SELF }),
+              new Defs.Selection({ kind: Defs.SELECTION.SELF }),
             ),
           ],
         }),
-        new Defs.TriggerSpec({
-          kind: Defs.TRIGGER_KIND.REST,
+        new Defs.Trigger({
+          kind: Defs.TRIGGER.REST,
           effects: [
-            Defs.EffectSpec.targeted(
-              Defs.EFFECT_KIND.ATTACK,
+            Defs.Effect.targeted(
+              Defs.EFFECT.ATTACK,
               1,
-              new Defs.SelectionSpec({
-                mode: Defs.SELECTION_MODE.DIRECT,
-                target: new Defs.TargetSpec({
-                  kind: Defs.TARGET_KIND.PLAYER,
+              new Defs.Selection({
+                kind: Defs.SELECTION.DIRECT,
+                targets: new Defs.Targets({
+                  types: [Defs.TYPE.PLAYER],
                   alignment: Defs.ALIGNMENT.OPPOSING,
                 }),
               }),
@@ -239,14 +249,14 @@ export class CardGenerator {
 
     return new Card({
       id: this.nextId(),
-      type: new Defs.CardTypeSpec({ kind: Defs.CARD_TYPE.SPELL, initialValue: 2 }),
-      costs: [Defs.CostSpec.payMana(3)],
+      type: new Defs.CardType({ kind: Defs.TYPE.SPELL, initialValue: 2 }),
+      costs: [Defs.Cost.payMana(3)],
       arcane: false,
       triggers: [
-        ...Defs.CARD_TYPE_RULES[Defs.CARD_TYPE.SPELL].defaultTriggers(),
-        new Defs.TriggerSpec({
-          kind: Defs.TRIGGER_KIND.AWAKEN,
-          effects: [Defs.EffectSpec.deploySubcard(summonedCard)],
+        ...Defs.CARD_TYPE_RULES[Defs.TYPE.SPELL].defaultTriggers(),
+        new Defs.Trigger({
+          kind: Defs.TRIGGER.AWAKEN,
+          effects: [Defs.Effect.deploySubcard(summonedCard)],
         }),
       ],
     });
