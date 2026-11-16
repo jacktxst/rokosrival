@@ -44,6 +44,18 @@ export class CardGame {
 
 		}
 
+		for (let card of this.currentPlayer.activeCards) {
+			
+			if (card.type.kind === "spell") {
+				card.mana -= 1
+				if (card.mana === 0) {
+					new TriggerCardEvent( card, "exit" )
+					this.currentPlayer.activeCards = this.currentPlayer.activeCards.filter(item => item !== card)
+				}
+			}
+
+		}
+
 		// note that renderBoard also removes event listeners, thus disabling the player from making a move. correct.
 
 		// reset mana for both players at the end of each turn
