@@ -51,18 +51,30 @@ export class CardGame {
 				if (card.mana === 0) {
 					new TriggerCardEvent( card, "exit" )
 					this.currentPlayer.activeCards = this.currentPlayer.activeCards.filter(item => item !== card)
+
+					for (let triggerCard of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
+						eventQueue.splice(1,0,new TriggerCardEvent( triggerCard, "grieve", card ))
+					}
 				}
 			}
 			if (card.type.kind === "construct") {
 				if (card.shield === 0) {
 					new TriggerCardEvent( card, "exit" )
 					this.currentPlayer.activeCards = this.currentPlayer.activeCards.filter(item => item !== card)
+
+					for (let triggerCard of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
+						eventQueue.splice(1,0,new TriggerCardEvent( triggerCard, "grieve", card ))
+					}
 				}
 			}
 			if (card.type.kind === "summon") {
 				if (card.health === 0) {
 					new TriggerCardEvent( card, "exit" )
 					this.currentPlayer.activeCards = this.currentPlayer.activeCards.filter(item => item !== card)
+
+					for (let triggerCard of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
+						eventQueue.splice(1,0,new TriggerCardEvent( triggerCard, "grieve", card ))
+					}
 				}
 			}
 
