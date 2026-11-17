@@ -265,12 +265,17 @@ function resolveLoop(timestamp) {
 						case "destroy": // can trigger: EXIT, GRIEVE
 							break;
 						case "draw":
-							e.originator.owner.hand.push(...e.originator.owner.deck.drawCards(e.effect.amount))
-							e.timeRemaining = 500
+							for (let target of e.targetList) {
+								target.hand.push(...target.deck.drawCards(e.effect.amount))
+								e.timeRemaining = 500
+							}
 							break;
 						case "discard":
-							for (let i = 0; i < e.effect.amount && i < e.originator.owner.hand.length; i++)
-								e.originator.owner.discard.push(e.originator.owner.hand.pop())
+							for (let target of e.targetList) {
+								for (let i = 0; i < e.effect.amount && i < target.hand.length; i++) {
+									target.discard.push(target.hand.pop())
+								}
+							}	
 							break;
 						case "deploySubcard": // can trigger: GREET, ENTRY
 							console.log(`DEPLOYING SUBCARD..? ${e.effect.card.type.kind}`)
