@@ -159,7 +159,7 @@ function resolveLoop(timestamp) {
 								{
 									const candidates = getSelectionCandidates(e.effect.selection, e.originator)
 									eventQueue.splice(0,1)
-									eventQueue[0].targetList = [ candidates[ randomInt( Math.random(), 0, candidates.length - 1 ) ] ]
+									eventQueue[0].targetList = [ candidates[ randomInt( Math.random, 0, candidates.length - 1 ) ] ]
 								}		
 								break;
 							case "each":
