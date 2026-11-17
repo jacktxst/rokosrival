@@ -68,7 +68,7 @@ body, html {
 	height: 150px;
 	margin: 5px;
 	font-family: fantasy, serif;
-	overflow-y: visible;
+	overflow-y: scroll;
 	-ms-overflow-style: none;  /* IE and Edge */
   	scrollbar-width: thin;  /* Firefox */
 	scrollbar-color: #aba591 #8b8571; /* Firefox */
@@ -99,6 +99,9 @@ body, html {
 	margin: 0;
 }
 
+.card ul {
+	padding-left: 10px;
+}
 
 .card-targeted {
 	outline: 15px solid green;
