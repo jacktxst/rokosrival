@@ -53,6 +53,18 @@ export class CardGame {
 					this.currentPlayer.activeCards = this.currentPlayer.activeCards.filter(item => item !== card)
 				}
 			}
+			if (card.type.kind === "construct") {
+				if (card.shield === 0) {
+					new TriggerCardEvent( card, "exit" )
+					this.currentPlayer.activeCards = this.currentPlayer.activeCards.filter(item => item !== card)
+				}
+			}
+			if (card.type.kind === "summon") {
+				if (card.health === 0) {
+					new TriggerCardEvent( card, "exit" )
+					this.currentPlayer.activeCards = this.currentPlayer.activecards.filter(item => item !== card)
+				}
+			}
 
 		}
 
