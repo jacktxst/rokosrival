@@ -269,6 +269,8 @@ function resolveLoop(timestamp) {
 							e.timeRemaining = 500
 							break;
 						case "discard":
+							for (let i = 0; i < e.effect.amount && i < e.originator.owner.hand.length; i++)
+								e.originator.owner.discard.push(e.originator.owner.hand.pop())
 							break;
 						case "deploySubcard": // can trigger: GREET, ENTRY
 							console.log(`DEPLOYING SUBCARD..? ${e.effect.card.type.kind}`)
