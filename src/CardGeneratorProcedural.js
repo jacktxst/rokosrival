@@ -140,7 +140,7 @@ export class CardGenerator {
       return Defs.Effect.player(
         kind,
         randomInt(this.seed, this.effectAmountRange[0], this.effectAmountRange[1]),
-        pick(this.seed, Object.values(Defs.PLAYER_REF)),
+        pick(this.seed, Object.values(Defs.ALIGNMENT)),
       );
     }
 
