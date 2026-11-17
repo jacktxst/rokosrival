@@ -79,7 +79,7 @@ function getSelectionCandidates(selection, originator) {
 		case "friendly":
 			alignedCards = [...originator.owner.activeCards, originator.owner]
 			break;
-		case "enemy":
+		case "opposing":
 			alignedCards = [...originator.owner.opponent.activeCards, originator.owner.opponent]
 			break;
 		default:
