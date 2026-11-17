@@ -230,7 +230,7 @@ function resolveLoop(timestamp) {
 								damage /= e.targetList.length
 							}
 							for (let target of e.targetList) {
-								if (target.shield !== 0) {
+								if (target.shield !== 0) { // got a weird error message: cant read .shield from undefined
 									if (target.shield < damage) {
 										damage -= target.shield
 										target.shield = 0
