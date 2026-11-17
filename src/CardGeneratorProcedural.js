@@ -109,12 +109,12 @@ export class CardGenerator {
     const defaultLegalEffects = [
       Defs.EFFECT.ATTACK, 
       Defs.EFFECT.HEAL, 
-      // Defs.EFFECT.DEFEND, 
-      // Defs.EFFECT.SURGE, 
-      // Defs.EFFECT.DECAY, 
-      // Defs.EFFECT.DESTROY, 
-      // Defs.EFFECT.DRAW, 
-      // Defs.EFFECT.DISCARD, 
+      Defs.EFFECT.DEFEND, 
+      Defs.EFFECT.SURGE, 
+      Defs.EFFECT.DECAY, 
+      Defs.EFFECT.DESTROY, 
+      Defs.EFFECT.DRAW, 
+      Defs.EFFECT.DISCARD, 
       // Defs.EFFECT.PREDICT
     ];
 
