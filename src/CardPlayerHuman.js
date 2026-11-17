@@ -79,7 +79,7 @@ export class CardPlayerHuman extends CardPlayerBase {
 		document.getElementById("end-turn-button").innerHTML = "Submit Selection"
 		document.getElementById("end-turn-button").addEventListener("click",(e)=>{
 			this.cardGame.view.renderBoard()
-			callback(selection)
+			resultsCallback(selection)
 		})
 
 	}
