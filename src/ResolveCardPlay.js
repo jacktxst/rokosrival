@@ -320,7 +320,7 @@ function resolveLoop(timestamp) {
 
 							for (let card of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
 
-								eventQueue.push(new TriggerCardEvent( card, "greet", subcard.type.kind ))
+								eventQueue.splice(1,0,new TriggerCardEvent( card, "greet", subcard.type.kind ))
 							}
 
 							eventQueue.splice(1,0,new TriggerCardEvent(subcard,"entry"))
