@@ -52,7 +52,7 @@ export class CardGame {
 					new TriggerCardEvent( card, "exit" )
 					this.currentPlayer.activeCards = this.currentPlayer.activeCards.filter(item => item !== card)
 
-					for (let triggerCard of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
+					for (let triggerCard of [...this.currentPlayer.activeCards, ...this.currentPlayer.opponent.activeCards]) {
 						eventQueue.splice(1,0,new TriggerCardEvent( triggerCard, "grieve", card ))
 					}
 				}
@@ -62,7 +62,7 @@ export class CardGame {
 					new TriggerCardEvent( card, "exit" )
 					this.currentPlayer.activeCards = this.currentPlayer.activeCards.filter(item => item !== card)
 
-					for (let triggerCard of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
+					for (let triggerCard of [...this.currentPlayer.activeCards, ...this.currentPlayer.opponent.activeCards]) {
 						eventQueue.splice(1,0,new TriggerCardEvent( triggerCard, "grieve", card ))
 					}
 				}
@@ -72,7 +72,7 @@ export class CardGame {
 					new TriggerCardEvent( card, "exit" )
 					this.currentPlayer.activeCards = this.currentPlayer.activeCards.filter(item => item !== card)
 
-					for (let triggerCard of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
+					for (let triggerCard of [...this.currentPlayer.activeCards, ...this.currentPlayer.opponent.activeCards]) {
 						eventQueue.splice(1,0,new TriggerCardEvent( triggerCard, "grieve", card ))
 					}
 				}
