@@ -97,6 +97,26 @@ function getSelectionCandidates(selection, originator) {
 	return candidates;
 }
 
+function cardMatchesTargets(card, targets, player) {
+
+	switch (targets.alignment) {
+		case "friendly":
+			if (card.owner !== player) return false;
+			break;
+		case "opposing":
+			if (card.owner !== player.opponent) return false;
+			break;
+	}
+
+	for ( let type of targets.types ) {
+
+		if (type.kind === card.type.kind) return true;
+
+	}
+
+	return false;
+}
+
 
 function resolveLoop(timestamp) {
 
@@ -120,7 +140,7 @@ function resolveLoop(timestamp) {
 					let newEvents = []
 
 					for (let trigger of e.target.triggers) {
-						if (trigger.kind === e.triggerKind && (!trigger.targets || trigger.targets.types[0].kind === e.triggerArg )  ) {
+						if (trigger.kind === e.triggerKind && (!trigger.targets || cardMatchesTargets( e.triggerArg, trigger.targets, e.triggerArg.owner ) )  ) { // TODO fix this shit
 							console.log("matching trigger found on card!")
 							for (let effect of trigger.effects) {
 								console.log(`${effect.kind} effect queued...`)
@@ -268,14 +288,14 @@ function resolveLoop(timestamp) {
 
 								for (let card of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
 
-									eventQueue.splice(1,0,new TriggerCardEvent( card, "grieve", target.type.kind ))
+									eventQueue.splice(1,0,new TriggerCardEvent( card, "grieve", target ))
 								
 								}
 
 								eventQueue.splice(1,0, new TriggerCardEvent( target, "exit" ))
 
 								target.owner.activeCards = target.owner.activeCards.filter(item => item !== target)
-								
+
 								if (!target.isSubcard) {
 									target.owner.discard.push(target)
 								}
@@ -305,7 +325,7 @@ function resolveLoop(timestamp) {
 
 							for (let card of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
 
-								eventQueue.splice(1,0,new TriggerCardEvent( card, "greet", subcard.type.kind ))
+								eventQueue.splice(1,0,new TriggerCardEvent( card, "greet", subcard ))
 							}
 
 							eventQueue.splice(1,0,new TriggerCardEvent(subcard,"entry"))

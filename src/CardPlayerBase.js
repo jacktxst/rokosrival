@@ -104,7 +104,7 @@ export class CardPlayerBase {
 
 		for (let card of [...this.activeCards, ...this.opponent.activeCards]) {
 
-			eventQueue.push(new TriggerCardEvent( card, "greet", deployedCard.type.kind ))
+			eventQueue.push(new TriggerCardEvent( card, "greet", deployedCard ))
 		}
 
 		eventQueue.push(
