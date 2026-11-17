@@ -271,6 +271,7 @@ function resolveLoop(timestamp) {
 							break;
 						case "deploySubcard": // can trigger: GREET, ENTRY
 							console.log(`DEPLOYING SUBCARD..? ${e.effect.card.type.kind}`)
+							e.effect.card.isSubcard = true
 							let subcard = new DeployedCard(e.effect.card , e.originator.owner)
 							e.timeRemaining = 500
 							e.originator.owner.activeCards.push(subcard)
