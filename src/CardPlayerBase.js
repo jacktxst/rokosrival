@@ -98,34 +98,19 @@ export class CardPlayerBase {
 		eventQueue.push(  
 
 			new TriggerCardEvent( deployedCard, "entry" ),
-			new ReturnControlEvent()
+			
 
 		)
 
-		/* TODO: we need to check if there are cards in play with a GREET trigger that needs
-		to be triggered by this card */
-		for (let card of this.activeCards) {
-			for (let trigger of card.triggers) {
-				if (trigger.kind === "greet") {
-					for (let target of trigger.targets) {
-						if (target.type === deployedCard.type) {
-							eventQueue.push(new TriggerCardEvent( card, "greet" ))
-						}
-					}
-				}
-			}
+		for (let card of [...this.activeCards, ...this.opponent.activeCards]) {
+
+			eventQueue.push(new TriggerCardEvent( card, "greet", deployedCard.type.kind ))
 		}
-		for (let card of this.opponent.activeCards) {
-			for (let trigger of card.triggers) {
-				if (trigger.kind === "greet") {
-					for (let target of trigger.targets) {
-						if (target.type === deployedCard.type) {
-							eventQueue.push(new TriggerCardEvent( card, "greet" ))
-						}
-					}
-				}
-			}
-		}
+
+		eventQueue.push(
+			new ReturnControlEvent()
+		)
+
 		
 		// remove card from hand and draw another
 

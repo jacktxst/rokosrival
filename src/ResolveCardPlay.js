@@ -25,12 +25,13 @@ export class GamePlayEvent {
 }
 
 export class TriggerCardEvent extends GamePlayEvent {
-	constructor(target, triggerKind) {
+	constructor(target, triggerKind, triggerArg=null) {
 		super()
 		this.kind = "trigger-card"
 
 		this.target = target 
 		this.triggerKind = triggerKind
+		this.triggerArg = triggerArg
 	}
 }
 
@@ -119,7 +120,7 @@ function resolveLoop(timestamp) {
 					let newEvents = []
 
 					for (let trigger of e.target.triggers) {
-						if (trigger.kind === e.triggerKind) {
+						if (trigger.kind === e.triggerKind && (!trigger.targets || trigger.targets.types[0].kind === e.triggerArg )  ) {
 							console.log("matching trigger found on card!")
 							for (let effect of trigger.effects) {
 								console.log(`${effect.kind} effect queued...`)
@@ -316,6 +317,12 @@ function resolveLoop(timestamp) {
 							let subcard = new DeployedCard(e.effect.card , e.originator.owner)
 							e.timeRemaining = 500
 							e.originator.owner.activeCards.push(subcard)
+
+							for (let card of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
+
+								eventQueue.push(new TriggerCardEvent( card, "greet", subcard.type.kind ))
+							}
+
 							eventQueue.splice(1,0,new TriggerCardEvent(subcard,"entry"))
 							gameState.currentGameView.renderBoard()
 							subcard.owner = e.originator.owner
