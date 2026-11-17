@@ -140,7 +140,7 @@ function resolveLoop(timestamp) {
 					let newEvents = []
 
 					for (let trigger of e.target.triggers) {
-						if (trigger.kind === e.triggerKind && (!trigger.targets || cardMatchesTargets( e.triggerArg, trigger.targets, e.triggerArg.owner ) )  ) { // TODO fix this shit
+						if (trigger.kind === e.triggerKind && (!e.triggerArg || cardMatchesTargets( e.triggerArg, trigger.targets, e.triggerArg.owner ) )  ) { // TODO fix this shit
 							console.log("matching trigger found on card!")
 							for (let effect of trigger.effects) {
 								console.log(`${effect.kind} effect queued...`)
