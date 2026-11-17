@@ -209,6 +209,14 @@ function resolveLoop(timestamp) {
 								damage /= e.targetList.length
 							}
 							for (let target of e.targetList) {
+								if (target.shield !== 0) {
+									if (target.shield < damage) {
+										damage -= target.shield
+										target.shield = 0
+									} else {
+										target.shield -= damage
+									}
+								}
 								target.health -= damage
 								if (target.type.kind !== "player") eventQueue.splice(1, 0, new TriggerCardEvent(target, "thorn") )
 								e.timeRemaining = 500
