@@ -265,7 +265,8 @@ function resolveLoop(timestamp) {
 						case "destroy": // can trigger: EXIT, GRIEVE
 							break;
 						case "draw":
-							
+							e.originator.owner.hand.push(...e.originator.owner.deck.drawCards(e.effect.amount))
+							e.timeRemaining = 500
 							break;
 						case "discard":
 							break;
