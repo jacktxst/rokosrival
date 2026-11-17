@@ -225,14 +225,39 @@ function resolveLoop(timestamp) {
 							}
 							break;
 						case "defend":
+							let armor = e.effect.amount
+							if (e.effect.selection.kind === "split among") {
+								armor /= e.targetList.length
+							}
+							for (let target of e.targetList) {
+								target.shield += armor
+								e.timeRemaining = 500
+							}
 							break;
 						case "surge":
+							surgeAmount = e.effect.amount
+							if (e.effect.selection.kind === "split among") {
+								surgeAmount /= e.targetList.length
+							}
+							for (let target of e.targetList) {
+								target.mana += surgeAmount
+								e.timeRemaining = 500
+							}
 							break;
 						case "decay":
+							decayAmount = e.effect.amount
+							if (e.effect.selection.kind === "split among") {
+								decayAmount /= e.targetList.length
+							}
+							for (let target of e.targetList) {
+								target.mana -= decayAmount
+								e.timeRemaining = 500
+							}
 							break;
 						case "destroy": // can trigger: EXIT, GRIEVE
 							break;
 						case "draw":
+							
 							break;
 						case "discard":
 							break;
