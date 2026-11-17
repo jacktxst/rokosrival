@@ -264,11 +264,36 @@ function resolveLoop(timestamp) {
 							break;
 						case "destroy": // can trigger: EXIT, GRIEVE
 							for (let target of e.targetList) {
-								eventQueue.splice(1,0, new TriggerCardEvent( target, "exit"))
+								eventQueue.splice(1,0, new TriggerCardEvent( target, "exit" ))
 								target.owner.activeCards = target.owner.activeCards.filter(item => item !== target)
 								if (!target.isSubcard) {
 									target.owner.discard.push(target)
 								}
+
+								for (let card of e.originator.owner.activeCards) {
+									for (let trigger of card.triggers) {
+										if (trigger.kind === "grieve") {
+											for (let target of trigger.targets) {
+												if (target.type === deployedCard.type) {
+													eventQueue.splice(1,0, new TriggerCardEvent( card, "grieve" ))
+												}
+											}
+										}
+									}
+								}
+
+								for (let card of e.originator.owner.opponent.activeCards) {
+									for (let trigger of card.triggers) {
+										if (trigger.kind === "grieve") {
+											for (let target of trigger.targets) {
+												if (target.type === deployedCard.type) {
+													eventQueue.splice(1,0, new TriggerCardEvent( card, "grieve" ))
+												}
+											}
+										}
+									}
+								}
+
 								e.timeRemaining = 500
 							}
 							break;
