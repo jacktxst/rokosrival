@@ -263,6 +263,14 @@ function resolveLoop(timestamp) {
 							}
 							break;
 						case "destroy": // can trigger: EXIT, GRIEVE
+							for (let target of e.targetList) {
+								eventQueue.splice(1,0, new TriggerCardEvent( target, "exit"))
+								target.owner.activeCards = target.owner.activeCards.filter(item => item !== target)
+								if (!target.isSubcard) {
+									target.owner.discard.push(target)
+								}
+								e.timeRemaining = 500
+							}
 							break;
 						case "draw":
 							for (let target of e.targetList) {
