@@ -264,7 +264,7 @@ function resolveLoop(timestamp) {
 							}
 							break;
 						case "surge":
-							surgeAmount = e.effect.amount
+							let surgeAmount = e.effect.amount
 							if (e.effect.selection.kind === "split among") {
 								surgeAmount /= e.targetList.length
 							}
@@ -274,7 +274,7 @@ function resolveLoop(timestamp) {
 							}
 							break;
 						case "decay":
-							decayAmount = e.effect.amount
+							let decayAmount = e.effect.amount
 							if (e.effect.selection.kind === "split among") {
 								decayAmount /= e.targetList.length
 							}
