@@ -49,7 +49,7 @@ export class CardGame {
 			if (card.type.kind === "spell") {
 				card.mana -= 1
 				if (card.mana === 0) {
-					new TriggerCardEvent( card, "exit" )
+					eventQueue.splice(1,0,new TriggerCardEvent( card, "exit" ))
 					this.currentPlayer.activeCards = this.currentPlayer.activeCards.filter(item => item !== card)
 
 					for (let triggerCard of [...this.currentPlayer.activeCards, ...this.currentPlayer.opponent.activeCards]) {
@@ -59,7 +59,7 @@ export class CardGame {
 			}
 			if (card.type.kind === "construct") {
 				if (card.shield === 0) {
-					new TriggerCardEvent( card, "exit" )
+					eventQueue.splice(1,0, new TriggerCardEvent( card, "exit" ))
 					this.currentPlayer.activeCards = this.currentPlayer.activeCards.filter(item => item !== card)
 
 					for (let triggerCard of [...this.currentPlayer.activeCards, ...this.currentPlayer.opponent.activeCards]) {
@@ -69,7 +69,7 @@ export class CardGame {
 			}
 			if (card.type.kind === "summon") {
 				if (card.health === 0) {
-					new TriggerCardEvent( card, "exit" )
+					eventQueue.splice(1,0, new TriggerCardEvent( card, "exit" ))
 					this.currentPlayer.activeCards = this.currentPlayer.activeCards.filter(item => item !== card)
 
 					for (let triggerCard of [...this.currentPlayer.activeCards, ...this.currentPlayer.opponent.activeCards]) {
