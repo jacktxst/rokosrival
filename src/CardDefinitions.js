@@ -182,37 +182,16 @@ export class Cost {
 }
 
 export class Effect {
-  constructor(kind, data = {}) {
-    //assert(Object.values(EFFECT).includes(kind), `unknown effect: ${kind}`);
+  constructor(kind, amount = null, selection = null) {
     this.kind = kind;
-    Object.assign(this, data);
-  }
-
-  static targeted(kind, amount, selection) {
-    //assert(EFFECT_TARGET_RULES[kind], `${kind} effect does not support Targets`);
-    //assert(selection instanceof Selection, `${kind} effect requires a Selection`);
-    //assert(Number.isInteger(amount) && amount > 0, `${kind} effect amount must be a positive integer`);
-    return new Effect(kind, { amount, selection });
-  }
-
-  static destroy(selection) {
-    //assert(selection instanceof Selection, `${EFFECT.DESTROY} effect requires a Selection`);
-    return new Effect(EFFECT.DESTROY, { selection });
-  }
-
-  static player(kind, amount, player = PLAYER_REF.FRIENDLY) {
-    assert(
-      [EFFECT.DRAW, EFFECT.DISCARD, EFFECT.PREDICT].includes(kind),
-      `${kind} effect does not support player actions.`,
-    );
-    //assert(Number.isInteger(amount) && amount > 0, `${kind} effect amount must be a positive integer`);
-    //assert(Object.values(PLAYER_REF).includes(player), `unknown player: ${player}`);
-    return new Effect(kind, { amount, player });
+    this.amount = amount;
+    this.selection = selection;
   }
 
   static deploySubcard(card) {
-    assert(card instanceof Card, "deploySubcard requires a Card instance");
-    return new Effect(EFFECT.DEPLOY_SUBCARD, { card });
+    const effect = new Effect("deploySubcard", card.type.initialValue);
+    effect.card = card;
+    return effect;
   }
 }
 

@@ -118,41 +118,30 @@ export class CardGenerator {
       // Defs.EFFECT.PREDICT
     ];
 
+    // if legal effects not provided, default to the above list
     if (legalEffects.length === 0) {
       legalEffects = defaultLegalEffects;
       if (depth === 0) {
+        // if legal effects not provided AND we are at the top level (depth 0), include DEPLOY_SUBCARD as a default legal effect
         legalEffects.push(Defs.EFFECT.DEPLOY_SUBCARD);
       }
     }
 
-    const  kind = pick(this.seed, legalEffects);
-
-    if (kind === Defs.EFFECT.DEPLOY_SUBCARD) {
-      return Defs.Effect.deploySubcard(
-        this.generateCard({
-          depth: depth + 1,
-          subcard: true,
-        }),
-      );
+    // pick which effect
+    const kind = pick(this.seed, legalEffects);
+    const value = randomInt(this.seed, this.effectAmountRange[0], this.effectAmountRange[1]);
+    switch (kind) {
+      case Defs.EFFECT.DEPLOY_SUBCARD:
+        return Defs.Effect.deploySubcard(
+          this.generateCard({
+            depth: depth + 1,
+          }),
+        );
+      default:
+        break;
     }
-
-    if ([Defs.EFFECT.DRAW, Defs.EFFECT.DISCARD, Defs.EFFECT.PREDICT].includes(kind)) {
-      return Defs.Effect.player(
-        kind,
-        randomInt(this.seed, this.effectAmountRange[0], this.effectAmountRange[1]),
-        pick(this.seed, Object.values(Defs.ALIGNMENT)),
-      );
-    }
-
-    if (kind === Defs.EFFECT.DESTROY) {
-      return Defs.Effect.destroy(this.generateSelectionForEffect(kind));
-    }
-
-    return Defs.Effect.targeted(
-      kind,
-      randomInt(this.seed, this.effectAmountRange[0], this.effectAmountRange[1]),
-      this.generateSelectionForEffect(kind),
-    );
+    const selection = this.generateSelectionForEffect(kind);
+    return new Defs.Effect({ kind, amount:value, selection });
   }
 
   // a trigger is a collection of effects that are executed when the trigger condition is met.
@@ -194,7 +183,7 @@ export class CardGenerator {
         new Defs.Trigger({
           kind: Defs.TRIGGER.ENTRY,
           effects: [
-            Defs.Effect.targeted(
+            new Defs.Effect(
               Defs.EFFECT.ATTACK,
               5,
               new Defs.Selection({
@@ -222,20 +211,20 @@ export class CardGenerator {
         new Defs.Trigger({
           kind: Defs.TRIGGER.REST,
           effects: [
-            Defs.Effect.targeted(
-              Defs.EFFECT.HEAL,
-              2,
-              new Defs.Selection({ kind: Defs.SELECTION.SELF }),
+            new Defs.Effect(
+              Defs.EFFECT.HEAL, //kind
+              2, //amount
+              new Defs.Selection({ kind: Defs.SELECTION.SELF }), //selection
             ),
           ],
         }),
         new Defs.Trigger({
           kind: Defs.TRIGGER.REST,
           effects: [
-            Defs.Effect.targeted(
-              Defs.EFFECT.ATTACK,
-              1,
-              new Defs.Selection({
+            new Defs.Effect(
+              Defs.EFFECT.ATTACK, //kind
+              1, // amount
+              new Defs.Selection({ // selection
                 kind: Defs.SELECTION.DIRECT,
                 targets: new Defs.Targets({
                   types: [Defs.TYPE.PLAYER],
@@ -257,7 +246,8 @@ export class CardGenerator {
         ...Defs.CARD_TYPE_RULES[Defs.TYPE.SPELL].defaultTriggers(),
         new Defs.Trigger({
           kind: Defs.TRIGGER.AWAKEN,
-          effects: [Defs.Effect.deploySubcard(summonedCard)],
+          effects: [
+            new Defs.Effect.deploySubcard(summonedCard)],
         }),
       ],
     });

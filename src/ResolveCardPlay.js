@@ -25,11 +25,11 @@ export class GamePlayEvent {
 }
 
 export class TriggerCardEvent extends GamePlayEvent {
-	constructor(target, triggerKind, triggerArg=null) {
+	constructor(triggeredCard, triggerKind, triggerArg=null) {
 		super()
 		this.kind = "trigger-card"
 
-		this.target = target 
+		this.triggeredCard = triggeredCard
 		this.triggerKind = triggerKind
 		this.triggerArg = triggerArg
 	}
@@ -136,17 +136,17 @@ function resolveLoop(timestamp) {
 			switch (e.kind) {
 
 				case "trigger-card": // expand into each triggered effect
-					console.log(`${e.target.type.kind} card triggered! trigger kind: ${e.triggerKind}`)
+					console.log(`${e.triggeredCard.type.kind} card triggered! trigger kind: ${e.triggerKind}`)
 					let newEvents = []
 
-					for (let trigger of e.target.triggers) {
-						if (trigger.kind === e.triggerKind && (!e.triggerArg || cardMatchesTargets( e.triggerArg, trigger.targets, e.triggerArg.owner ) )  ) { // TODO fix this shit
+					for (let trigger of e.triggeredCard.triggers) {
+						if (trigger.kind === e.triggerKind && (!e.triggerArg || cardMatchesTargets( e.triggerArg, trigger.targets, e.triggeredCard.owner ) )  ) { // TODO fix this shit
 							console.log("matching trigger found on card!")
 							for (let effect of trigger.effects) {
 								console.log(`${effect.kind} effect queued...`)
 								newEvents.push( 
-									new GatherTargetsEvent(e.target, effect),
-									new AnimateEffectEvent(e.target, effect)
+									new GatherTargetsEvent(e.triggeredCard, effect),
+									new AnimateEffectEvent(e.triggeredCard, effect)
 								)
 							}
 						}
