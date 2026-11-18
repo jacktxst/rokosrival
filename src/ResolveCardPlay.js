@@ -309,7 +309,7 @@ function resolveLoop(timestamp) {
 								target.owner.activeCards = target.owner.activeCards.filter(item => item !== target)
 
 								if (!target.isSubcard) {
-									target.owner.discard.push(target) //got an error saying function does not exist in resolveLoop
+									target.owner.discard.placeCards(target)
 								}
 
 								e.timeRemaining = 500
