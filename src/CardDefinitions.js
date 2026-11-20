@@ -182,14 +182,15 @@ export class Cost {
 }
 
 export class Effect {
-  constructor(kind, amount = null, selection = null) {
-    this.kind = kind;
+  constructor(effectKind, amount = null, selection = null) {
+    assert(Object.values(EFFECT).includes(effectKind), `unknown effect kind in Effect constructor: ${effectKind}`);
+    this.kind = effectKind;
     this.amount = amount;
     this.selection = selection;
   }
 
   static deploySubcard(card) {
-    const effect = new Effect("deploySubcard", card.type.initialValue);
+    const effect = new Effect(EFFECT.DEPLOY_SUBCARD, card.type.initialValue);
     effect.card = card;
     return effect;
   }
