@@ -74,7 +74,63 @@ export class CardPlayerHuman extends CardPlayerBase {
 		prepareActiveCards(opponentCardDivs, this.opponent)
 		prepareActiveCards(playerCardDivs, this)
 
-		// TODO: make players selectable somehow
+		/*
+		   PLAYER IS SELECTABLE NOW BUT THIS CODE NEEDS TO BE CLEANED UP
+		*/
+
+		if (candidates.includes( this )) {
+
+			const rokoDiv = document.getElementById("roko-stats")
+
+			rokoDiv.classList.add("card-hoverable")
+			rokoDiv.addEventListener("click", (e)=>{
+
+				switch ( selection.includes( this ) ) {
+					case true:
+						selection = selection.filter( item => item !== this )
+						rokoDiv.classList.remove("card-targeted")
+						break;
+					case false:
+						if (selection.length < maxTargets) {
+							selection.push(this)
+							rokoDiv.classList.add("card-targeted")
+						}
+						break;
+				}
+
+			})
+
+		}
+
+		if (candidates.includes( this.opponent )) {
+
+			const rivalDiv = document.getElementById("rival-stats")
+
+			rivalDiv.classList.add("card-hoverable")
+			rivalDiv.addEventListener("click", (e)=>{
+
+				switch ( selection.includes( this.opponent ) ) {
+					case true:
+						selection = selection.filter( item => item !== this.opponent )
+						rivalDiv.classList.remove("card-targeted")
+						break;
+					case false:
+						if (selection.length < maxTargets) {
+							selection.push(this.opponent)
+							rivalDiv.classList.add("card-targeted")
+						}
+						break;
+				}
+
+			})
+
+		}
+
+		/*
+		 we reuse the end turn button for the submit selection button. 
+		makes sense only bc you shouldnt be able to end turn during
+		a selection prompt anyways, but i dont really like this solution.
+		*/
 
 		document.getElementById("end-turn-button").innerHTML = "Submit Selection"
 		document.getElementById("end-turn-button").addEventListener("click",(e)=>{

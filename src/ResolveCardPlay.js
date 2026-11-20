@@ -75,7 +75,6 @@ function getSelectionCandidates(selection, originator) {
 	switch (selection.targets.alignment) {
 		case "any":
 			alignedCards = [...originator.owner.activeCards, ...originator.owner.opponent.activeCards, originator.owner, originator.owner.opponent]
-			
 			break;
 		case "friendly":
 			alignedCards = [...originator.owner.activeCards, originator.owner]
@@ -106,11 +105,13 @@ function cardMatchesTargets(card, targets, player) {
 		case "opposing":
 			if (card.owner !== player.opponent) return false;
 			break;
+		case "any":
+			break;
 	}
 
 	for ( let type of targets.types ) {
 
-		if (type.kind === card.type.kind) return true;
+		if (type === card.type.kind) return true;
 
 	}
 
@@ -139,7 +140,7 @@ function resolveLoop(timestamp) {
 					console.log(`${e.triggeredCard.type.kind} card triggered! trigger kind: ${e.triggerKind}`)
 					let newEvents = []
 
-					for (let trigger of e.triggeredCard.triggers) {
+					for (let trigger of e.triggeredCard.triggers || []) { // this || check makes sure that if e.triggeredCard is a player, and thus .triggers is null, iterate over an empty list instead of null to prevent crash
 						if (trigger.kind === e.triggerKind && (!e.triggerArg || cardMatchesTargets( e.triggerArg, trigger.targets, e.triggeredCard.owner ) )  ) { // TODO fix this shit
 							console.log("matching trigger found on card!")
 							for (let effect of trigger.effects) {
@@ -309,7 +310,7 @@ function resolveLoop(timestamp) {
 								target.owner.activeCards = target.owner.activeCards.filter(item => item !== target)
 
 								if (!target.isSubcard) {
-									target.owner.discard.placeCards(target)
+									target.owner.discard.placeCards([target])
 								}
 
 								e.timeRemaining = 500
