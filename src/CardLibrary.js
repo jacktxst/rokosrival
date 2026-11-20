@@ -10,26 +10,25 @@
 */
 
 import { CardGenerator } from "./CardGeneratorProcedural.js";
+import * as Defs from "./CardDefinitions.js";
 
 export class CardLibrary {
-  constructor() {
-    const generator = new CardGenerator({ idPrefix: "mockup" });
-    const gen2 = new CardGenerator({effectAmountRange: [1,1]})
-    this.cards = [
-      generator.buildMockupSimpleAttackSpell()
-    ];
-
-    for (let i = 0; i < 100; i++) {
-      this.cards.push(gen2.generateCard());
-    }
-    
-    for (let i = 0; i < 20; i++) {
-      this.cards.push(gen2.generateCard({forcedType:'spell', forcedTrigger:'entry', forcedEffects:['heal']}));
-    }
-    
+  // TODO: seeding NYI
+  constructor({cards = [], seed = Math.random()} = {}) {
+    this.cards = cards.length > 0 ? cards : this.testCardGeneration();
+    this.seed = seed;
   }
 
-  /* generates a random deck with n cards. may contain repeats. */
+  /* Populates the card library with a specified number of cards using the given generator. */
+  populateLibrary(generator, numCards) {
+    let newCards = [];
+    for (let i = 0; i < numCards; i++) {
+      newCards.push(generator.generateCard());
+    }
+    return newCards;
+  }
+
+  /* Randomly chooses n cards from the existing card library to form a deck. May contain repeats. */
   getRandomDeck(n){
 
     let cards = [];
@@ -40,6 +39,30 @@ export class CardLibrary {
 
     return cards;
 
+  }
+
+  /* Generates test cards and populates the library with them. */
+  testCardGeneration() {
+    let newCards = [];
+    const gen1 = new CardGenerator({
+      idPrefix: "simple",
+      maxTargetedTypes: 1,
+      legalTypes: [Defs.TYPE.SPELL],
+      legalTriggers: [Defs.TRIGGER.ENTRY, Defs.TRIGGER.EXIT],
+      legalEffects: [Defs.EFFECT.HEAL, Defs.EFFECT.ATTACK],
+    });
+    const gen2 = new CardGenerator();
+    const gen3 = new CardGenerator({
+      idPrefix: "complex",
+      maxEffectsPerTrigger: 3,
+      typeValueRange: [5, 30],
+      effectAmountRange: [5, 25]
+    });
+
+    newCards.push(...this.populateLibrary(gen1, 5)); // 5 simple cards
+    newCards.push(...this.populateLibrary(gen2, 10)); // 10 default cards
+    newCards.push(...this.populateLibrary(gen3, 3)); // 3 complex cards
+    return newCards;
   }
 
 }
