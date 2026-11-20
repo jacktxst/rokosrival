@@ -5,7 +5,7 @@ export class CardPlayerBot extends CardPlayerBase {
 
 	doTurn() {
 		
-		cardPlay = pick(this.hand, this.hand.length)
+		let cardPlay = pick(this.hand, this.hand.length)
 		
 		for (let card of cardPlay)  {
 			let i = this.hand.findIndex(item => item === card)
