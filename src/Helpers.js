@@ -7,6 +7,7 @@ export function clampInt(value, min, max) {
 }
 
 export function capitalize(value) {
+  assert(typeof value === "string", "capitalize expects a string, but received " + value + " of type " + typeof value);
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 

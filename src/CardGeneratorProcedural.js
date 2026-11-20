@@ -137,7 +137,6 @@ export class CardGenerator {
         }),
       );
     }
-    print("generating effect of kind: ", kind, " with value: ", value);
     const selection = this.generateSelectionForEffect(kind);
     return new Defs.Effect(kind, value, selection);
   }

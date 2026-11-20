@@ -182,8 +182,9 @@ export class Cost {
 }
 
 export class Effect {
-  constructor(effectKind, amount = null, selection = null) {
+  constructor(effectKind, amount, selection = null) {
     assert(Object.values(EFFECT).includes(effectKind), `unknown effect kind in Effect constructor: ${effectKind}`);
+    assert(Number.isInteger(amount), "Effect amount must be an integer");
     this.kind = effectKind;
     this.amount = amount;
     this.selection = selection;

@@ -3,13 +3,22 @@ import {assert} from './Helpers.js'
 import * as Defs from './CardDefinitions.js' 
 
 
-export function formatTarget(targets) {
-  // now that targets can have multiple types, we join them with commas
-  //assert(targets instanceof Defs.Targets, "formatTarget requires a Targets instance");
-  if(targets.alignment === Defs.ALIGNMENT.ANY) {
-    return targets.types.map(capitalize).join(" or ");
+export function formatTargets(targets) {
+  // omit alignment if it is "any"
+  const alignmentStr = targets.alignment === Defs.ALIGNMENT.ANY ? "" : targets.alignment;
+
+  let typeStr;
+  if(targets.types.length > 1) {
+    // if there are multiple types, join them with commas and "or" before the last one
+    typeStr = targets.types.slice(0, -1).join(", ") + " or " + targets.types[targets.types.length - 1];
+  } else {
+    if(targets.types[0] === "any") {
+      typeStr = "card";
+    }
+    typeStr = targets.types[0];
   }
-  return `${capitalize(targets.alignment)} ${targets.types.map(capitalize).join(" or ")}`;
+
+  return `${alignmentStr}${alignmentStr ? " " : ""}${typeStr}`;
 }
 
 
@@ -20,23 +29,18 @@ export function formatCost(cost) {
 		case 'payLife':
 			return `${cost.amount} Life`
 		case 'sacrifice':
-			return `Sacrifice ${cost.amount} ${formatTarget(cost.targets)}s`
+			return `Sacrifice ${cost.amount} ${formatTargets(cost.targets)}s`
     case 'free':
-      return "Free!";
+      return "Free!"
 		default:
-			return capitalize(cost.kind)
+			return cost.kind
 	}
 }
 
 
 export function formatTrigger(trigger) {
-	if (trigger.kind === 'greet') {
-		return `Greet ${formatTarget(trigger.targets)}`
-	}
-  if (trigger.kind === 'grieve') {
-    return `Grieve ${formatTarget(trigger.targets)}`;
-  }
-	return capitalize(trigger.kind)
+  // only Greet and Grieve have targets, so don't format targets for other triggers
+	return `${capitalize(trigger.kind)}${trigger.targets ? " " + formatTargets(trigger.targets) : ""}`;
 }
 
 
@@ -47,7 +51,7 @@ export function formatTriggerHeader(trigger) {
     case Defs.TRIGGER.REST:
       return "Rest";
     case Defs.TRIGGER.GREET:
-      return `Greet ${formatTarget(trigger.targets)}`;
+      return `Greet ${formatTargets(trigger.targets)}`;
     case Defs.TRIGGER.GRIEVE:
       return "Grieve";
     case Defs.TRIGGER.THORN:
@@ -63,34 +67,62 @@ export function formatTriggerHeader(trigger) {
 
 
 
-export function formatEffect(effect, indent) {
+export function formatEffect(effect) {
+  if(effect.kind === Defs.EFFECT.DEPLOY_SUBCARD) {
+    return `Deploy a ${capitalize(effect.card.type.kind)} subcard`;
+  }
+  const selectionStr = formatSelection(effect.selection);
   switch (effect.kind) {
-    case Defs.EFFECT.DEPLOY_SUBCARD:
-      return `{\n${formatCard(effect.card, indent + 2)}\n${" ".repeat(indent)}}`;
-    case Defs.EFFECT.DESTROY:
-      return `Destroy ${formatSelection(effect.selection)}`;
+    case Defs.EFFECT.ATTACK:
+      return `Deal ${effect.amount} damage ${selectionStr}`;
+
     case Defs.EFFECT.DRAW:
-      return `${capitalize(effect.player)} Player Draw ${effect.amount}`;
+      if(effect.selection.kind !== Defs.SELECTION.SELF) {
+        // if amount is 1, use "a card", otherwise use "n cards"
+        return `${selectionStr} draws ${effect.amount === 1 ? "a" : effect.amount} ${effect.amount === 1 ? "card" : "cards"}`;
+      }
+      // if selection is self, "You draw ..." instead of "<selection> draws ..."
+      return `You draw ${effect.amount === 1 ? "a" : effect.amount} ${effect.amount === 1 ? "card" : "cards"}`;
+
     case Defs.EFFECT.DISCARD:
-      return `${capitalize(effect.player)} Player Discard ${effect.amount}`;
-    case Defs.EFFECT.PREDICT:
-      return `${capitalize(effect.player)} Player Predict ${effect.amount}`;
+      if(effect.selection.kind !== Defs.SELECTION.SELF) {
+        return `${selectionStr} discards ${effect.amount === 1 ? "a" : effect.amount} ${effect.amount === 1 ? "card" : "cards"}`;
+      }
+      return `You discard ${effect.amount === 1 ? "a" : effect.amount} ${effect.amount === 1 ? "card" : "cards"}`;
+    case Defs.EFFECT.DEFEND:
+      return `Apply ${effect.amount} shield ${selectionStr}`;
+    case Defs.EFFECT.HEAL:
+      return `Heal ${effect.amount} life ${selectionStr}`;
     default:
-      return `${capitalize(effect.kind)} ${effect.amount} ${formatSelection(effect.selection)}`;
+      return `${capitalize(effect.kind)}s ${effect.amount} ${selectionStr}`;
   }
 }
 
 
 
 export function formatSelection(selection) {
-  if (selection.kind === Defs.SELECTION.SELF) return "Self";
-  return `${capitalize(selection.kind)} ${formatTarget(selection.targets)}`;
+  if(selection.kind === Defs.SELECTION.SELF) {
+    return "to itself";
+  }
+  const targetStr = formatTargets(selection.targets);
+  switch (selection.kind) {
+    case Defs.SELECTION.DIRECT:
+      return `to target ${targetStr}`;
+    case Defs.SELECTION.EACH:
+      return `to each ${targetStr}`;
+    case Defs.SELECTION.RANDOM:
+      return `to a random ${targetStr}`;
+    case Defs.SELECTION.SPLIT:
+      return `divided equally among each chosen ${targetStr}`;
+    default:
+      return `${capitalize(selection.kind)} ${targetStr}`;
+  }
 }
 
 
 
-export function formatCard(card, indent = 0) {
-  const pad = " ".repeat(indent);
+export function formatCard(card) {
+  const pad = " ";
   const typeLabel = `${capitalize(card.type.kind)} ${card.type.initialValue}`;
   // if a card contains the "free" cost, we omit the "Cost: " line entirely.
   const costLabel = card.costs.map(formatCost).filter(label => label !== "Free!").join(", ");
@@ -99,9 +131,8 @@ export function formatCard(card, indent = 0) {
   for (const trigger of card.triggers) {
     lines.push(`${pad}${formatTriggerHeader(trigger)}:`);
     for (const effect of trigger.effects) {
-      lines.push(`${pad}  ${formatEffect(effect, indent + 2)}`);
+      lines.push(`${pad}  ${formatEffect(effect)}`);
     }
   }
-
   return lines.join("\n");
 }
