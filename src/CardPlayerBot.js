@@ -20,6 +20,8 @@ export class CardPlayerBot extends CardPlayerBase {
 	selectFromCandidates( maxTargets, candidates, resultsCallback ) {
 		let selection = pick(candidates, maxTargets > candidates.length ? candidates.length : maxTargets)
 
+		/* commented this out bc renderBoard makes it so these effects dissapear instantly. this code basically has no effect rn.
+
 		const opponentCardDivs = document.getElementById("opponent-deployed-cards").children
 		const playerCardDivs   = document.getElementById(  "player-deployed-cards").children
 	
@@ -47,6 +49,8 @@ export class CardPlayerBot extends CardPlayerBase {
 
 			rokoDiv.classList.add("card-targeted")
 		}
+
+		*/
 
 		this.cardGame.view.renderBoard()
 		resultsCallback(selection)
