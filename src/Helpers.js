@@ -21,26 +21,32 @@ export function randomInt(rng, min, max) {
   return Math.floor(rng() * (max - min + 1)) + min;
 }
 
-export function pick(rng, array) {
-  let maxMultiPick = 1; // TODO
+// picks a random subset of elements from an array
+// always returns an array of picked elements
+export function pick(array, maxMultiPick = 1, rng = Math.random) {
+  assert(Array.isArray(array), `tried to Pick from a "${typeof array}"; expected an array but got "${array}"`);
   if (insist(array.length > 0, "Pick was called on an empty array")) return [];
   if (insist(maxMultiPick !== 0, "Pick was called with maxMultiPick equal to 0")) return [];
+
+  // create a local copy of the array to avoid modifying the original array
+  // ((it took me a while to realize you need to use array.slice() to create a copy and you can't just assign the array directly))
+  let arrayCopy = array.slice();
 
   // negative maxMultiPick chooses which elements to leave unpicked,
   // then returns the remaining elements as the picked ones.
   if (maxMultiPick < 0) {
-    const unpicked = pick(rng, array);
+    const unpicked = pick(array, -maxMultiPick, rng);
     return array.filter(item => !unpicked.includes(item));
   }
 
   let result = [];
   const pickCount = randomInt(rng, 1, Math.min(maxMultiPick, array.length));
   
+  // pick pickCount elements from the array randomly, ensuring no duplicates
   for (let i = 0; i < pickCount; i += 1) {
-    // pick a random element from the array, ensuring no duplicates
-    const index = randomInt(rng, 0, array.length - 1);
-    result.push(array[index]);
-    array.splice(index, 1);
+    const index = randomInt(rng, 0, arrayCopy.length - 1);
+    result.push(arrayCopy[index]);
+    arrayCopy.splice(index, 1);
   }
   return result;
 }

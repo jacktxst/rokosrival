@@ -1,6 +1,6 @@
 // CardDefinitions.js
 import { Card } from "./Card.js";
-import { assert } from "./Helpers.js"
+import { assert, insist } from "./Helpers.js"
 import { clampInt } from "./Helpers.js"
 
 // valid card types
@@ -56,9 +56,25 @@ export const EFFECT = Object.freeze({
   DEPLOY_SUBCARD: "deploySubcard",
 });
 
-// valid targets for each effect
+// valid targets for each effect (and also for Triggers since some Triggers require targets)
 // Self-targeting is handled by the resolver rather than this target-kind list.
-export const EFFECT_TARGET_RULES = Object.freeze({
+export const TARGET_RULES = Object.freeze({
+  [TRIGGER.GREET]: new Set([
+    TYPE.CONSTRUCT,
+    TYPE.SUMMON,
+    TYPE.SPELL,
+  ]),
+  [TRIGGER.GRIEVE]: new Set([
+    TYPE.CONSTRUCT,
+    TYPE.SUMMON,
+    TYPE.SPELL,
+  ]),
+  [TRIGGER.THORN]: new Set([
+    TYPE.CONSTRUCT,
+    TYPE.SUMMON,
+    TYPE.SPELL,
+  ]),
+  
   [EFFECT.ATTACK]: new Set([
     TYPE.CONSTRUCT,
     TYPE.SUMMON,
@@ -122,13 +138,12 @@ export const EFFECT_SELECTION_RULES = Object.freeze({
 
 export class Targets {
   constructor({ types, alignment = ALIGNMENT.ANY }) {
-    // validate that each target type is a valid TYPE
-    //assert(Array.isArray(types), "types provided is not in the form of an array");
-    //assert(types.length > 0, "types array is empty");
-    //assert(types.every((type) => Object.values(TYPE).includes(type)), "types array contains invalid card Types: " + types.filter((type) => !Object.values(TYPE).includes(type)).join(", "));
-    //assert(Object.values(ALIGNMENT).includes(alignment), `tried to target an unknown alignment: ${alignment}`);
+    assert(Array.isArray(types), `tried to assemble Targets from a ${typeof types}; expected an Array of Types but got ${types}`);
     this.types = types;
-    this.alignment = alignment;
+
+    // ensure the alignment is valid
+    // throw a warning and default to ANY if not
+    this.alignment = insist(Object.values(ALIGNMENT).includes(alignment), `assembling Targets for an unknown alignment "${alignment}"; defaulting to ANY`) ? alignment : ALIGNMENT.ANY;
   }
 }
 
@@ -200,16 +215,16 @@ export class Effect {
 }
 
 export class Trigger {
-  constructor({ kind, targets = null, effects = [] }) {
-    //assert(Object.values(TRIGGER).includes(kind), `unknown trigger kind: ${kind}`);
-    //assert(targets === null || targets instanceof Targets, `${kind} Trigger targets must be a Targets instance or null`);
-    //assert(effects.every((effect) => effect instanceof Effect), `${kind} Trigger effects must be Effect instances`);
+  constructor({ kind, effects, targets = null}) {
+    assert(Object.values(TRIGGER).includes(kind), `Tried to assemble trigger with unknown Trigger kind: "${kind}"`);
+    assert(Array.isArray(effects), `Tried to assemble ${kind} Trigger with non-array effects`);
+    insist(effects.length > 0, `Assembling ${kind} Trigger with zero effects`);
 
     if (kind === TRIGGER.GREET || kind === TRIGGER.GRIEVE || kind === TRIGGER.THORN) {
-      assert(targets !== null, `${kind} Trigger failed to provide Targets`);
+      insist(targets !== null, `Assembling ${kind} Trigger with missing Targets`);
       this.targets = targets;
     } else {
-      assert(targets === null, `${kind} Trigger provided unnecessary Targets: ${JSON.stringify(targets)}`);
+      insist(targets === null, `Ignoring unnecessary Targets when assembling ${kind} Trigger: ${JSON.stringify(targets)}`);
     }
     this.kind = kind;
     this.effects = effects;

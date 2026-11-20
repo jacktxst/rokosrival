@@ -39,6 +39,7 @@ export function formatCost(cost) {
 
 
 export function formatTrigger(trigger) {
+  assert(typeof trigger.kind === "string", `Tried to format trigger with invalid type: ${trigger.kind} (expected string)`);
   // only Greet and Grieve have targets, so don't format targets for other triggers
 	return `${capitalize(trigger.kind)}${trigger.targets ? " " + formatTargets(trigger.targets) + "s" : ""}`;
 }
@@ -50,9 +51,11 @@ export function formatEffect(effect) {
     return `Deploy a ${capitalize(effect.card.type.kind)} subcard`;
   }
   const selectionStr = formatSelection(effect.selection);
+
+  let to = effect.selection.kind === Defs.SELECTION.SPLIT ? "" : " to ";
   switch (effect.kind) {
     case Defs.EFFECT.ATTACK:
-      return `Deal ${effect.amount} damage ${selectionStr}`;
+      return `Deal ${effect.amount} damage ${to}${selectionStr}`;
 
     case Defs.EFFECT.DRAW:
       if(effect.selection.kind !== Defs.SELECTION.SELF) {
@@ -68,9 +71,9 @@ export function formatEffect(effect) {
       }
       return `You discard ${effect.amount === 1 ? "a" : effect.amount} ${effect.amount === 1 ? "card" : "cards"}`;
     case Defs.EFFECT.DEFEND:
-      return `Apply ${effect.amount} shield ${selectionStr}`;
+      return `Apply ${effect.amount} shield ${to}${selectionStr}`;
     case Defs.EFFECT.HEAL:
-      return `Heal ${effect.amount} life ${selectionStr}`;
+      return `Heal ${effect.amount} life ${to}${selectionStr}`;
     default:
       return `${capitalize(effect.kind)}s ${effect.amount} ${selectionStr}`;
   }
@@ -81,16 +84,16 @@ export function formatEffect(effect) {
 
 export function formatSelection(selection) {
   if(selection.kind === Defs.SELECTION.SELF) {
-    return "to itself";
+    return "itself";
   }
   const targetStr = formatTargets(selection.targets);
   switch (selection.kind) {
     case Defs.SELECTION.DIRECT:
-      return `to target ${targetStr}`;
+      return `target ${targetStr}`;
     case Defs.SELECTION.EACH:
-      return `to each ${targetStr}`;
+      return `each ${targetStr}`;
     case Defs.SELECTION.RANDOM:
-      return `to a random ${targetStr}`;
+      return `a random ${targetStr}`;
     case Defs.SELECTION.SPLIT:
       return `divided equally among each chosen ${targetStr}`;
     default:
