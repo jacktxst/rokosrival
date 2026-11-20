@@ -18,7 +18,7 @@ export class CardPlayerBot extends CardPlayerBase {
 	}
 
 	selectFromCandidates( maxTargets, candidates, resultsCallback ) {
-		let selection = pick(candidates, maxTargets)
+		let selection = pick(candidates, maxTargets > candidates.length ? candidates.length : maxTargets)
 
 		const opponentCardDivs = document.getElementById("opponent-deployed-cards").children
 		const playerCardDivs   = document.getElementById(  "player-deployed-cards").children
