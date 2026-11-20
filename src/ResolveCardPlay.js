@@ -140,7 +140,7 @@ function resolveLoop(timestamp) {
 					console.log(`${e.triggeredCard.type.kind} card triggered! trigger kind: ${e.triggerKind}`)
 					let newEvents = []
 
-					for (let trigger of e.triggeredCard.triggers) {
+					for (let trigger of e.triggeredCard.triggers || []) { // this || check makes sure that if e.triggeredCard is a player, and thus .triggers is null, iterate over an empty list instead of null to prevent crash
 						if (trigger.kind === e.triggerKind && (!e.triggerArg || cardMatchesTargets( e.triggerArg, trigger.targets, e.triggeredCard.owner ) )  ) { // TODO fix this shit
 							console.log("matching trigger found on card!")
 							for (let effect of trigger.effects) {
