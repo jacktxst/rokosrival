@@ -242,7 +242,7 @@ function resolveLoop(timestamp) {
 								target.health -= damage
 								if (target.health <= 0) {
 									target.owner.activeCards = target.owner.activeCards.filter(item => item !== target)
-									eventQueue.splice(1,0,new TriggerCardEvent(card, "exit"))
+									eventQueue.splice(1,0,new TriggerCardEvent(target, "exit"))
 									
 									if (!target.isSubcard) {
 										target.owner.discard.placeCards([target])
