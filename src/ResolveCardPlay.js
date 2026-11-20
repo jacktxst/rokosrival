@@ -137,12 +137,12 @@ function resolveLoop(timestamp) {
 			switch (e.kind) {
 
 				case "trigger-card": // expand into each triggered effect
-					console.log(`${e.triggeredCard.type.kind} card triggered! trigger kind: ${e.triggerKind}`)
+					// console.log(`${e.triggeredCard.type.kind} card triggered! trigger kind: ${e.triggerKind}`)
 					let newEvents = []
 
 					for (let trigger of e.triggeredCard.triggers || []) { // this || check makes sure that if e.triggeredCard is a player, and thus .triggers is null, iterate over an empty list instead of null to prevent crash
 						if (trigger.kind === e.triggerKind && (!e.triggerArg || cardMatchesTargets( e.triggerArg, trigger.targets, e.triggeredCard.owner ) )  ) { // TODO fix this shit
-							console.log("matching trigger found on card!")
+							console.log(`matching trigger found on card! ${e.triggeredCard.type.kind} ${e.triggerKind}`)
 							for (let effect of trigger.effects) {
 								console.log(`${effect.kind} effect queued...`)
 								newEvents.push( 
@@ -221,7 +221,7 @@ function resolveLoop(timestamp) {
 					break;
 
 				case "animate-effect":
-					console.log(`animate-effect ${e.effect.kind}`)
+					console.log(`animate-effect ${e.effect.kind} ${e.targetList[0]?.type.kind}...`)
 					e.state = "in-progress"
 					switch (e.effect.kind) {
 
@@ -245,7 +245,7 @@ function resolveLoop(timestamp) {
 									eventQueue.splice(1,0,new TriggerCardEvent(target, "exit"))
 									
 									if (!target.isSubcard) {
-										target.owner.discard.push(target)
+										target.owner.discard.placeCards([target])
 									}
 
 									for (let card of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
@@ -327,7 +327,7 @@ function resolveLoop(timestamp) {
 							for (let target of e.targetList) {
 								if (target.type.kind !== "player") continue;
 								for (let i = 0; i < e.effect.amount && i < target.hand.length; i++) {
-									target.discard.push(target.hand.pop())
+									target.discard.placeCards([target.hand.pop()])
 								}
 							}	
 							break;
