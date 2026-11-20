@@ -33,6 +33,7 @@ export class CardGame {
 	}
 
 	yieldTurn() {
+
 		// activate any active cards with "rest" triggers
 		for (let card of this.currentPlayer.activeCards) {
 			
@@ -44,8 +45,12 @@ export class CardGame {
 
 		}
 
+		/*
+
+		spell mana decay, fizzle, exit, and grieve
+
+		 */
 		for (let card of this.currentPlayer.activeCards) {
-			
 			if (card.type.kind === "spell") {
 				card.mana -= 1
 				if (card.mana === 0) {
@@ -57,38 +62,15 @@ export class CardGame {
 					}
 				}
 			}
-			if (card.type.kind === "construct") {
-				if (card.shield === 0) {
-					eventQueue.splice(1,0, new TriggerCardEvent( card, "exit" ))
-					this.currentPlayer.activeCards = this.currentPlayer.activeCards.filter(item => item !== card)
-
-					for (let triggerCard of [...this.currentPlayer.activeCards, ...this.currentPlayer.opponent.activeCards]) {
-						eventQueue.splice(1,0,new TriggerCardEvent( triggerCard, "grieve", card ))
-					}
-				}
-			}
-			if (card.type.kind === "summon") {
-				if (card.health === 0) {
-					eventQueue.splice(1,0, new TriggerCardEvent( card, "exit" ))
-					this.currentPlayer.activeCards = this.currentPlayer.activeCards.filter(item => item !== card)
-
-					for (let triggerCard of [...this.currentPlayer.activeCards, ...this.currentPlayer.opponent.activeCards]) {
-						eventQueue.splice(1,0,new TriggerCardEvent( triggerCard, "grieve", card ))
-					}
-				}
-			}
-
 		}
-
-		// note that renderBoard also removes event listeners, thus disabling the player from making a move. correct.
 
 		// reset mana for both players at the end of each turn
 		this.player1.mana = this.player1.baseMana
 		this.player2.mana = this.player2.baseMana
 
-
 		this.view.renderBoard()
 
+		// swap active players
 		if (this.currentPlayer === this.player1) {
 			this.currentPlayer = this.player2
 		} else {
@@ -106,6 +88,7 @@ export class CardGame {
 
 		}
 
+		// after all the triggers resolve, allow the active player to make their turn
 		eventQueue.push(
 			new ReturnControlEvent()
 		)
