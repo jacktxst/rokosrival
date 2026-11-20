@@ -242,7 +242,7 @@ function resolveLoop(timestamp) {
 								target.health -= damage
 								if (target.health <= 0) {
 									target.owner.activeCards = target.owner.activeCards.filter(item => item !== target)
-									eventQueue.splice(1,0,new TriggerCardEvent(card, "exit"))
+									eventQueue.splice(1,0,new TriggerCardEvent(target, "exit"))
 									
 									if (!target.isSubcard) {
 										target.owner.discard.push(target)
@@ -305,7 +305,7 @@ function resolveLoop(timestamp) {
 								
 								}
 
-								eventQueue.splice(1,0, new TriggerCardEvent( target, "exit" ))
+								if (target.type.kind !== "player") eventQueue.splice(1,0, new TriggerCardEvent( target, "exit" ))
 
 								target.owner.activeCards = target.owner.activeCards.filter(item => item !== target)
 
@@ -318,12 +318,14 @@ function resolveLoop(timestamp) {
 							break;
 						case "draw":
 							for (let target of e.targetList) {
+								if (target.type.kind !== "player") continue;
 								target.hand.push(...target.deck.drawCards(e.effect.amount))
 								e.timeRemaining = 500
 							}
 							break;
 						case "discard":
 							for (let target of e.targetList) {
+								if (target.type.kind !== "player") continue;
 								for (let i = 0; i < e.effect.amount && i < target.hand.length; i++) {
 									target.discard.push(target.hand.pop())
 								}
@@ -369,9 +371,6 @@ function resolveLoop(timestamp) {
 			break;
 
 	}
-
-	
-
 }
 
 resolveLoop()
