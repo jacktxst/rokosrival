@@ -221,7 +221,7 @@ function resolveLoop(timestamp) {
 					break;
 
 				case "animate-effect":
-					console.log(`animate-effect ${e.effect.kind}`)
+					console.log(`animate-effect ${e.effect.kind} ${e.targetList[0].type.kind}...`)
 					e.state = "in-progress"
 					switch (e.effect.kind) {
 
@@ -245,7 +245,7 @@ function resolveLoop(timestamp) {
 									eventQueue.splice(1,0,new TriggerCardEvent(card, "exit"))
 									
 									if (!target.isSubcard) {
-										target.owner.discard.push(target)
+										target.owner.discard.placeCards([target])
 									}
 
 									for (let card of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
@@ -325,7 +325,7 @@ function resolveLoop(timestamp) {
 						case "discard":
 							for (let target of e.targetList) {
 								for (let i = 0; i < e.effect.amount && i < target.hand.length; i++) {
-									target.discard.push(target.hand.pop())
+									target.discard.placeCards([target.hand.pop()])
 								}
 							}	
 							break;
