@@ -137,12 +137,12 @@ function resolveLoop(timestamp) {
 			switch (e.kind) {
 
 				case "trigger-card": // expand into each triggered effect
-					console.log(`${e.triggeredCard.type.kind} card triggered! trigger kind: ${e.triggerKind}`)
+					// console.log(`${e.triggeredCard.type.kind} card triggered! trigger kind: ${e.triggerKind}`)
 					let newEvents = []
 
 					for (let trigger of e.triggeredCard.triggers || []) { // this || check makes sure that if e.triggeredCard is a player, and thus .triggers is null, iterate over an empty list instead of null to prevent crash
 						if (trigger.kind === e.triggerKind && (!e.triggerArg || cardMatchesTargets( e.triggerArg, trigger.targets, e.triggeredCard.owner ) )  ) { // TODO fix this shit
-							console.log("matching trigger found on card!")
+							console.log(`matching trigger found on card! ${e.triggeredCard.type.kind} ${e.triggerKind}`)
 							for (let effect of trigger.effects) {
 								console.log(`${effect.kind} effect queued...`)
 								newEvents.push( 
