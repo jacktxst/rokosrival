@@ -221,7 +221,7 @@ function resolveLoop(timestamp) {
 					break;
 
 				case "animate-effect":
-					console.log(`animate-effect ${e.effect.kind} ${e.targetList[0].type.kind}...`)
+					console.log(`animate-effect ${e.effect.kind} ${e.targetList[0]?.type.kind}...`)
 					e.state = "in-progress"
 					switch (e.effect.kind) {
 
