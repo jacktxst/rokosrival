@@ -26,6 +26,7 @@ export class CardPlayerBase {
 
 		this.health = 100
 		this.baseMana = 100
+		this.shield = 0
 		this.mana = this.baseMana
 		this.deck.unshuffleCards()
 		this.deck.shuffleCards()
