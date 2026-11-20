@@ -44,7 +44,7 @@ export class Card {
 		const triggers = this.triggers.map((trigger) => `
 			<div>	
 				<details>
-					<summary> <strong>${escapeHtml(formatTrigger(trigger))}</strong> </summary>
+					<summary class="trigger trigger-${trigger.kind}" > <strong>${escapeHtml(formatTrigger(trigger))}</strong> </summary>
 					${trigger.effects.length
 						? `<div>${trigger.effects.map((effect) => `
 							<div style="margin-top:5px; margin-left: 4px;"> 

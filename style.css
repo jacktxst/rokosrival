@@ -62,8 +62,8 @@ body, html {
 	background-image: url("./textures/paper.jpg");
 	background-repeat: repeat;
 	background-size: 300px;
-	padding: 12px;
-	width: 90px;
+	padding: 0px;
+	width: 100px;
 	border-radius: 15px;
 	height: 150px;
 	margin: 5px;
@@ -74,7 +74,7 @@ body, html {
 }
 
 .rr-card-title {
-	margin: 0 0 4px;
+	margin: 4px 4px 4px;
 }
 
 .rr-card-cost {
@@ -97,6 +97,37 @@ body, html {
 
 
 }
+
+
+
+.trigger {
+	background-color: black;
+	color: white;
+	margin-bottom: 2px;
+}
+
+.trigger-thorn {
+	background-color: maroon;
+}
+
+.trigger-entry {
+	background-color: darkgreen;
+}
+
+.trigger-exit {
+	background-color: darkred;
+}
+
+.trigger-awaken {
+	background-color: cyan;
+}
+
+.trigger-rest {
+	background-color: coral;
+}
+
+
+
 
 .card-hoverable:hover {
 	outline: 1px solid white;
