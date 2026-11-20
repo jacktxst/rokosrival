@@ -149,7 +149,7 @@ body, html {
 ========================================================================
 */
 
-#lobby {
+#lobby, #create-multiplayer-game {
 	margin: auto;
 	max-width: 500px;
 	display: flex;

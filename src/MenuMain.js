@@ -1,5 +1,6 @@
 import { goToLobby } from './MenuLobby.js'
 import { gameState, GameState } from './GameState.js'
+import {goToCreateMultiplayerGame} from "./MenuCreateMultiplayerGame.js";
 
 export function goToMainMenu() {
 
@@ -15,6 +16,14 @@ export function goToMainMenu() {
 
 			<div id="continue-button" class="stone-button">
 				Continue
+			</div>
+			
+			<div id="create-game-button" class="stone-button">
+				Create Multiplayer Game
+			</div>
+			
+			<div id="join-game-button" class="stone-button">
+				Join Multiplayer Game
 			</div>
 
 		</div>
@@ -32,6 +41,19 @@ export function goToMainMenu() {
 
 		// gameState.loadFrom()
 		
+	})
+
+	document.getElementById("create-game-button").addEventListener("click",(e)=>{
+
+		// gameState.loadFrom()
+		goToCreateMultiplayerGame()
+
+	})
+
+	document.getElementById("join-game-button").addEventListener("click",(e)=>{
+
+		// gameState.loadFrom()
+
 	})
 
 }
