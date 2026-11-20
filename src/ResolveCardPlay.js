@@ -105,11 +105,13 @@ function cardMatchesTargets(card, targets, player) {
 		case "opposing":
 			if (card.owner !== player.opponent) return false;
 			break;
+		case "any":
+			break;
 	}
 
 	for ( let type of targets.types ) {
 
-		if (type.kind === card.type.kind) return true;
+		if (type === card.type.kind) return true;
 
 	}
 
@@ -308,7 +310,7 @@ function resolveLoop(timestamp) {
 								target.owner.activeCards = target.owner.activeCards.filter(item => item !== target)
 
 								if (!target.isSubcard) {
-									target.owner.discard.placeCards(target)
+									target.owner.discard.placeCards([target])
 								}
 
 								e.timeRemaining = 500
