@@ -1,5 +1,5 @@
 body, html {
-	background-image: url("./textures/sample9.png");
+	background-image: url("./textures/wood2.png");
 	padding: 0px;
 	margin: 0px;
 }
@@ -67,10 +67,22 @@ body, html {
 	border-radius: 15px;
 	height: 150px;
 	margin: 5px;
-	font-family: fantasy;
-	overflow: auto;
+	font-family: fantasy, serif;
+	overflow-y: scroll;
+	-ms-overflow-style: none;  /* IE and Edge */
+  	scrollbar-width: thin;  /* Firefox */
+	scrollbar-color: #aba591 #8b8571; /* Firefox */
 	font-size: 13px;
 	line-height: 1.25;
+}
+.card::-webkit-scrollbar {
+    width: 7px; /* Most browsers */
+}
+.card::-webkit-scrollbar-track {
+  background: #8b8571; /* Most browsers */
+}
+.card::-webkit-scrollbar-thumb {
+  background: #aba591; /* Most browsers */
 }
 
 .rr-card-title {
@@ -86,6 +98,9 @@ body, html {
 	margin: 0;
 }
 
+.card ul {
+	padding-left: 10px;
+}
 
 .card-targeted {
 	outline: 15px solid green;
