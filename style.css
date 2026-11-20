@@ -62,8 +62,8 @@ body, html {
 	background-image: url("./textures/paper.jpg");
 	background-repeat: repeat;
 	background-size: 300px;
-	padding: 15px;
-	width: 90px;
+	padding: 0px;
+	width: 100px;
 	border-radius: 15px;
 	height: 150px;
 	margin: 5px;
@@ -74,16 +74,15 @@ body, html {
 }
 
 .rr-card-title {
-	margin: 0 0 6px;
+	margin: 4px 4px 4px;
 }
 
 .rr-card-cost {
 	font-weight: bold;
-	margin-bottom: 6px;
+	margin-bottom: 4px;
 }
 
 .rr-card-triggers {
-	padding: 5px;
 	margin: 0;
 }
 
@@ -98,6 +97,46 @@ body, html {
 
 
 }
+
+
+
+.trigger {
+	background-color: black;
+	opacity: 50%;
+	color: white;
+	margin-bottom: 2px;
+}
+
+.trigger-thorn {
+	background-color: darkorange;
+}
+
+.trigger-entry {
+	background-color: darkgreen;
+}
+
+.trigger-exit {
+	background-color: darkred;
+}
+
+.trigger-awaken {
+	background-color: cornflowerblue;
+}
+
+.trigger-rest {
+	background-color: coral;
+}
+
+.trigger-grieve {
+	background-color: navy;
+}
+
+.trigger-greet {
+	background-color: darkseagreen;
+}
+
+
+
 
 .card-hoverable:hover {
 	outline: 1px solid white;

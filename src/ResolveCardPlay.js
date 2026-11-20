@@ -25,12 +25,13 @@ export class GamePlayEvent {
 }
 
 export class TriggerCardEvent extends GamePlayEvent {
-	constructor(target, triggerKind) {
+	constructor(triggeredCard, triggerKind, triggerArg=null) {
 		super()
 		this.kind = "trigger-card"
 
-		this.target = target 
+		this.triggeredCard = triggeredCard
 		this.triggerKind = triggerKind
+		this.triggerArg = triggerArg
 	}
 }
 
@@ -74,7 +75,6 @@ function getSelectionCandidates(selection, originator) {
 	switch (selection.targets.alignment) {
 		case "any":
 			alignedCards = [...originator.owner.activeCards, ...originator.owner.opponent.activeCards, originator.owner, originator.owner.opponent]
-			
 			break;
 		case "friendly":
 			alignedCards = [...originator.owner.activeCards, originator.owner]
@@ -96,6 +96,28 @@ function getSelectionCandidates(selection, originator) {
 	return candidates;
 }
 
+function cardMatchesTargets(card, targets, player) {
+
+	switch (targets.alignment) {
+		case "friendly":
+			if (card.owner !== player) return false;
+			break;
+		case "opposing":
+			if (card.owner !== player.opponent) return false;
+			break;
+		case "any":
+			break;
+	}
+
+	for ( let type of targets.types ) {
+
+		if (type === card.type.kind) return true;
+
+	}
+
+	return false;
+}
+
 
 function resolveLoop(timestamp) {
 
@@ -115,17 +137,17 @@ function resolveLoop(timestamp) {
 			switch (e.kind) {
 
 				case "trigger-card": // expand into each triggered effect
-					console.log(`${e.target.type.kind} card triggered! trigger kind: ${e.triggerKind}`)
+					// console.log(`${e.triggeredCard.type.kind} card triggered! trigger kind: ${e.triggerKind}`)
 					let newEvents = []
 
-					for (let trigger of e.target.triggers) {
-						if (trigger.kind === e.triggerKind) {
-							console.log("matching trigger found on card!")
+					for (let trigger of e.triggeredCard.triggers || []) { // this || check makes sure that if e.triggeredCard is a player, and thus .triggers is null, iterate over an empty list instead of null to prevent crash
+						if (trigger.kind === e.triggerKind && (!e.triggerArg || cardMatchesTargets( e.triggerArg, trigger.targets, e.triggeredCard.owner ) )  ) { // TODO fix this shit
+							console.log(`matching trigger found on card! ${e.triggeredCard.type.kind} ${e.triggerKind}`)
 							for (let effect of trigger.effects) {
 								console.log(`${effect.kind} effect queued...`)
 								newEvents.push( 
-									new GatherTargetsEvent(e.target, effect),
-									new AnimateEffectEvent(e.target, effect)
+									new GatherTargetsEvent(e.triggeredCard, effect),
+									new AnimateEffectEvent(e.triggeredCard, effect)
 								)
 							}
 						}
@@ -173,7 +195,7 @@ function resolveLoop(timestamp) {
 								{
 									const candidates = getSelectionCandidates(e.effect.selection, e.originator)
 
-									e.originator.owner.selectFromCandidates(1, candidates, (targets)=>{
+									e.originator.owner.selectFromCandidates(99, candidates, (targets)=>{
 										eventQueue.splice(0,1)
 										eventQueue[0].targetList = targets
 									})
@@ -199,7 +221,7 @@ function resolveLoop(timestamp) {
 					break;
 
 				case "animate-effect":
-					console.log(`animate-effect ${e.effect.kind}`)
+					console.log(`animate-effect ${e.effect.kind} ${e.targetList[0]?.type.kind}...`)
 					e.state = "in-progress"
 					switch (e.effect.kind) {
 
@@ -209,7 +231,27 @@ function resolveLoop(timestamp) {
 								damage /= e.targetList.length
 							}
 							for (let target of e.targetList) {
+								if (target.shield !== 0) { // got a weird error message: cant read .shield from undefined
+									if (target.shield < damage) {
+										damage -= target.shield
+										target.shield = 0
+									} else {
+										target.shield -= damage
+									}
+								}
 								target.health -= damage
+								if (target.health <= 0) {
+									target.owner.activeCards = target.owner.activeCards.filter(item => item !== target)
+									eventQueue.splice(1,0,new TriggerCardEvent(target, "exit"))
+									
+									if (!target.isSubcard) {
+										target.owner.discard.placeCards([target])
+									}
+
+									for (let card of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
+										eventQueue.splice(1,0,new TriggerCardEvent( card, "grieve", target ))
+									}
+								}
 								if (target.type.kind !== "player") eventQueue.splice(1, 0, new TriggerCardEvent(target, "thorn") )
 								e.timeRemaining = 500
 							}
@@ -225,22 +267,82 @@ function resolveLoop(timestamp) {
 							}
 							break;
 						case "defend":
+							let armor = e.effect.amount
+							if (e.effect.selection.kind === "split among") {
+								armor /= e.targetList.length
+							}
+							for (let target of e.targetList) {
+								target.shield += armor
+								e.timeRemaining = 500
+							}
 							break;
 						case "surge":
+							let surgeAmount = e.effect.amount
+							if (e.effect.selection.kind === "split among") {
+								surgeAmount /= e.targetList.length
+							}
+							for (let target of e.targetList) {
+								target.mana += surgeAmount
+								e.timeRemaining = 500
+							}
 							break;
 						case "decay":
+							let decayAmount = e.effect.amount
+							if (e.effect.selection.kind === "split among") {
+								decayAmount /= e.targetList.length
+							}
+							for (let target of e.targetList) {
+								target.mana -= decayAmount
+								e.timeRemaining = 500
+							}
 							break;
 						case "destroy": // can trigger: EXIT, GRIEVE
+							for (let target of e.targetList) {
+
+								for (let card of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
+
+									eventQueue.splice(1,0,new TriggerCardEvent( card, "grieve", target ))
+								
+								}
+
+								if (target.type.kind !== "player") eventQueue.splice(1,0, new TriggerCardEvent( target, "exit" ))
+
+								target.owner.activeCards = target.owner.activeCards.filter(item => item !== target)
+
+								if (!target.isSubcard) {
+									target.owner.discard.placeCards([target])
+								}
+
+								e.timeRemaining = 500
+							}
 							break;
 						case "draw":
+							for (let target of e.targetList) {
+								if (target.type.kind !== "player") continue;
+								target.hand.push(...target.deck.drawCards(e.effect.amount))
+								e.timeRemaining = 500
+							}
 							break;
 						case "discard":
+							for (let target of e.targetList) {
+								if (target.type.kind !== "player") continue;
+								for (let i = 0; i < e.effect.amount && i < target.hand.length; i++) {
+									target.discard.placeCards([target.hand.pop()])
+								}
+							}	
 							break;
 						case "deploySubcard": // can trigger: GREET, ENTRY
 							console.log(`DEPLOYING SUBCARD..? ${e.effect.card.type.kind}`)
+							e.effect.card.isSubcard = true
 							let subcard = new DeployedCard(e.effect.card , e.originator.owner)
 							e.timeRemaining = 500
 							e.originator.owner.activeCards.push(subcard)
+
+							for (let card of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
+
+								eventQueue.splice(1,0,new TriggerCardEvent( card, "greet", subcard ))
+							}
+
 							eventQueue.splice(1,0,new TriggerCardEvent(subcard,"entry"))
 							gameState.currentGameView.renderBoard()
 							subcard.owner = e.originator.owner
@@ -269,9 +371,6 @@ function resolveLoop(timestamp) {
 			break;
 
 	}
-
-	
-
 }
 
 resolveLoop()

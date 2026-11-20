@@ -69,8 +69,8 @@ export class ViewCardGame {
 					
 					</div>
 
-					<div>
-					${opponent.name}: [${opponent.health} Health]
+					<div id="rival-stats">
+					${opponent.name}: [${opponent.health} Health] [${opponent.mana} Mana] [${opponent.shield} Shield]
 
 					</div>
 				</div>
@@ -107,8 +107,8 @@ export class ViewCardGame {
 		
 				<div id="player-hud" class="shadow-bg" style="display:flex; flex-direction: row;">
 
-					<div>
-					${p1.name}: [${p1.health} Health] [${p1.mana} Mana]
+					<div id="roko-stats">
+					${p1.name}: [${p1.health} Health] [${p1.mana} Mana] [${p1.shield} Shield]
 					</div>
 
 					<div id="player-hand">

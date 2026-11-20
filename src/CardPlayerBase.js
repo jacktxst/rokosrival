@@ -26,6 +26,7 @@ export class CardPlayerBase {
 
 		this.health = 100
 		this.baseMana = 100
+		this.shield = 0
 		this.mana = this.baseMana
 		this.deck.unshuffleCards()
 		this.deck.shuffleCards()
@@ -98,13 +99,21 @@ export class CardPlayerBase {
 		eventQueue.push(  
 
 			new TriggerCardEvent( deployedCard, "entry" ),
-			new ReturnControlEvent()
+			
 
 		)
 
-		/* TODO: we need to check if there are cards in play with a GREET trigger that needs
-		to be triggered by this card */
+		for (let card of [...this.activeCards, ...this.opponent.activeCards]) {
+			if (card != deployedCard) {
+				eventQueue.push(new TriggerCardEvent( card, "greet", deployedCard ))
+			}
+		}
 
+		eventQueue.push(
+			new ReturnControlEvent()
+		)
+
+		
 		// remove card from hand and draw another
 
 		this.hand.splice(i, 1)
