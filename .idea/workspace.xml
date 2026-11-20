@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b786d694-bd9a-40ba-b833-5ab90c9122e1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/CardGame.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/CardGame.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +54,7 @@
       <option name="presentableId" value="Default" />
       <updated>1795162557980</updated>
       <workItem from="1795162559569" duration="3073000" />
-      <workItem from="1795195730381" duration="2978000" />
+      <workItem from="1795195730381" duration="3033000" />
     </task>
     <servers />
   </component>
