@@ -107,7 +107,7 @@ body, html {
 }
 
 .trigger-thorn {
-	background-color: maroon;
+	background-color: darkorange;
 }
 
 .trigger-entry {
@@ -119,12 +119,19 @@ body, html {
 }
 
 .trigger-awaken {
-	background-color: cyan;
-	color: black;
+	background-color: cornflowerblue;
 }
 
 .trigger-rest {
 	background-color: coral;
+}
+
+.trigger-grieve {
+	background-color: navy;
+}
+
+.trigger-greet {
+	background-color: darkseagreen;
 }
 
 
