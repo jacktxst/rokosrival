@@ -75,7 +75,6 @@ function getSelectionCandidates(selection, originator) {
 	switch (selection.targets.alignment) {
 		case "any":
 			alignedCards = [...originator.owner.activeCards, ...originator.owner.opponent.activeCards, originator.owner, originator.owner.opponent]
-			
 			break;
 		case "friendly":
 			alignedCards = [...originator.owner.activeCards, originator.owner]
