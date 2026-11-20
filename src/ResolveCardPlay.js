@@ -195,7 +195,7 @@ function resolveLoop(timestamp) {
 								{
 									const candidates = getSelectionCandidates(e.effect.selection, e.originator)
 
-									e.originator.owner.selectFromCandidates(1, candidates, (targets)=>{
+									e.originator.owner.selectFromCandidates(99, candidates, (targets)=>{
 										eventQueue.splice(0,1)
 										eventQueue[0].targetList = targets
 									})
