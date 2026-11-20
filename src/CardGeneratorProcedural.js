@@ -21,7 +21,9 @@ export class CardGenerator {
     this.maxNestedDepth = maxNestedDepth;
     this.typeValueRange = typeValueRange;
     this.effectAmountRange = effectAmountRange;
-    this.sequence = 0;
+    this.sequence = 0; // TODO -Loid
+    this.maxEffectsPerTrigger = 3; // maximum number of effects per trigger
+    this.legalTriggers = Object.values(Defs.TRIGGER);
   }
 
   // generates a unique ID for each card, optionally with a suffix
@@ -33,6 +35,8 @@ export class CardGenerator {
 
   generateCard(options = {}) {
     const depth = options.depth ?? 0; // if depth is not provided, default to 0
+    let legalTriggers = [...this.legalTriggers]; // local copy of legal triggers
+
     assert(depth <= this.maxNestedDepth, "depth exceeds maxNestedDepth");
     const type = new Defs.CardType({
       kind: options.forcedType ?? pick(this.seed, [Defs.TYPE.SPELL, Defs.TYPE.SUMMON, Defs.TYPE.CONSTRUCT]),
@@ -41,12 +45,18 @@ export class CardGenerator {
 
     const costs = options.depth > 0 ? [] : this.generateCosts(type.kind, type.initialValue);
     const arcane = options.depth > 0 ? false : this.seed() < 0.25;
-    const triggers = [];
     // generate a random number of triggers for the card.
     // subcards generate with fewer triggers to avoid excessive complexity
     const triggerCount = randomInt(this.seed, 1, 3 - depth);
+
+    
+    let triggers = [];
     for (let i = 0; i < triggerCount; i += 1) {
-      triggers.push(this.generateTrigger({ depth }));
+      triggers.push(this.generateTrigger({ depth, }));
+
+      // remove the kind of the newly generated Trigger from the local list of legal Triggers 
+      // (to avoid duplicate Trigger kinds on the same card)
+      legalTriggers.splice(legalTriggers.indexOf(triggers[i].kind), 1);
     }
 
     return new Card({
@@ -59,7 +69,7 @@ export class CardGenerator {
   }
 
   generateCosts(kind, initialValue) {
-    const costs = [];
+    let costs = [];
     if (this.seed() < 0.8) {
       costs.push(Defs.Cost.payMana(Math.max(1, Math.ceil(initialValue / 2))));
     } else {
@@ -77,7 +87,7 @@ export class CardGenerator {
     // if legalAlignments is provided, pick an alignment from that list. otherwise, alignment defaults to ANY.
     const alignment = pick(this.seed, legalAlignments);
     const typeChoices = legalTypes ?? Object.values(Defs.TYPE);
-    const types = [];
+    let types = [];
     const targetTypeCount = randomInt(this.seed, 1, typeChoices.length);
     types.push(pick(this.seed, typeChoices, targetTypeCount));
     
@@ -150,21 +160,21 @@ export class CardGenerator {
     // if legalTriggers is provided, pick a trigger kind from that list. otherwise, pick a trigger kind from the full list of trigger kinds.
     const triggerKind = legalTriggers.length > 0 ? pick(this.seed, legalTriggers) : pick(this.seed, Object.values(Defs.TRIGGER));
 
-    const effectCount = randomInt(this.seed, 1, legalEffects.length);
+    const effectCount = randomInt(this.seed, 1, Math.max(this.maxEffectsPerTrigger, legalEffects.length));
     let effects = [];
     for (let i = 0; i < effectCount; i += 1) {
       const newEffect = this.generateEffect({ depth, legalEffects });
   
       // remove the kind of the newly generated effect from the list of legal effects 
-      // to avoid duplicate effect kinds within the same trigger:
-      legalEffects = legalEffects.filter(e => e !== newEffect.kind);
+      // (to avoid duplicate effect kinds within the same trigger)
+      legalEffects.splice(legalEffects.indexOf(newEffect.kind), 1);
 
       effects.push(newEffect);
     }
 
-    // note to self: add rules to CardDefinitions that describes which triggers are allowed to have targets
+    // TODO add rules to CardDefinitions that describes which triggers are allowed to have targets -Loid
     if (triggerKind === Defs.TRIGGER.GREET || triggerKind === Defs.TRIGGER.GRIEVE || triggerKind === Defs.TRIGGER.THORN) {
-      const legalTypes = [Defs.TYPE.SPELL, Defs.TYPE.SUMMON, Defs.TYPE.CONSTRUCT]; // also note this line to self
+      const legalTypes = [Defs.TYPE.SPELL, Defs.TYPE.SUMMON, Defs.TYPE.CONSTRUCT]; // TODO -Loid
       return new Defs.Trigger({ kind: triggerKind, targets: this.generateTargets({ legalTypes }), effects });
     }
     

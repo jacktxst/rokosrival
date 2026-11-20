@@ -183,6 +183,8 @@ export class Cost {
 
 export class Effect {
   constructor(effectKind, amount, selection = null) {
+    // TODO Destroy effect doesn't require an amount, unlike other effects. -Loid
+    // consequently, it ALSO shouldn't be able to generate with the SPLIT selection kind.
     assert(Object.values(EFFECT).includes(effectKind), `unknown effect kind in Effect constructor: ${effectKind}`);
     assert(Number.isInteger(amount), "Effect amount must be an integer");
     this.kind = effectKind;

@@ -40,29 +40,7 @@ export function formatCost(cost) {
 
 export function formatTrigger(trigger) {
   // only Greet and Grieve have targets, so don't format targets for other triggers
-	return `${capitalize(trigger.kind)}${trigger.targets ? " " + formatTargets(trigger.targets) : ""}`;
-}
-
-
-export function formatTriggerHeader(trigger) {
-  switch (trigger.kind) {
-    case Defs.TRIGGER.AWAKEN:
-      return "Awaken";
-    case Defs.TRIGGER.REST:
-      return "Rest";
-    case Defs.TRIGGER.GREET:
-      return `Greet ${formatTargets(trigger.targets)}`;
-    case Defs.TRIGGER.GRIEVE:
-      return "Grieve";
-    case Defs.TRIGGER.THORN:
-      return "Thorn";
-    case Defs.TRIGGER.EXIT:
-      return "Exit";
-    case Defs.TRIGGER.ENTRY:
-      return "Entry";
-    default:
-      return trigger.kind;
-  }
+	return `${capitalize(trigger.kind)}${trigger.targets ? " " + formatTargets(trigger.targets) + "s" : ""}`;
 }
 
 
@@ -96,6 +74,7 @@ export function formatEffect(effect) {
     default:
       return `${capitalize(effect.kind)}s ${effect.amount} ${selectionStr}`;
   }
+  // TODO add formatting for other effect kinds that may not require an amount, like DESTROY -Loid
 }
 
 
@@ -129,7 +108,7 @@ export function formatCard(card) {
   const lines = [`${pad}${typeLabel}${costLabel ? " | Cost: " + costLabel : ""}${card.arcane ? " | Arcane" : ""}`];
 
   for (const trigger of card.triggers) {
-    lines.push(`${pad}${formatTriggerHeader(trigger)}:`);
+    lines.push(`${pad}${formatTrigger(trigger)}:`);
     for (const effect of trigger.effects) {
       lines.push(`${pad}  ${formatEffect(effect)}`);
     }
