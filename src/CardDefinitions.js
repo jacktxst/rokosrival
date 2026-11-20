@@ -202,11 +202,14 @@ export class Trigger {
     //assert(Object.values(TRIGGER).includes(kind), `unknown trigger kind: ${kind}`);
     //assert(targets === null || targets instanceof Targets, `${kind} Trigger targets must be a Targets instance or null`);
     //assert(effects.every((effect) => effect instanceof Effect), `${kind} Trigger effects must be Effect instances`);
+
     if (kind === TRIGGER.GREET || kind === TRIGGER.GRIEVE || kind === TRIGGER.THORN) {
       assert(targets !== null, `${kind} Trigger failed to provide Targets`);
+      this.targets = targets;
+    } else {
+      assert(targets === null, `${kind} Trigger provided unnecessary Targets: ${JSON.stringify(targets)}`);
     }
     this.kind = kind;
-    this.targets = targets;
     this.effects = effects;
   }
 }

@@ -147,24 +147,28 @@ export class CardGenerator {
   // triggers should be able to generate with multiple valid targets
   generateTrigger({ depth = 0, legalTriggers = [], legalEffects = [] } = {}) {
     
-    const legalTypes = [Defs.TYPE.SPELL, Defs.TYPE.SUMMON, Defs.TYPE.CONSTRUCT];
-    const targets = this.generateTargets( {legalTypes} );
     // if legalTriggers is provided, pick a trigger kind from that list. otherwise, pick a trigger kind from the full list of trigger kinds.
     const triggerKind = legalTriggers.length > 0 ? pick(this.seed, legalTriggers) : pick(this.seed, Object.values(Defs.TRIGGER));
 
-
     const effectCount = randomInt(this.seed, 1, legalEffects.length);
-    const effects = [];
-
+    let effects = [];
     for (let i = 0; i < effectCount; i += 1) {
       const newEffect = this.generateEffect({ depth, legalEffects });
+  
       // remove the kind of the newly generated effect from the list of legal effects 
-      // to avoid duplicate effect kinds within the same trigger
+      // to avoid duplicate effect kinds within the same trigger:
       legalEffects = legalEffects.filter(e => e !== newEffect.kind);
+
       effects.push(newEffect);
     }
 
-    return new Defs.Trigger({ kind: triggerKind, targets, effects });
+    // note to self: add rules to CardDefinitions that describes which triggers are allowed to have targets
+    if (triggerKind === Defs.TRIGGER.GREET || triggerKind === Defs.TRIGGER.GRIEVE || triggerKind === Defs.TRIGGER.THORN) {
+      const legalTypes = [Defs.TYPE.SPELL, Defs.TYPE.SUMMON, Defs.TYPE.CONSTRUCT]; // also note this line to self
+      return new Defs.Trigger({ kind: triggerKind, targets: this.generateTargets({ legalTypes }), effects });
+    }
+    
+    return new Defs.Trigger({ kind: triggerKind, effects });
   }
 
 
