@@ -46,13 +46,13 @@ export class Card {
 				<details>
 					<summary> <strong>${escapeHtml(formatTrigger(trigger))}</strong> </summary>
 					${trigger.effects.length
-						? `<ul>${trigger.effects.map((effect) => `
-							<li> 
+						? `<div>${trigger.effects.map((effect) => `
+							<div style="margin-top:5px; margin-left: 4px;"> 
 								${effect.kind === 'deploySubcard'
 									? `Deploy ${escapeHtml(capitalize(effect.card.type.kind))} ${effect.card.type.initialValue}${effect.card.renderDetailsHTML()}`
 									: escapeHtml(formatEffect(effect))}
-							</li>
-						`).join('')}</ul>`
+							</div>
+						`).join('')}</div>`
 						: '..no effects..'}
 				</details>
 			</div>
