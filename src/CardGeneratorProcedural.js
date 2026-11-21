@@ -8,7 +8,7 @@ export class CardGenerator {
     // random number generator function, should return a number between 0 and 1.
     // for reproducible randomness, pass a custom RNG function.
     rngFunction = Math.random, // TODO: allow seeding for reproducible randomness
-
+    seed = 0, // seed for reproducible randomness, currently not used
     idPrefix = "default", // allows you to determine which generator created the card. useful for debugging
     maxNestedDepth = 2, // maximum depth of nested subcards
     typeValueRange = [1, 7], // initial value range for card types. used to determine the initial value of a card type when generating a new card
@@ -22,6 +22,7 @@ export class CardGenerator {
 
     // options initialization
     this.rngFunction = rngFunction; // function returning a number between 0 and 1
+    this.seed = seed; // currently not used
     this.idPrefix = idPrefix;
     this.maxNestedDepth = maxNestedDepth;
     this.typeValueRange = typeValueRange;

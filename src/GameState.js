@@ -14,16 +14,28 @@ import { CardDeck } from './CardDeck.js'
 */
 
 export class GameState {
-
 	constructor() {
 
 		this.matchNumber = 0
 		this.currentState = ""
-		this.cardLibrary  = new CardLibrary()
 		this.currentGameView = null
+		this.seed = 0 // TODO
+		this.cardLibrary  = new CardLibrary(this.seed)
 		this.playerDeck = new CardDeck( this.cardLibrary.getRandomDeck(50) )
+	}
 
-
+	loadSaveData() {
+		const savedGame = localStorage.getItem("savedGame")
+		if(savedGame) {
+			const data = JSON.parse(savedGame)
+			this.matchNumber = data.matchNumber
+			this.currentState = data.currentState
+			// Load other necessary properties as needed
+		}
+	}
+	
+	hasSavedGame() {
+		return localStorage.getItem("savedGame") !== null
 	}
 }
 

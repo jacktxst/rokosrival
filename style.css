@@ -181,8 +181,70 @@ body, html {
 	height: 100vh;
 	flex-direction: column;
 	justify-content: center;
-	align-items: stretch
+	align-items: stretch;
+	gap: 20px;
+	padding: 20px;
+}
 
+#main-menu-buttons {
+	display: flex;
+	flex-direction: row;
+	gap: 15px;
+	justify-content: center;
+}
+
+#main-menu-buttons .stone-button {
+	flex: 1;
+	max-width: 200px;
+}
+
+#new-game-section {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 10px;
+	background-color: rgba(0, 0, 0, 0.2);
+	border-radius: 6px;
+}
+
+#new-game-section label {
+	color: white;
+	font-weight: bold;
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+	font-size: 14px;
+}
+
+#seed-input {
+	padding: 8px;
+	border: 1px solid rgba(0, 0, 0, 0.4);
+	border-radius: 4px;
+	background-color: rgba(255, 255, 255, 0.95);
+	color: #333;
+	font-family: monospace;
+	font-size: 14px;
+	text-transform: uppercase;
+}
+
+#seed-input::placeholder {
+	color: #999;
+}
+
+#seed-input:focus {
+	outline: none;
+	box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+#save-data-input {
+	padding: 10px;
+	border: 1px solid rgba(0, 0, 0, 0.4);
+	border-radius: 6px;
+	background-color: rgba(255, 255, 255, 0.9);
+	color: #333;
+	font-family: monospace;
+	font-size: 12px;
+	resize: vertical;
+	min-height: 100px;
+	max-height: 200px;
 }
  
 /*

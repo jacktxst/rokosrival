@@ -14,7 +14,7 @@ import * as Defs from "./CardDefinitions.js";
 
 export class CardLibrary {
   // TODO: seeding NYI
-  constructor({cards = [], seed = Math.random()} = {}) {
+  constructor({cards = [], seed = 0} = {}) {
     this.cards = cards.length > 0 ? cards : this.testCardGeneration();
     this.seed = seed;
   }
@@ -46,14 +46,18 @@ export class CardLibrary {
     let newCards = [];
     const gen1 = new CardGenerator({
       idPrefix: "simple",
+      seed: this.seed,
       maxTargetedTypes: 1,
       legalTypes: [Defs.TYPE.SPELL],
       legalTriggers: [Defs.TRIGGER.ENTRY, Defs.TRIGGER.EXIT],
       legalEffects: [Defs.EFFECT.HEAL, Defs.EFFECT.ATTACK],
     });
-    const gen2 = new CardGenerator();
+
+    const gen2 = new CardGenerator(); // default generator, could also pass seed: this.seed if needed
+
     const gen3 = new CardGenerator({
       idPrefix: "complex",
+      seed: this.seed,
       maxEffectsPerTrigger: 3,
       typeValueRange: [5, 30],
       effectAmountRange: [5, 25]
