@@ -12,11 +12,11 @@ export class CardPlayerBase {
 	constructor(args) {
 
 		this.name        = args.name || "Default Name"
-		this.deck        = args.deck
+		this.deck        = args.deck || new CardDeck()
 		this.discard     = args.discard || new CardDeck()
 		this.cardGame    = args.game || null
 		this.activeCards = []
-
+		this.opponent = null
 		this.type = { kind: "player" }
 
 	}
@@ -31,7 +31,6 @@ export class CardPlayerBase {
 		this.deck.unshuffleCards()
 		this.deck.shuffleCards()
 		this.hand = this.deck.drawCards(5)
-		this.opponent = (this === this.cardGame.player1) ? this.cardGame.player2 : this.cardGame.player1
 	}
 
 	/*
@@ -104,7 +103,7 @@ export class CardPlayerBase {
 		)
 
 		for (let card of [...this.activeCards, ...this.opponent.activeCards]) {
-			if (card != deployedCard) {
+			if (card !== deployedCard) {
 				eventQueue.push(new TriggerCardEvent( card, "greet", deployedCard ))
 			}
 		}

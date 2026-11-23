@@ -2,8 +2,7 @@ import { Card } from "./Card.js";
 import { DeployedCard } from './DeployedCard.js'
 
 import "./CardDefinitions.js";
-import { CardGame } from "./CardGame.js";
-import { gameState } from './GameState.js'
+import { game } from './Game.js'
 import { assert, randomInt } from "./Helpers.js"
 
 /*
@@ -61,6 +60,19 @@ export class ReturnControlEvent extends GamePlayEvent {
 		super()
 		this.kind = "return-control"
 	}
+}
+
+export function renderQueueHTML() {
+	let html = ""
+
+	for (let e of eventQueue){
+		html += `
+		<div>${e.kind}</div>
+		`
+	}
+
+	return html;
+
 }
 
 export let eventQueue = []
@@ -159,7 +171,7 @@ function resolveLoop(timestamp) {
 
 				case "gather-targets":
 					e.state = "in-progress"
-					console.log(`gather targets! owner: ${e.originator.owner.name} `)
+					console.log(`${e.originator.owner.name} gather targets for ${e.effect.kind}`)
 					if (!e.effect.selection) {
 						console.log("no selection required, skipping...")
 						eventQueue.splice(0,1)
@@ -221,7 +233,7 @@ function resolveLoop(timestamp) {
 					break;
 
 				case "animate-effect":
-					console.log(`animate-effect ${e.effect.kind} ${e.targetList[0]?.type.kind}...`)
+					console.log(`animate-effect ${e.effect.kind} ${e.targetList[0]?.type.kind || "none"}...`)
 					e.state = "in-progress"
 					switch (e.effect.kind) {
 
@@ -253,7 +265,7 @@ function resolveLoop(timestamp) {
 									}
 								}
 								if (target.type.kind !== "player") eventQueue.splice(1, 0, new TriggerCardEvent(target, "thorn") )
-								e.timeRemaining = 500
+								e.timeRemaining = 1000
 							}
 							break;
 						case "heal":
@@ -263,7 +275,7 @@ function resolveLoop(timestamp) {
 							}
 							for (let target of e.targetList) {
 								target.health += healAmount
-								e.timeRemaining = 500
+								e.timeRemaining = 1000
 							}
 							break;
 						case "defend":
@@ -273,7 +285,7 @@ function resolveLoop(timestamp) {
 							}
 							for (let target of e.targetList) {
 								target.shield += armor
-								e.timeRemaining = 500
+								e.timeRemaining = 1000
 							}
 							break;
 						case "surge":
@@ -283,7 +295,7 @@ function resolveLoop(timestamp) {
 							}
 							for (let target of e.targetList) {
 								target.mana += surgeAmount
-								e.timeRemaining = 500
+								e.timeRemaining = 1000
 							}
 							break;
 						case "decay":
@@ -293,7 +305,7 @@ function resolveLoop(timestamp) {
 							}
 							for (let target of e.targetList) {
 								target.mana -= decayAmount
-								e.timeRemaining = 500
+								e.timeRemaining = 1000
 							}
 							break;
 						case "destroy": // can trigger: EXIT, GRIEVE
@@ -313,14 +325,14 @@ function resolveLoop(timestamp) {
 									target.owner.discard.placeCards([target])
 								}
 
-								e.timeRemaining = 500
+								e.timeRemaining = 1000
 							}
 							break;
 						case "draw":
 							for (let target of e.targetList) {
 								if (target.type.kind !== "player") continue;
 								target.hand.push(...target.deck.drawCards(e.effect.amount))
-								e.timeRemaining = 500
+								e.timeRemaining = 1000
 							}
 							break;
 						case "discard":
@@ -335,7 +347,7 @@ function resolveLoop(timestamp) {
 							console.log(`DEPLOYING SUBCARD..? ${e.effect.card.type.kind}`)
 							e.effect.card.isSubcard = true
 							let subcard = new DeployedCard(e.effect.card , e.originator.owner)
-							e.timeRemaining = 500
+							e.timeRemaining = 1000
 							e.originator.owner.activeCards.push(subcard)
 
 							for (let card of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
@@ -344,7 +356,7 @@ function resolveLoop(timestamp) {
 							}
 
 							eventQueue.splice(1,0,new TriggerCardEvent(subcard,"entry"))
-							gameState.currentGameView.renderBoard()
+							game.renderer.renderBoard()
 							subcard.owner = e.originator.owner
 							break;
 
@@ -354,8 +366,8 @@ function resolveLoop(timestamp) {
 
 				case "return-control":
 					console.log("return control")
-					eventQueue = [];
-					gameState.currentGameView.cardGame.currentPlayer.doTurn()
+					eventQueue.length=0;
+					game.cardGame.currentPlayer.doTurn()
 					break;
 			}
 
@@ -366,7 +378,7 @@ function resolveLoop(timestamp) {
 			e.timeRemaining -= deltaTime
 			if (e.timeRemaining <= 0) {
 				eventQueue.splice(0,1)
-				gameState.currentGameView.renderBoard()
+				game.renderer.renderBoard()
 			}
 			break;
 

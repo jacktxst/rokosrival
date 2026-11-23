@@ -1,5 +1,5 @@
-import { gameState, GameState } from './GameState.js'
-import { ViewCardGame } from './ViewCardGame.js'
+import { game, Game } from './Game.js'
+import { CardGameRenderer } from './CardGameRenderer.js'
 import {CardPlayerBot} from './CardPlayerBot.js'
 import {CardPlayerHuman} from './CardPlayerHuman.js'
 import {CardDeck} from './CardDeck.js'
@@ -18,7 +18,7 @@ import {goToMainMenu} from './MenuMain.js'
 	and can start the next round.
 
 	Additionally, once saving is added, 
-	I think the game should only be saveable from the lobby,
+	I think the game should only be savable from the lobby,
 	not during or right after a match.
 
 */
@@ -34,7 +34,7 @@ export function goToLobby() {
 				Exit To Main Menu
 			</div> 
 			
-			<h1 class="shadow-bg"> Match No.: ${gameState.matchNumber} </h1>
+			<h1 class="shadow-bg"> Match No.: ${game.matchNumber} </h1>
 
 			<div id="ready-button" class="stone-button">
 				Ready
@@ -46,7 +46,7 @@ export function goToLobby() {
 
 			${ 
 				(()=>{let text = ""
-					for (let card of gameState.playerDeck.cards) {
+					for (let card of game.playerDeck.cards) {
 						text += card.renderHTML()
 					}
 					return text;
@@ -67,15 +67,7 @@ export function goToLobby() {
 
 	document.getElementById("ready-button").addEventListener("click",(e)=>{
 
-		let p1   = new CardPlayerHuman({ deck:new CardDeck(gameState.cardLibrary.cards), name: "You"})
-		let p2   = new CardPlayerBot  ({ deck:new CardDeck(gameState.cardLibrary.cards), name: "CPU"})
-		let game = new CardGame(p1, p2, null)
-		
-
-		gameState.currentGameView = new ViewCardGame(game)
-		game.view = gameState.currentGameView
-
-		game.beginGame()
+		game.beginRound()
 
 	})
 
