@@ -250,6 +250,7 @@ function resolveLoop(timestamp) {
 										target.shield = 0
 									} else {
 										target.shield -= damage
+										damage = 0
 									}
 								}
 								target.health -= damage
