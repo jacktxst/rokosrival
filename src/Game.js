@@ -45,3 +45,4 @@ export class Game {
 }
 
 export let game = new Game();
+window.game = game;

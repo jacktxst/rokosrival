@@ -4,6 +4,7 @@ import { DeployedCard } from './DeployedCard.js'
 import "./CardDefinitions.js";
 import { game } from './Game.js'
 import { assert, randomInt } from "./Helpers.js"
+import {goToGameOver} from "./MenuGameOver.js";
 
 /*
 
@@ -317,15 +318,21 @@ function resolveLoop(timestamp) {
 								
 								}
 
-								if (target.type.kind !== "player") eventQueue.splice(1,0, new TriggerCardEvent( target, "exit" ))
+								if (target.type.kind !== "player") {
+									eventQueue.splice(1,0, new TriggerCardEvent( target, "exit" ))
+									target.owner.activeCards = target.owner.activeCards.filter(item => item !== target)
 
-								target.owner.activeCards = target.owner.activeCards.filter(item => item !== target)
+									if (!target.isSubcard) {
+										target.owner.discard.placeCards([target])
+									}
 
-								if (!target.isSubcard) {
-									target.owner.discard.placeCards([target])
+									e.timeRemaining = 1000
+
+								} else {
+									eventQueue = []
+									goToGameOver()
 								}
 
-								e.timeRemaining = 1000
 							}
 							break;
 						case "draw":
@@ -367,6 +374,7 @@ function resolveLoop(timestamp) {
 				case "return-control":
 					console.log("return control")
 					eventQueue.length=0;
+					game.renderer.renderBoard()
 					game.cardGame.currentPlayer.doTurn()
 					break;
 			}

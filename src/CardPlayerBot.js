@@ -7,7 +7,7 @@ export class CardPlayerBot extends CardPlayerBase {
 
 		if (!this.hasPlayed) {
 			this.hasPlayed = true
-			this.playCounter = 5
+			this.playCounter = 1
 			this.playCounter--;
 			this.deployCardFromHand( 0 )
 		} else if (this.playCounter === 0) {
