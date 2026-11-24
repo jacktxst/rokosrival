@@ -42,7 +42,7 @@ export function goToLobby() {
 			
 			<h1 class="shadow-bg"> Your Deck: </h1>
 
-			<div class="shadow-bg" style="max-height: 300px; display: grid; grid-template-columns: auto auto auto; overflow: auto; ">
+			<div class="shadow-bg" style="max-height: 300px; display: grid; grid-template-columns: auto auto auto; overflow: auto; justify-content: space-evenly">
 
 			${ 
 				(()=>{let text = ""
