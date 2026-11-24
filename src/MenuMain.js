@@ -1,5 +1,5 @@
 import { goToLobby } from './MenuLobby.js'
-import { gameState, GameState } from './GameState.js'
+import { game, Game } from './Game.js'
 
 export function goToMainMenu() {
 
@@ -23,7 +23,7 @@ export function goToMainMenu() {
 
 	document.getElementById("new-game-button").addEventListener("click",(e)=>{
 
-		/* game state for a new game is already initialized in GameState.js */
+		game.init()
 		goToLobby()
 
 	})

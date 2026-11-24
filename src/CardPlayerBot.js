@@ -4,16 +4,19 @@ import { pick } from './Helpers.js'
 export class CardPlayerBot extends CardPlayerBase {
 
 	doTurn() {
-		
-		let cardPlay = pick(this.hand, this.hand.length)
-		
-		for (let card of cardPlay)  {
-			let i = this.hand.findIndex(item => item === card)
 
-			this.deployCardFromHand( i )
+		if (!this.hasPlayed) {
+			this.hasPlayed = true
+			this.playCounter = 1
+			this.playCounter--;
+			this.deployCardFromHand( 0 )
+		} else if (this.playCounter === 0) {
+			this.hasPlayed = false
+			this.cardGame.yieldTurn()
+		} else {
+			this.playCounter--;
+			this.deployCardFromHand( 0 )
 		}
-
-		this.cardGame.yieldTurn()
 
 	}
 

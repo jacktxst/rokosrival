@@ -6,13 +6,6 @@
 
 */
 
-import { CardGame } from './CardGame.js'
-import { CardDeck } from './CardDeck.js'
-import { gameState } from './GameState.js'
-import { CardPlayerHuman } from './CardPlayerHuman.js'
-import { CardPlayerBot } from './CardPlayerBot.js'
-import { capitalize, escapeHtml } from './Helpers.js'
-import { formatCost, formatTrigger, formatCard, formatEffect } from './CardFormatHelpers.js'
 
 /*
 
@@ -20,14 +13,15 @@ import { formatCost, formatTrigger, formatCard, formatEffect } from './CardForma
 
 */
 
-export class ViewCardGame {
+import {renderQueueHTML} from './ResolveCardPlay.js'
+
+export class CardGameRenderer {
 
 
 	constructor(cardGame) {
 		
 		this.cardGame = cardGame
-		this.p1 = cardGame.player1 
-		this.p2 = cardGame.player2
+		this.cardGame.view = this
 		
 	}
 
@@ -46,10 +40,12 @@ export class ViewCardGame {
 	renderBoard(){ 
 
 
-		const opponent = this.p2
-		const p1 = this.p1
+		const opponent = this.cardGame.player2;
+		const p1 = this.cardGame.player1;
 
 		document.body.innerHTML = `
+
+			<div id="queue" style="background-color: white; position: absolute; display:flex; flex-direction: column;">${renderQueueHTML()}</div>
 
 			<div id="board">
 
@@ -64,7 +60,7 @@ export class ViewCardGame {
 								<div class="opponent-card"></div>
 							`
 						}
-						return string
+						return string;
 					})()}
 					
 					</div>
@@ -126,7 +122,7 @@ export class ViewCardGame {
 				</div>	
 			</div>
 			
-		`
+		`;
 
 	}
 

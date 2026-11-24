@@ -9,30 +9,36 @@
 */
 
 import { TriggerCardEvent, ReturnControlEvent, eventQueue } from './ResolveCardPlay.js'
-
+import { assert } from './Helpers.js'
 
 export class CardGame {
 
-	constructor(player1, player2, gameView) {
-		this.view = gameView
+	constructor(player1, player2) {
 		this.player1 = player1
 		this.player2 = player2
 		this.currentPlayer = player1
 		player1.cardGame = this
+		player1.opponent = player2
 		player2.cardGame = this
+		player2.opponent = player1
+		this.view = null
 	}
 
 	/** */
 	beginGame() {
-		this.player1.view = this.view
-		this.player2.view = this.view
-		this.player1.beginGame()
-		this.player2.beginGame()
-		this.view.renderBoard()
-		this.currentPlayer.doTurn()
+		this.player1.view = this.view;
+		this.player2.view = this.view;
+		this.player1.beginGame();
+		this.player2.beginGame();
+		this.view.renderBoard();
+		this.currentPlayer.doTurn();
 	}
 
 	yieldTurn() {
+
+		this.view.renderBoard()
+
+		assert( eventQueue.length === 0, "EventQueue still running!" );
 
 		// activate any active cards with "rest" triggers
 		for (let card of this.currentPlayer.activeCards) {
