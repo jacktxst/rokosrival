@@ -86,6 +86,7 @@ export class CardGameRenderer {
 				</div>
 	
 				<div id="frontline">
+						<div id="selection-prompt" style="color:white;"> </div>
 						<div id="end-turn-button" class="stone-button"> End Turn </div>
 				</div>
 	

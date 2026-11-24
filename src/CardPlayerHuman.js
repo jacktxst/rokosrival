@@ -1,4 +1,7 @@
 import {CardPlayerBase} from './CardPlayerBase.js'
+import {formatTargets} from "./CardFormatHelpers.js";
+import {eventQueue} from "./ResolveCardPlay.js";
+import {assert} from "./Helpers.js";
 
 export class CardPlayerHuman extends CardPlayerBase {
 
@@ -40,6 +43,14 @@ export class CardPlayerHuman extends CardPlayerBase {
 	*/
 
 	selectFromCandidates( maxTargets, candidates, resultsCallback ) {
+
+		assert(eventQueue[0].kind === "gather-targets", "event must be of kind gather-targets!")
+
+		let effect = eventQueue[0].effect
+
+		assert(effect, "effect not defined!")
+
+		document.getElementById("selection-prompt").innerHTML = `Select ${formatTargets(effect.selection.targets)} for ${effect.amount} ${effect.kind} `
 
 		let selection = []
 
