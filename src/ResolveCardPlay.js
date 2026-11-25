@@ -244,30 +244,9 @@ function resolveLoop(timestamp) {
 								damage /= e.targetList.length
 							}
 							for (let target of e.targetList) {
-								if (target.shield !== 0) { // got a weird error message: cant read .shield from undefined
-									if (target.shield < damage) {
-										damage -= target.shield
-										target.shield = 0
-									} else {
-										target.shield -= damage
-									}
-								}
-								target.health -= damage
-								if (target.health <= 0) {
-									target.owner.activeCards = target.owner.activeCards.filter(item => item !== target)
-									eventQueue.splice(1,0,new TriggerCardEvent(target, "exit"))
-									
-									if (!target.isSubcard) {
-										target.owner.discard.placeCards([target])
-									}
-
-									for (let card of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
-										eventQueue.splice(1,0,new TriggerCardEvent( card, "grieve", target ))
-									}
-								}
-								if (target.type.kind !== "player") eventQueue.splice(1, 0, new TriggerCardEvent(target, "thorn") )
-								e.timeRemaining = 1000
+								target.attack(e.originator, damage)
 							}
+							e.timeRemaining = 1000
 							break;
 						case "heal":
 							let healAmount = e.effect.amount

@@ -130,4 +130,25 @@ export class CardPlayerBase {
 
 	}
 
+	attack(attacker, damage) {
+		if (this.shield !== 0) { // got a weird error message: cant read .shield from undefined
+			if (this.shield < damage) {
+				damage -= this.shield
+				this.shield = 0
+			} else {
+				this.shield -= damage
+				damage = 0
+			}
+		}
+		this.health -= damage;
+		for (let card of this.activeCards) {
+			if (card.type.kind === "spell") {
+				eventQueue.splice(1,0, new TriggerCardEvent(card, "thorn", attacker))
+			}
+		}
+		if (this.health <= 0) {
+			// die
+		}
+	}
+
 }
