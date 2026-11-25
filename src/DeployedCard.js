@@ -1,4 +1,5 @@
 import { Card } from './Card.js'
+import {eventQueue, TriggerCardEvent} from "./ResolveCardPlay.js";
 
 export class DeployedCard extends Card  {
 
@@ -46,6 +47,40 @@ export class DeployedCard extends Card  {
 
 	}
 
+	attack(attacker, damage) {
+		if (this.shield !== 0) { // got a weird error message: cant read .shield from undefined
+			if (this.shield < damage) {
+				damage -= this.shield
+				this.shield = 0
+			} else {
+				this.shield -= damage
+				damage = 0
+			}
+		}
+		this.health -= damage
+		if (this.type.kind === 'construct' && this.shield <= 0) {
 
+			this.fizzle()
+
+		}
+		else if (this.health <= 0) {
+			this.fizzle()
+		}
+		eventQueue.splice(1, 0, new TriggerCardEvent(this, "thorn", attacker) )
+
+	}
+
+	fizzle(){
+		this.owner.activeCards = this.owner.activeCards.filter(item => item !== this)
+		eventQueue.splice(1,0,new TriggerCardEvent(this, "exit"))
+
+		if (!this.isSubcard) {
+			this.owner.discard.placeCards([this])
+		}
+
+		for (let card of [...this.owner.activeCards, ...this.owner.opponent.activeCards]) {
+			eventQueue.splice(1,0,new TriggerCardEvent( card, "grieve", this ))
+		}
+	}
 
 }
