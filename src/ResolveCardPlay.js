@@ -4,7 +4,6 @@ import { DeployedCard } from './DeployedCard.js'
 import "./CardDefinitions.js";
 import { game } from './Game.js'
 import { assert, randomInt } from "./Helpers.js"
-import {goToGameOver} from "./MenuGameOver.js";
 
 /*
 
@@ -15,6 +14,10 @@ import {goToGameOver} from "./MenuGameOver.js";
 	and the yieldTurn function in CardGame.js
 
 */
+
+export function clearEvents() {
+	eventQueue = []
+}
 
 export class GamePlayEvent {
 	constructor() {
@@ -291,26 +294,8 @@ function resolveLoop(timestamp) {
 						case "destroy": // can trigger: EXIT, GRIEVE
 							for (let target of e.targetList) {
 
-								for (let card of [...e.originator.owner.activeCards, ...e.originator.owner.opponent.activeCards]) {
-
-									eventQueue.splice(1,0,new TriggerCardEvent( card, "grieve", target ))
-								
-								}
-
-								if (target.type.kind !== "player") {
-									eventQueue.splice(1,0, new TriggerCardEvent( target, "exit" ))
-									target.owner.activeCards = target.owner.activeCards.filter(item => item !== target)
-
-									if (!target.isSubcard) {
-										target.owner.discard.placeCards([target])
-									}
-
-									e.timeRemaining = 1000
-
-								} else {
-									eventQueue = []
-									goToGameOver()
-								}
+								target.fizzle()
+								e.timeRemaining = 1000
 
 							}
 							break;

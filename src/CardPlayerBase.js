@@ -147,7 +147,7 @@ export class CardPlayerBase {
 			}
 		}
 		if (this.health <= 0) {
-			// die
+			this.fizzle()
 		}
 	}
 

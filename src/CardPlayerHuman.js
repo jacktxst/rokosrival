@@ -1,7 +1,8 @@
 import {CardPlayerBase} from './CardPlayerBase.js'
 import {formatTargets} from "./CardFormatHelpers.js";
-import {eventQueue} from "./ResolveCardPlay.js";
+import {clearEvents, eventQueue} from "./ResolveCardPlay.js";
 import {assert} from "./Helpers.js";
+import {loseGame} from "./MenuGameOver.js";
 
 export class CardPlayerHuman extends CardPlayerBase {
 
@@ -149,6 +150,11 @@ export class CardPlayerHuman extends CardPlayerBase {
 			resultsCallback(selection)
 		})
 
+	}
+
+	fizzle() {
+		clearEvents()
+		loseGame()
 	}
 
 }

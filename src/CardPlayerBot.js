@@ -1,5 +1,7 @@
 import {CardPlayerBase} from './CardPlayerBase.js'
 import { pick } from './Helpers.js'
+import {clearEvents} from "./ResolveCardPlay.js";
+import {winGame} from "./MenuGameOver.js";
 
 export class CardPlayerBot extends CardPlayerBase {
 
@@ -57,6 +59,11 @@ export class CardPlayerBot extends CardPlayerBase {
 
 		this.cardGame.view.renderBoard()
 		resultsCallback(selection)
+	}
+
+	fizzle() {
+		clearEvents()
+		winGame()
 	}
 
 }
