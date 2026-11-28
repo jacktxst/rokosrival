@@ -66,16 +66,30 @@ export class Card {
 					triggerSummary.classList.add("trigger-"+trigger.kind)
 
 					let deleteButton = document.createElement("button")
-						deleteButton.class="cheat-button"
+						deleteButton.classList.add("cheat-button")
 						deleteButton.innerHTML="x"
 						deleteButton.addEventListener("click", ((e) => {
 							this.triggers = this.triggers.filter(item => item !== trigger)
 							triggersDiv.removeChild(triggerDetails)
 						}).bind(this))
 					let changeButton = document.createElement("button")
-			            changeButton.class="cheat-button"
+			            changeButton.className ="cheat-button"
 						changeButton.innerHTML=">"
-						changeButton.addEventListener("click", (e) => {})
+						changeButton.addEventListener("click", (e) => {
+							const mapping = {
+								rest:"awaken",
+								awaken:"entry",
+								entry:"thorn",
+								thorn:"greet",
+								greet:"grieve",
+								grieve:"exit",
+								exit:"rest"
+							}
+							triggerSummary.classList.remove("trigger-"+trigger.kind)
+							trigger.kind = mapping[trigger.kind];
+							triggerSummary.classList.add("trigger-"+trigger.kind)
+							triggerText.innerHTML = escapeHtml(formatTrigger(trigger))
+						})
 
 					let triggerText = document.createElement("strong")
 						triggerText.innerHTML = escapeHtml(formatTrigger(trigger))
@@ -103,9 +117,15 @@ export class Card {
 						effectsDiv.append(effectDiv)
 					}
 
+				let newEffectButton = document.createElement("button")
+					newEffectButton.className="cheat-button"
+					newEffectButton.innerHTML = "+"
+					newEffectButton.addEventListener("click", ((e) => {
+
+					}).bind(this))
 
 
-			triggerDetails.append(triggerSummary, effectsDiv)
+			triggerDetails.append(triggerSummary, effectsDiv, newEffectButton)
 
 
 
@@ -113,29 +133,32 @@ export class Card {
 		}
 
 		let newTriggerButton = document.createElement("button")
-			newTriggerButton.class = "cheat-button"
+			newTriggerButton.className = "cheat-button"
 			newTriggerButton.innerHTML = "+"
-			newTriggerButton.addEventListener("click", (e) => {
+			newTriggerButton.addEventListener("click", ((e) => {
 				this.triggers.push(new Trigger({kind:"rest",effects:[]}))
 				this.div.replaceChildren()
 				this.div.append(...this.renderDetails())
 				e.preventDefault()
-			})
+			}).bind(this))
 		triggersDiv.append(newTriggerButton)
 
-		return [
+		this.detailsContent = [
 			titleBar,
 			cost,
 			triggersDiv
 		]
+		return this.detailsContent;
 	}
 
 	render(cssClass) {
-		let div = document.createElement("div");
-		this.div = div;
-		div.classList.add(cssClass);
-		div.append(...this.renderDetails())
-		return div;
+		if (!this.div) {
+			this.div = document.createElement("div");
+		}
+		this.div.className = cssClass;
+		this.div.replaceChildren()
+		this.div.append(...this.renderDetails())
+		return this.div;
 	}
 
 }

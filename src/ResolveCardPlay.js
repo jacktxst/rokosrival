@@ -241,8 +241,10 @@ function resolveLoop(timestamp) {
 					e.state = "in-progress"
 
 					let amount = e.effect.amount
-					if (e.effect.selection.kind === "split among") {
-						amount /= e.targetList.length
+					if (e.effect.kind !== "deploySubcard") {
+						if (e.effect.selection.kind === "split among") {
+							amount /= e.targetList.length
+						}
 					}
 
 					switch (e.effect.kind) {
