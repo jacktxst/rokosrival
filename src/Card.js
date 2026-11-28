@@ -65,6 +65,67 @@ export class Card {
 			return effectDiv;
 		}
 
+		function createTriggerDetails(trigger) {
+			let triggerDetails = document.createElement("details")
+
+			let triggerSummary = document.createElement("summary")
+			triggerSummary.classList.add("trigger")
+			triggerSummary.classList.add("trigger-"+trigger.kind)
+
+			let deleteButton = document.createElement("button")
+			deleteButton.classList.add("cheat-button")
+			deleteButton.innerHTML="x"
+			deleteButton.addEventListener("click", ((e) => {
+				this.triggers = this.triggers.filter(item => item !== trigger)
+				triggersDiv.removeChild(triggerDetails)
+			}).bind(this))
+			let changeButton = document.createElement("button")
+			changeButton.className ="cheat-button"
+			changeButton.innerHTML=">"
+			changeButton.addEventListener("click", (e) => {
+				const mapping = {
+					rest:"awaken",
+					awaken:"entry",
+					entry:"thorn",
+					thorn:"greet",
+					greet:"grieve",
+					grieve:"exit",
+					exit:"rest"
+				}
+				triggerSummary.classList.remove("trigger-"+trigger.kind)
+				trigger.kind = mapping[trigger.kind];
+				triggerSummary.classList.add("trigger-"+trigger.kind)
+				triggerText.innerHTML = escapeHtml(formatTrigger(trigger))
+			})
+
+			let triggerText = document.createElement("strong")
+			triggerText.innerHTML = escapeHtml(formatTrigger(trigger))
+
+			triggerSummary.append(deleteButton,changeButton,triggerText)
+
+
+
+			let effectsDiv = document.createElement("div")
+
+			for (let effect of trigger.effects) {
+				effectsDiv.append(createEffectDiv.bind(this)(effect,trigger,effectsDiv))
+			}
+
+			let newEffectButton = document.createElement("button")
+			newEffectButton.className="cheat-button"
+			newEffectButton.innerHTML = "+"
+			newEffectButton.addEventListener("click", ((e) => {
+				let effect = new Effect("destroy",1,{kind:"specified",targets:new Targets({types:["player"],alignment:"any"})})
+				trigger.effects.push(effect)
+				effectsDiv.append(createEffectDiv.bind(this)(effect,trigger,effectsDiv))
+			}).bind(this))
+
+
+			triggerDetails.append(triggerSummary, effectsDiv, newEffectButton)
+
+			return triggerDetails;
+		}
+
 		const title = `${capitalize(this.type.kind)} (${ this.getHeaderNumber() })`
 
 		let titleBar = document.createElement("h3")
@@ -82,78 +143,16 @@ export class Card {
 
 		for (let trigger of this.triggers) {
 
-			let triggerDetails = document.createElement("details")
-
-
-
-				let triggerSummary = document.createElement("summary")
-					triggerSummary.classList.add("trigger")
-					triggerSummary.classList.add("trigger-"+trigger.kind)
-
-					let deleteButton = document.createElement("button")
-						deleteButton.classList.add("cheat-button")
-						deleteButton.innerHTML="x"
-						deleteButton.addEventListener("click", ((e) => {
-							this.triggers = this.triggers.filter(item => item !== trigger)
-							triggersDiv.removeChild(triggerDetails)
-						}).bind(this))
-					let changeButton = document.createElement("button")
-			            changeButton.className ="cheat-button"
-						changeButton.innerHTML=">"
-						changeButton.addEventListener("click", (e) => {
-							const mapping = {
-								rest:"awaken",
-								awaken:"entry",
-								entry:"thorn",
-								thorn:"greet",
-								greet:"grieve",
-								grieve:"exit",
-								exit:"rest"
-							}
-							triggerSummary.classList.remove("trigger-"+trigger.kind)
-							trigger.kind = mapping[trigger.kind];
-							triggerSummary.classList.add("trigger-"+trigger.kind)
-							triggerText.innerHTML = escapeHtml(formatTrigger(trigger))
-						})
-
-					let triggerText = document.createElement("strong")
-						triggerText.innerHTML = escapeHtml(formatTrigger(trigger))
-
-				triggerSummary.append(deleteButton,changeButton,triggerText)
-
-
-
-				let effectsDiv = document.createElement("div")
-
-					for (let effect of trigger.effects) {
-						effectsDiv.append(createEffectDiv.bind(this)(effect,trigger,effectsDiv))
-					}
-
-				let newEffectButton = document.createElement("button")
-					newEffectButton.className="cheat-button"
-					newEffectButton.innerHTML = "+"
-					newEffectButton.addEventListener("click", ((e) => {
-						let effect = new Effect("destroy",1,{kind:"specified",targets:new Targets({types:["player"],alignment:"any"})})
-						trigger.effects.push(effect)
-						effectsDiv.append(createEffectDiv.bind(this)(effect,trigger,effectsDiv))
-					}).bind(this))
-
-
-			triggerDetails.append(triggerSummary, effectsDiv, newEffectButton)
-
-
-
-			triggersDiv.append(triggerDetails)
+			triggersDiv.append(createTriggerDetails.bind(this)(trigger))
 		}
 
 		let newTriggerButton = document.createElement("button")
 			newTriggerButton.className = "cheat-button"
 			newTriggerButton.innerHTML = "+"
 			newTriggerButton.addEventListener("click", ((e) => {
-				this.triggers.push(new Trigger({kind:"rest",effects:[]}))
-				this.div.replaceChildren()
-				this.div.append(...this.renderDetails())
-				e.preventDefault()
+				let trigger = new Trigger({kind:"rest",effects:[]})
+				this.triggers.push(trigger)
+				triggersDiv.insertBefore(createTriggerDetails.bind(this)(trigger),triggersDiv.children[triggersDiv.children.length-1])
 			}).bind(this))
 		triggersDiv.append(newTriggerButton)
 
