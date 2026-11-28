@@ -14,6 +14,8 @@ export class CardPlayerHuman extends CardPlayerBase {
 
 	doTurn() {
 
+		document.getElementById("end-turn-button").innerHTML = "End Turn"
+
 		let userCardDivs = document.getElementById("player-hand").children
 		if (!userCardDivs) return
 
