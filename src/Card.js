@@ -2,7 +2,8 @@
 import {CardType, Effect, Targets, Trigger, TYPE} from "./CardDefinitions.js";
 import {assert} from "./Helpers.js"
 import { capitalize, escapeHtml } from './Helpers.js'
-import { formatCost, formatTrigger, formatCard, formatEffect } from './CardFormatHelpers.js'
+import {formatCost, formatTrigger, formatCard, formatEffect, formatSelection} from './CardFormatHelpers.js'
+import * as Defs from "./CardDefinitions.js";
 
 export class Card {
 
@@ -41,27 +42,97 @@ export class Card {
 	renderDetails() {
 
 		function createEffectDiv(effect, trigger, effectsDiv) {
-			const effectDiv = document.createElement("div")
+			let effectDiv = document.createElement("div")
 				effectDiv.style.marginTop = "5px"
 				effectDiv.style.marginLeft = "4px"
 
 				let removeEffectButton = document.createElement("button")
-				removeEffectButton.className ="cheat-button"
-				removeEffectButton.innerHTML="x"
-				removeEffectButton.addEventListener("click", (e) => {
-					trigger.effects = this.triggers.filter(item => item !== effect)
-					effectsDiv.removeChild(effectDiv)
-				})
+					removeEffectButton.className ="cheat-button"
+					removeEffectButton.innerHTML="x"
+					removeEffectButton.addEventListener("click", (e) => {
+						trigger.effects = this.triggers.filter(item => item !== effect)
+						effectsDiv.removeChild(effectDiv)
+					})
 				effectDiv.append(removeEffectButton)
 
-				if (effect.kind === "deploySubcard") {
+				let changeEffectButton = document.createElement("button")
+					changeEffectButton.className ="cheat-button"
+					changeEffectButton.innerHTML=">"
+					changeEffectButton.addEventListener("click", (e) => {
+						const mapping = {
+							attack:"heal",
+							heal:"defend",
+							defend:"decay",
+							decay:"destroy",
+							destroy:"surge",
+							surge:"draw",
+							draw:"discard",
+							discard:"attack"
+						}
+						effect.kind = mapping[effect.kind]
+						let changedDiv = createEffectDiv.bind(this)(effect, trigger, effectsDiv)
+						effectsDiv.insertBefore(changedDiv, effectDiv, )
+						effectsDiv.removeChild(effectDiv)
+					})
+				effectDiv.append(changeEffectButton)
 
-					effectDiv.innerHTML = "Deploy:"
-					// effectDiv.append(...effect.card.renderDetails())
+				let amountUpButton = document.createElement("button")
+					amountUpButton.className ="cheat-button"
+					amountUpButton.innerHTML="+"
+					amountUpButton.addEventListener("click", (e) => {
+						effect.amount++;
+						let changedDiv = createEffectDiv.bind(this)(effect, trigger, effectsDiv)
+						effectsDiv.insertBefore(changedDiv, effectDiv, )
+						effectsDiv.removeChild(effectDiv)
+					})
 
-				} else {
-					effectDiv.append (  escapeHtml(formatEffect(effect)) )
+				let amountDownButton = document.createElement("button")
+					amountDownButton.className ="cheat-button"
+					amountDownButton.innerHTML="-"
+					amountDownButton.addEventListener("click", (e) => {
+						effect.amount--;
+						let changedDiv = createEffectDiv.bind(this)(effect, trigger, effectsDiv)
+						effectsDiv.insertBefore(changedDiv, effectDiv, )
+						effectsDiv.removeChild(effectDiv)
+				})
+
+				const selectionStr = effect.selection?formatSelection(effect.selection):"";
+
+				let to = effect.selection? (effect.selection.kind === Defs.SELECTION.SPLIT ? "" : " to "):"";
+
+				switch (effect.kind) {
+					case Defs.EFFECT.ATTACK:
+						effectDiv.append("Deal ", amountDownButton, effect.amount, amountUpButton, " damage ", to, selectionStr)
+						break;
+
+					case Defs.EFFECT.DRAW:
+						if(effect.selection.kind !== Defs.SELECTION.SELF) {
+							// if amount is 1, use "a card", otherwise use "n cards"
+							effectDiv.append(selectionStr, " draws ", amountDownButton, effect.amount === 1 ? "a" : effect.amount, amountUpButton, effect.amount === 1 ? "card" : "cards" )
+						} else {
+							// if selection is self, "You draw ..." instead of "<selection> draws ..."
+							effectDiv.append("You draw ",amountDownButton,effect.amount === 1 ? "a" : effect.amount,amountUpButton,effect.amount === 1 ? "card" : "cards")
+						}
+						break;
+
+					case Defs.EFFECT.DISCARD:
+						if(effect.selection.kind !== Defs.SELECTION.SELF) {
+							effectDiv.append(selectionStr, " discards ",amountDownButton,effect.amount === 1 ? "a" : effect.amount,amountUpButton,effect.amount === 1 ? "card" : "cards")
+						} else {
+							effectDiv.append("You discard ",amountDownButton,effect.amount === 1 ? "a" : effect.amount,amountUpButton,effect.amount === 1 ? "card" : "cards")
+						}
+						break;
+					case Defs.EFFECT.DEFEND:
+						effectDiv.append("Apply ",amountDownButton,effect.amount,amountUpButton," shield ",to,selectionStr)
+						break;
+					case Defs.EFFECT.HEAL:
+						effectDiv.append("Heal ",amountDownButton,effect.amount,amountUpButton," life ",to,selectionStr)
+						break;
+					default:
+						effectDiv.append(capitalize(effect.kind),"s",amountDownButton,effect.amount,amountUpButton,selectionStr)
+						break;
 				}
+
 			return effectDiv;
 		}
 
