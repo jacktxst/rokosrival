@@ -55,25 +55,30 @@ body, html {
 }
 
 .card {
-	color: black;
+
 	display: flex;
 	flex-direction: column;
 	flex-shrink: 0;
-	background-image: url("./textures/paper.jpg");
-	background-repeat: repeat;
-	background-size: 300px;
 	padding: 0px;
 	width: 100px;
 	border-radius: 15px;
 	height: 150px;
 	margin: 5px;
+	overflow-y: auto;
+
+	background-image: url("./textures/paper.jpg");
+	background-repeat: repeat;
+	background-size: 300px;
+
+	color: black;
 	font-family: fantasy, serif;
-	overflow-y: scroll;
+	font-size: 13px;
+	line-height: 1.25;
+
 	-ms-overflow-style: none;  /* IE and Edge */
   	scrollbar-width: thin;  /* Firefox */
 	scrollbar-color: #aba591 #8b8571; /* Firefox */
-	font-size: 13px;
-	line-height: 1.25;
+
 }
 .card::-webkit-scrollbar {
     width: 7px; /* Most browsers */
@@ -84,6 +89,70 @@ body, html {
 .card::-webkit-scrollbar-thumb {
   background: #aba591; /* Most browsers */
 }
+
+.opponent-card {
+	width: 50px;
+	height: 90px;
+
+	margin: 5px;
+
+	background-image: url("./textures/paper.jpg");
+	background-repeat: repeat;
+	background-size: 300px;
+	border-radius: 15px;
+
+	box-sizing: content-box;
+
+
+	color: black;
+	display: flex;
+	flex-direction: column;
+	flex-shrink: 0;
+	padding: 0px;
+
+	overflow-y: clip;
+	-ms-overflow-style: none;  /* IE and Edge */
+	scrollbar-width: thin;  /* Firefox */
+	scrollbar-color: #aba591 #8b8571; /* Firefox */
+
+	color: rgba(0,0,0,0);
+
+
+}
+
+.cheat-button {
+	width: 15px;
+	height: 15px;
+	padding: 0;
+	font-size: 8pt;
+	/*display: none;*/
+}
+
+.opponent-card:hover {
+	display: flex;
+	flex-direction: column;
+	flex-shrink: 0;
+	padding: 0px;
+	width: 100px;
+	border-radius: 15px;
+	height: 150px;
+	margin: 5px;
+	overflow-y: auto;
+
+	background-image: url("./textures/paper.jpg");
+	background-repeat: repeat;
+	background-size: 300px;
+
+	color: black;
+	font-family: fantasy, serif;
+	font-size: 13px;
+	line-height: 1.25;
+
+	-ms-overflow-style: none;  /* IE and Edge */
+	scrollbar-width: thin;  /* Firefox */
+	scrollbar-color: #aba591 #8b8571; /* Firefox */
+}
+
 
 .rr-card-title {
 	margin: 4px 4px 4px;
@@ -201,19 +270,9 @@ body, html {
 	flex-direction: row;
 }
 
-.opponent-card {
-	width: 50px;
-	height: 90px;
 
-	margin: 5px;
 
-	background-image: url("./textures/paper.jpg");
-	background-repeat: repeat;
-	background-size: 300px;
-	border-radius: 15px;
 
-	box-sizing: content-box;
-}
 
 .deployed-cards {
 	height: 90px;

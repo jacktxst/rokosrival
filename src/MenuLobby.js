@@ -7,6 +7,7 @@ import {CardGame} from './CardGame.js'
 
 
 import {goToMainMenu} from './MenuMain.js'
+import {showCardsInDiv} from "./Helpers.js";
 
 /*
 
@@ -42,22 +43,15 @@ export function goToLobby() {
 			
 			<h1 class="shadow-bg"> Your Deck: </h1>
 
-			<div class="shadow-bg" style="max-height: 300px; display: grid; grid-template-columns: auto auto auto; overflow: auto; justify-content: space-evenly">
+			<div id="lobby-deck-display" class="shadow-bg" style="max-height: 300px; display: grid; grid-template-columns: auto auto auto; overflow: auto; justify-content: space-evenly">
 
-			${ 
-				(()=>{let text = ""
-					for (let card of game.playerDeck.cards) {
-						text += card.renderHTML()
-					}
-					return text;
-				})()
-
-			}
 				
 			</div>
 		</div>
 
 	`
+
+	showCardsInDiv(game.playerDeck.cards, document.getElementById("lobby-deck-display"),"card")
 
 	document.getElementById("exit-button").addEventListener("click",(e)=>{
 
