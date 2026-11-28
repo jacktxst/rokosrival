@@ -108,7 +108,7 @@ export class Card {
 							if (effect.kind === "deploySubcard") {
 
 								effectDiv.innerHTML = "Deploy:"
-								effectDiv.append(...effect.card.renderDetails())
+								// effectDiv.append(...effect.card.renderDetails())
 
 							} else {
 								effectDiv.innerHTML =  escapeHtml(formatEffect(effect))
@@ -152,9 +152,7 @@ export class Card {
 	}
 
 	render(cssClass) {
-		if (!this.div) {
-			this.div = document.createElement("div");
-		}
+		this.div = document.createElement("div");
 		this.div.className = cssClass;
 		this.div.replaceChildren()
 		this.div.append(...this.renderDetails())
