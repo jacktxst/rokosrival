@@ -1,5 +1,5 @@
 // Card.js
-import {CardType, Trigger, TYPE} from "./CardDefinitions.js";
+import {CardType, Effect, Targets, Trigger, TYPE} from "./CardDefinitions.js";
 import {assert} from "./Helpers.js"
 import { capitalize, escapeHtml } from './Helpers.js'
 import { formatCost, formatTrigger, formatCard, formatEffect } from './CardFormatHelpers.js'
@@ -39,6 +39,31 @@ export class Card {
 	}
 
 	renderDetails() {
+
+		function createEffectDiv(effect, trigger, effectsDiv) {
+			const effectDiv = document.createElement("div")
+				effectDiv.style.marginTop = "5px"
+				effectDiv.style.marginLeft = "4px"
+
+				let removeEffectButton = document.createElement("button")
+				removeEffectButton.className ="cheat-button"
+				removeEffectButton.innerHTML="x"
+				removeEffectButton.addEventListener("click", (e) => {
+					trigger.effects = this.triggers.filter(item => item !== effect)
+					effectsDiv.removeChild(effectDiv)
+				})
+				effectDiv.append(removeEffectButton)
+
+				if (effect.kind === "deploySubcard") {
+
+					effectDiv.innerHTML = "Deploy:"
+					// effectDiv.append(...effect.card.renderDetails())
+
+				} else {
+					effectDiv.append (  escapeHtml(formatEffect(effect)) )
+				}
+			return effectDiv;
+		}
 
 		const title = `${capitalize(this.type.kind)} (${ this.getHeaderNumber() })`
 
@@ -101,27 +126,16 @@ export class Card {
 				let effectsDiv = document.createElement("div")
 
 					for (let effect of trigger.effects) {
-						let effectDiv = document.createElement("div")
-							effectDiv.style.marginTop = "5px"
-							effectDiv.style.marginLeft = "4px"
-
-							if (effect.kind === "deploySubcard") {
-
-								effectDiv.innerHTML = "Deploy:"
-								// effectDiv.append(...effect.card.renderDetails())
-
-							} else {
-								effectDiv.innerHTML =  escapeHtml(formatEffect(effect))
-							}
-
-						effectsDiv.append(effectDiv)
+						effectsDiv.append(createEffectDiv.bind(this)(effect,trigger,effectsDiv))
 					}
 
 				let newEffectButton = document.createElement("button")
 					newEffectButton.className="cheat-button"
 					newEffectButton.innerHTML = "+"
 					newEffectButton.addEventListener("click", ((e) => {
-
+						let effect = new Effect("destroy",1,{kind:"specified",targets:new Targets({types:["player"],alignment:"any"})})
+						trigger.effects.push(effect)
+						effectsDiv.append(createEffectDiv.bind(this)(effect,trigger,effectsDiv))
 					}).bind(this))
 
 
