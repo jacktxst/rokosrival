@@ -1,5 +1,5 @@
 // Card.js
-import { CardType, TYPE } from "./CardDefinitions.js";
+import {CardType, Trigger, TYPE} from "./CardDefinitions.js";
 import {assert} from "./Helpers.js"
 import { capitalize, escapeHtml } from './Helpers.js'
 import { formatCost, formatTrigger, formatCard, formatEffect } from './CardFormatHelpers.js'
@@ -112,6 +112,17 @@ export class Card {
 			triggersDiv.append(triggerDetails)
 		}
 
+		let newTriggerButton = document.createElement("button")
+			newTriggerButton.class = "cheat-button"
+			newTriggerButton.innerHTML = "+"
+			newTriggerButton.addEventListener("click", (e) => {
+				this.triggers.push(new Trigger({kind:"rest",effects:[]}))
+				this.div.replaceChildren()
+				this.div.append(...this.renderDetails())
+				e.preventDefault()
+			})
+		triggersDiv.append(newTriggerButton)
+
 		return [
 			titleBar,
 			cost,
@@ -121,9 +132,9 @@ export class Card {
 
 	render(cssClass) {
 		let div = document.createElement("div");
+		this.div = div;
 		div.classList.add(cssClass);
 		div.append(...this.renderDetails())
-		this.div = div;
 		return div;
 	}
 

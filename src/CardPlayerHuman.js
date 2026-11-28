@@ -24,6 +24,10 @@ export class CardPlayerHuman extends CardPlayerBase {
 				    return;
 				}
 
+				if (e.target.closest('button')) {
+					return;
+				}	
+
 				this.deployCardFromHand( i )
 				
 				
