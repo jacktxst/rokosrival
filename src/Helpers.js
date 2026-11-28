@@ -60,3 +60,10 @@ export function escapeHtml(value) {
     "'": '&#39;',
   })[character])
 }
+
+export function showCardsInDiv(cards, div, cssClass) {
+  div.replaceChildren()
+  for (let card of cards) {
+    div.appendChild(card.render(cssClass))
+  }
+}

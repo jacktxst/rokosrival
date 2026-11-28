@@ -239,72 +239,60 @@ function resolveLoop(timestamp) {
 				case "animate-effect":
 					console.log(`animate-effect ${e.effect.kind} ${e.targetList[0]?.type.kind || "none"}...`)
 					e.state = "in-progress"
+
+					let amount = e.effect.amount
+					if (e.effect.selection.kind === "split among") {
+						amount /= e.targetList.length
+					}
+
 					switch (e.effect.kind) {
 
 						case "attack": // should trigger: THORN, EXIT, GRIEVE
-							let damage = e.effect.amount
-							if (e.effect.selection.kind === "split among") {
-								damage /= e.targetList.length
-							}
 							for (let target of e.targetList) {
-								target.attack(e.originator, damage)
+								target.attack(e.originator, amount)
 							}
 							e.timeRemaining = 1000
 							break;
 						case "heal":
-							let healAmount = e.effect.amount
-							if (e.effect.selection.kind === "split among") {
-								healAmount /= e.targetList.length
-							}
 							for (let target of e.targetList) {
-								target.health += healAmount
-								e.timeRemaining = 1000
+								target.health += amount
 							}
+							e.timeRemaining = 1000
 							break;
 						case "defend":
-							let armor = e.effect.amount
-							if (e.effect.selection.kind === "split among") {
-								armor /= e.targetList.length
-							}
+
 							for (let target of e.targetList) {
-								target.shield += armor
-								e.timeRemaining = 1000
+								target.shield += amount
 							}
+							e.timeRemaining = 1000
 							break;
 						case "surge":
-							let surgeAmount = e.effect.amount
-							if (e.effect.selection.kind === "split among") {
-								surgeAmount /= e.targetList.length
-							}
+
 							for (let target of e.targetList) {
-								target.mana += surgeAmount
-								e.timeRemaining = 1000
+								target.mana += amount
+
 							}
+							e.timeRemaining = 1000
 							break;
 						case "decay":
-							let decayAmount = e.effect.amount
-							if (e.effect.selection.kind === "split among") {
-								decayAmount /= e.targetList.length
-							}
 							for (let target of e.targetList) {
-								target.mana -= decayAmount
-								e.timeRemaining = 1000
+								target.mana -= amount
+								if (target.mana <= 0) {target.fizzle()}
 							}
+							e.timeRemaining = 1000
 							break;
 						case "destroy": // can trigger: EXIT, GRIEVE
 							for (let target of e.targetList) {
-
 								target.fizzle()
-								e.timeRemaining = 1000
-
 							}
+							e.timeRemaining = 1000
 							break;
 						case "draw":
 							for (let target of e.targetList) {
 								if (target.type.kind !== "player") continue;
 								target.hand.push(...target.deck.drawCards(e.effect.amount))
-								e.timeRemaining = 1000
 							}
+							e.timeRemaining = 1000
 							break;
 						case "discard":
 							for (let target of e.targetList) {

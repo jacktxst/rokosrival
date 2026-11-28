@@ -6,7 +6,7 @@ import { formatCost, formatTrigger, formatCard, formatEffect } from './CardForma
 
 export class Card {
 
-  constructor({ id, type, costs = [], arcane = false, triggers = [], owner = { kind: "inherited" } }) {
+	constructor({ id, type, costs = [], arcane = false, triggers = [], owner = { kind: "inherited" } }) {
 		// assert(type instanceof CardType, "Card type must be a CardType instance");
 		// assert(typeof id === "string", "Card id must be a string");
 
@@ -21,60 +21,110 @@ export class Card {
 		this.arcane = Boolean(arcane);
 		this.triggers = triggers;
 		this.owner = owner;
-		
-  }
 
-  getData() {
-  	return {
-  		id: this.id,
-  		type: this.type,
-  		costs: this.costs,
-  		arcane: this.arcane,
-  		triggers: this.triggers,
-  	}
-  }
+	}
 
-  getHeaderNumber() {
-  	return this.type.initialValue
-  }
+	getData() {
+		return {
+			id: this.id,
+			type: this.type,
+			costs: this.costs,
+			arcane: this.arcane,
+			triggers: this.triggers,
+		}
+	}
 
-  renderDetailsHTML() {
-  	const title = `${capitalize(this.type.kind)} (${ this.getHeaderNumber() })`
+	getHeaderNumber() {
+		return this.type.initialValue
+	}
+
+	renderDetails() {
+
+		const title = `${capitalize(this.type.kind)} (${ this.getHeaderNumber() })`
+
+		let titleBar = document.createElement("h3")
+		titleBar.classList.add("rr-card-title")
+		titleBar.innerHTML = escapeHtml(title)
+
 		const costs = this.costs.map(formatCost)
-		const triggers = this.triggers.map((trigger) => `
-			<div>	
-				<details>
-					<summary class="trigger trigger-${trigger.kind}" > <strong>${escapeHtml(formatTrigger(trigger))}</strong> </summary>
-					${trigger.effects.length
-						? `<div>${trigger.effects.map((effect) => `
-							<div style="margin-top:5px; margin-left: 4px;"> 
-								${effect.kind === 'deploySubcard'
-									? `Deploy ${escapeHtml(capitalize(effect.card.type.kind))} ${effect.card.type.initialValue}${effect.card.renderDetailsHTML()}`
-									: escapeHtml(formatEffect(effect))}
-							</div>
-						`).join('')}</div>`
-						: '..no effects..'}
-				</details>
-			</div>
-		`).join('')
 
-		return ` 
+		let cost  = document.createElement("div")
+		cost.classList.add("rr-card-cost")
+		cost.innerHTML = `Cost: ${costs.length ? costs.map(escapeHtml).join(', ') : 'Free'}${this.arcane ? ' · Arcane' : ''}`
 
-				<h3 class="rr-card-title">${escapeHtml(title)}</h3>
-				<div class="rr-card-cost">Cost: ${costs.length ? costs.map(escapeHtml).join(', ') : 'Free'}${this.arcane ? ' · Arcane' : ''}</div>
-				${triggers ? `<div class="rr-card-triggers">${triggers}</div>` : '<div class="rr-card-triggers">No triggers</div>'}
-			
-		`
-  	}
-  
-  renderHTML() {
+		let triggersDiv = document.createElement("div")
+		triggersDiv.classList.add("rr-card-triggers")
 
-		return ` 
-			<div class="card">
+		for (let trigger of this.triggers) {
 
-					${this.renderDetailsHTML()}
+			let triggerDetails = document.createElement("details")
 
-			</div>
-		`
-  }
+
+
+				let triggerSummary = document.createElement("summary")
+					triggerSummary.classList.add("trigger")
+					triggerSummary.classList.add("trigger-"+trigger.kind)
+
+					let deleteButton = document.createElement("button")
+						deleteButton.class="cheat-button"
+						deleteButton.innerHTML="x"
+						deleteButton.addEventListener("click", ((e) => {
+							this.triggers = this.triggers.filter(item => item !== trigger)
+							triggersDiv.removeChild(triggerDetails)
+						}).bind(this))
+					let changeButton = document.createElement("button")
+			            changeButton.class="cheat-button"
+						changeButton.innerHTML=">"
+						changeButton.addEventListener("click", (e) => {})
+
+					let triggerText = document.createElement("strong")
+						triggerText.innerHTML = escapeHtml(formatTrigger(trigger))
+
+				triggerSummary.append(deleteButton,changeButton,triggerText)
+
+
+
+				let effectsDiv = document.createElement("div")
+
+					for (let effect of trigger.effects) {
+						let effectDiv = document.createElement("div")
+							effectDiv.style.marginTop = "5px"
+							effectDiv.style.marginLeft = "4px"
+
+							if (effect.kind === "deploySubcard") {
+
+								effectDiv.innerHTML = "Deploy:"
+								effectDiv.append(...effect.card.renderDetails())
+
+							} else {
+								effectDiv.innerHTML =  escapeHtml(formatEffect(effect))
+							}
+
+						effectsDiv.append(effectDiv)
+					}
+
+
+
+			triggerDetails.append(triggerSummary, effectsDiv)
+
+
+
+			triggersDiv.append(triggerDetails)
+		}
+
+		return [
+			titleBar,
+			cost,
+			triggersDiv
+		]
+	}
+
+	render(cssClass) {
+		let div = document.createElement("div");
+		div.classList.add(cssClass);
+		div.append(...this.renderDetails())
+		this.div = div;
+		return div;
+	}
+
 }

@@ -14,6 +14,8 @@
 */
 
 import {renderQueueHTML} from './ResolveCardPlay.js'
+import {setupCheats} from "./CardEditor.js";
+import {showCardsInDiv} from "./Helpers.js";
 
 export class CardGameRenderer {
 
@@ -53,15 +55,6 @@ export class CardGameRenderer {
 
 					<div id="opponent-hand">
 					
-					${(()=>{
-						let string = ""
-						for (let i=0;i<opponent.hand.length;i++) {
-							string += `
-								<div class="opponent-card"></div>
-							`
-						}
-						return string;
-					})()}
 					
 					</div>
 
@@ -74,15 +67,7 @@ export class CardGameRenderer {
 				
 	
 				<div class="deployed-cards" id="opponent-deployed-cards">
-					${(()=>{
-						let string = ""
-						for (let card of opponent.activeCards) {
-							string += `
-									${card.renderHTML()}
-							`
-						}
-						return string
-					})()}
+					
 				</div>
 	
 				<div id="frontline">
@@ -91,15 +76,7 @@ export class CardGameRenderer {
 				</div>
 	
 				<div class="deployed-cards" id="player-deployed-cards">
-					${(()=>{
-						let string = ""
-						for (let card of p1.activeCards) {
-							string += `
-									${card.renderHTML()}
-							`
-						}
-						return string
-					})()}
+					
 				</div>
 		
 				<div id="player-hud" class="shadow-bg" style="display:flex; flex-direction: row;">
@@ -109,15 +86,7 @@ export class CardGameRenderer {
 					</div>
 
 					<div id="player-hand">
-					${(()=>{
-						let string = ""
-						for (let card of p1.hand) {
-							string += `
-								${card.renderHTML()}
-							`
-						}
-						return string
-					})()}
+					
 					</div>
 
 				</div>	
@@ -125,7 +94,16 @@ export class CardGameRenderer {
 			
 		`;
 
+		showCardsInDiv(opponent.hand, document.getElementById("opponent-hand"), "opponent-card");
+		showCardsInDiv(opponent.activeCards, document.getElementById("opponent-deployed-cards"), "card");
+		showCardsInDiv(p1.activeCards, document.getElementById("player-deployed-cards"), "card");
+		showCardsInDiv(p1.hand, document.getElementById("player-hand"), "card");
+
+		// setupCheats()
+
 	}
+
+
 
 }
 
